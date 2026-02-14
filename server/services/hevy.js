@@ -1,5 +1,7 @@
 const axios = require('axios');
 const db = require('../db');
+const fs = require('fs');
+const path = require('path');
 
 const HEVY_API_BASE = 'https://api.hevyapp.com/v1';
 
@@ -49,16 +51,17 @@ const saveWorkout = (workout) => {
                 raw_data = excluded.raw_data
         `;
 
-        // Calculate volume if not provided directly (simplified)
-        // Hevy returns exercises -> sets -> weight_kg * reps
+        // Calculate volume if not provided directly
         let volume = 0;
         if (workout.exercises) {
             workout.exercises.forEach(ex => {
-                ex.sets.forEach(set => {
-                    if (set.weight_kg && set.reps) {
-                        volume += set.weight_kg * set.reps;
-                    }
-                });
+                if (ex.sets) {
+                    ex.sets.forEach(set => {
+                        if (set.weight_kg && set.reps) {
+                            volume += (set.weight_kg * set.reps);
+                        }
+                    });
+                }
             });
         }
 
@@ -85,18 +88,33 @@ const syncWorkouts = async () => {
     let page = 1;
     let syncedCount = 0;
     let hasMore = true;
-
-    // Safety limit to avoid infinite loops during dev
-    const MAX_PAGES = 5;
-
-    console.log("Starting sync...");
+    const MAX_PAGES = 100;
+    const logPath = path.join(__dirname, '../sync.log');
 
     try {
+        fs.appendFileSync(logPath, `\n--- Sync started at ${new Date().toISOString()} ---\n`);
+
         while (hasMore && page <= MAX_PAGES) {
-            const data = await fetchWorkoutsFromApi(apiKey, page, 20); // Sync 20 at a time
-            const workouts = data.workouts;
+            fs.appendFileSync(logPath, `Fetching page ${page}...\n`);
+            let data;
+            try {
+                data = await fetchWorkoutsFromApi(apiKey, page, 20);
+            } catch (fetchError) {
+                if (fetchError.message.includes('404')) {
+                    fs.appendFileSync(logPath, `Reached end of data (404). Stopping.\n`);
+                    hasMore = false;
+                    break;
+                }
+                throw fetchError;
+            }
+
+            // Handle different possible response structures
+            const workouts = Array.isArray(data) ? data : (data.workouts || []);
+
+            fs.appendFileSync(logPath, `Fetched ${workouts.length} workouts from page ${page}.\n`);
 
             if (!workouts || workouts.length === 0) {
+                fs.appendFileSync(logPath, `No more workouts found. Stopping.\n`);
                 hasMore = false;
                 break;
             }
@@ -106,20 +124,19 @@ const syncWorkouts = async () => {
                 syncedCount++;
             }
 
-            // Hevy pagination info might need checking custom logic, 
-            // usually check if returned count < requested page_size
-            if (workouts.length < 20) {
-                hasMore = false;
-            } else {
-                page++;
-            }
+            // Move to next page regardless of count, until we get 0
+            page++;
+
+            // Small delay to be nice to the API
+            await new Promise(resolve => setTimeout(resolve, 200));
         }
+
+        fs.appendFileSync(logPath, `Sync finished. Total synced in this session: ${syncedCount}\n`);
+        return { status: 'success', synced: syncedCount };
     } catch (e) {
-        console.error("Sync error:", e);
+        fs.appendFileSync(logPath, `CRITICAL SYNC ERROR: ${e.message}\n`);
         throw e;
     }
-
-    return { status: 'success', synced: syncedCount };
 };
 
 const fetchRoutinesFromApi = async (apiKey) => {
@@ -137,15 +154,12 @@ const syncRoutines = async () => {
     const apiKey = await getApiKey();
     if (!apiKey) throw new Error('Hevy API Key not found');
 
-    // For MVP, just fetch and return, or save if we had a table. 
-    // The DB init created 'routines' table, so let's save.
     const data = await fetchRoutinesFromApi(apiKey);
     const routines = data.routines;
 
     if (!routines) return { status: 'no_data' };
 
     for (const routine of routines) {
-        // Simplified upsert
         await new Promise((resolve, reject) => {
             db.run(`INSERT OR REPLACE INTO routines (id, title, raw_data) VALUES (?, ?, ?)`,
                 [routine.id, routine.title, JSON.stringify(routine)],
@@ -160,6 +174,6 @@ module.exports = {
     validateApiKey,
     fetchWorkouts: fetchWorkoutsFromApi,
     syncWorkouts,
-    fetchRoutines: fetchRoutinesFromApi, // export direct fetch if needed
+    fetchRoutines: fetchRoutinesFromApi,
     syncRoutines
 };

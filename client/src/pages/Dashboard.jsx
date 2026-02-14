@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
-import { Dumbbell, Activity, Calendar } from 'lucide-react';
-import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer } from 'recharts';
+import { Dumbbell, Activity, Calendar, RefreshCw } from 'lucide-react';
+import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, LabelList } from 'recharts';
 
 const Dashboard = () => {
     const [stats, setStats] = useState({
@@ -12,6 +12,7 @@ const Dashboard = () => {
         recentWorkouts: []
     });
     const [loading, setLoading] = useState(true);
+    const [syncing, setSyncing] = useState(false);
     const [showAllWorkouts, setShowAllWorkouts] = useState(false);
     const [showAllVolume, setShowAllVolume] = useState(false);
 
@@ -31,6 +32,20 @@ const Dashboard = () => {
         fetchStats();
     }, []);
 
+    const handleSync = async () => {
+        setSyncing(true);
+        try {
+            await axios.post('/api/hevy/sync');
+            const res = await axios.get('/api/stats');
+            console.log("Stats updated:", res.data);
+            setStats(res.data);
+        } catch (error) {
+            console.error("Failed to sync", error);
+        } finally {
+            setSyncing(false);
+        }
+    };
+
     if (loading) return <div className="loading">Cargando Panel...</div>;
 
     // Mock data for the chart if no real data
@@ -44,7 +59,17 @@ const Dashboard = () => {
 
     return (
         <div className="dashboard-page">
-            <h2>Panel de Control</h2>
+            <div className="dashboard-header">
+                <h2>Panel de Control</h2>
+                <button
+                    className={`sync-btn ${syncing ? 'spinning' : ''}`}
+                    onClick={handleSync}
+                    disabled={syncing}
+                >
+                    <RefreshCw size={18} />
+                    {syncing ? 'Sincronizando...' : 'Sincronizar Hevy'}
+                </button>
+            </div>
 
             <div className="stats-grid">
                 <div className="stat-card">
@@ -97,7 +122,15 @@ const Dashboard = () => {
                                 contentStyle={{ backgroundColor: 'var(--card-bg)', border: '1px solid var(--border-color)' }}
                                 itemStyle={{ color: 'var(--text-primary)' }}
                             />
-                            <Bar dataKey="volume" fill="var(--accent-color)" radius={[4, 4, 0, 0]} />
+                            <Bar dataKey="volume" fill="#2563eb" radius={[4, 4, 0, 0]}>
+                                <LabelList
+                                    dataKey="volume"
+                                    position="inside"
+                                    fill="white"
+                                    formatter={(value) => `${value} kg`}
+                                    style={{ fontSize: '12px', fontWeight: 'bold' }}
+                                />
+                            </Bar>
                         </BarChart>
                     </ResponsiveContainer>
                 </div>
