@@ -1,0 +1,64 @@
+const sqlite3 = require('sqlite3').verbose();
+const path = require('path');
+const fs = require('fs');
+
+// Ensure data directory exists
+const dataDir = path.join(__dirname, 'data');
+if (!fs.existsSync(dataDir)) {
+    fs.mkdirSync(dataDir);
+}
+
+const dbPath = path.join(dataDir, 'hevy_dash.db');
+const db = new sqlite3.Database(dbPath, (err) => {
+    if (err) {
+        console.error('Could not connect to database', err);
+    } else {
+        console.log('Connected to SQLite database');
+        initDb();
+    }
+});
+
+const initDb = () => {
+    db.serialize(() => {
+        // User Settings Table
+        db.run(`
+      CREATE TABLE IF NOT EXISTS user_settings (
+        id INTEGER PRIMARY KEY CHECK (id = 1),
+        hevy_api_key TEXT,
+        openai_api_key TEXT,
+        age INTEGER,
+        gender TEXT,
+        weight REAL,
+        goal TEXT,
+        updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
+      )
+    `);
+
+        db.run(`INSERT OR IGNORE INTO user_settings (id) VALUES (1)`);
+
+        // Workouts Table
+        db.run(`
+      CREATE TABLE IF NOT EXISTS workouts (
+        id TEXT PRIMARY KEY,
+        title TEXT,
+        start_time DATETIME,
+        end_time DATETIME,
+        volume_kg REAL,
+        raw_data JSON,
+        created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+      )
+    `);
+
+        // Routines Table
+        db.run(`
+      CREATE TABLE IF NOT EXISTS routines (
+        id TEXT PRIMARY KEY,
+        title TEXT,
+        raw_data JSON,
+        created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+      )
+    `);
+    });
+};
+
+module.exports = db;

@@ -1,0 +1,30 @@
+.analytics-page {
+    display: flex;
+    flex-direction: column;
+    gap: 30px;
+}
+
+.analytics-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+    gap: 20px;
+}
+
+.chart-card {
+    background-color: #1e1e1e;
+    padding: 20px;
+    border-radius: 12px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+}
+
+.chart-card h3 {
+    margin-top: 0;
+    margin-bottom: 20px;
+    color: #bb86fc;
+}
+
+.insight-section {
+    background-color: #1e1e1e;
+    padding: 20px;
+    border-radius: 12px;
+}

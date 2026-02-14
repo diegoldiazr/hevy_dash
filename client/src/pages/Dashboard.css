@@ -1,0 +1,73 @@
+.dashboard-page {
+    display: flex;
+    flex-direction: column;
+    gap: 30px;
+}
+
+.stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 20px;
+}
+
+.stat-card {
+    background-color: #1e1e1e;
+    padding: 20px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+}
+
+.icon-wrapper {
+    background-color: rgba(187, 134, 252, 0.1);
+    color: #bb86fc;
+    padding: 15px;
+    border-radius: 50%;
+    display: flex;
+}
+
+.stat-info h3 {
+    margin: 0;
+    font-size: 1.8rem;
+    color: white;
+}
+
+.stat-info p {
+    margin: 5px 0 0;
+    color: #888;
+}
+
+.chart-section {
+    background-color: #1e1e1e;
+    padding: 20px;
+    border-radius: 12px;
+}
+
+.chart-container {
+    margin-top: 20px;
+}
+
+.recent-list {
+    background-color: #1e1e1e;
+    padding: 20px;
+    border-radius: 12px;
+}
+
+.workout-item {
+    display: flex;
+    justify-content: space-between;
+    padding: 15px 0;
+    border-bottom: 1px solid #333;
+    color: #e0e0e0;
+}
+
+.workout-item:last-child {
+    border-bottom: none;
+}
+
+.no-data {
+    color: #888;
+    font-style: italic;
+}

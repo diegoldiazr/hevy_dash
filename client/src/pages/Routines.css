@@ -1,0 +1,107 @@
+.routines-page {
+    max-width: 900px;
+    margin: 0 auto;
+}
+
+.routine-card {
+    background-color: #1e1e1e;
+    border-radius: 12px;
+    margin-bottom: 20px;
+    overflow: hidden;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+}
+
+.routine-header {
+    padding: 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background-color: #252525;
+}
+
+.title-section h3 {
+    margin: 0;
+    color: #03dac6;
+}
+
+.exercise-count {
+    color: #888;
+    font-size: 0.9rem;
+}
+
+.actions {
+    display: flex;
+    gap: 10px;
+}
+
+.analyze-btn {
+    background-color: #3700b3;
+    color: white;
+    border: none;
+    padding: 8px 12px;
+    border-radius: 6px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 0.9rem;
+    transition: background 0.2s;
+}
+
+.analyze-btn:hover:not(:disabled) {
+    background-color: #6200ea;
+}
+
+.expand-btn {
+    background: none;
+    border: none;
+    color: #aaa;
+    cursor: pointer;
+}
+
+.routine-details {
+    padding: 20px;
+    border-top: 1px solid #333;
+}
+
+.exercises-list ul {
+    list-style: none;
+    padding: 0;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 10px;
+}
+
+.exercises-list li {
+    background-color: #2c2c2c;
+    padding: 8px 12px;
+    border-radius: 4px;
+    font-size: 0.95rem;
+}
+
+.sets-info {
+    color: #888;
+    font-size: 0.85rem;
+}
+
+.ai-analysis {
+    margin-top: 20px;
+    background-color: rgba(187, 134, 252, 0.1);
+    border: 1px solid #bb86fc;
+    padding: 15px;
+    border-radius: 8px;
+    color: #e0e0e0;
+}
+
+.ai-analysis h4 {
+    margin-top: 0;
+    color: #bb86fc;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.ai-analysis p {
+    white-space: pre-wrap;
+    line-height: 1.5;
+}
