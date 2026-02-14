@@ -1,9 +1,10 @@
 import React from 'react'
-import { BrowserRouter as Router, Routes, Route, Link } from 'react-router-dom';
-import { LayoutDashboard, Dumbbell, TrendingUp, Notebook, BarChart2, MessageSquare, Settings as SettingsIcon } from 'lucide-react';
+import { BrowserRouter as Router, Routes, Route, NavLink } from 'react-router-dom';
+import { LayoutDashboard, Dumbbell, TrendingUp, Notebook, BarChart2, MessageSquare, Settings as SettingsIcon, ChevronLeft } from 'lucide-react';
 
 import Settings from './pages/Settings';
 import './pages/Settings.css';
+import './App.css'; // Global Layout Styles
 
 import Coach from './pages/Coach';
 import './pages/Coach.css';
@@ -27,26 +28,63 @@ import './pages/Analytics.css';
 // const DashboardPlaceholder = () => <h2>Dashboard</h2>;
 // const WorkoutsPlaceholder = () => <h2>Workouts</h2>;
 // const ProgressionPlaceholder = () => <h2>Progression</h2>;
-// const RoutinesPlaceholder = () => <h2>Routines</h2>;
+// const RoutinesPlaceholder = () => <h2>Rutinas</h2>;
 // const AnalyticsPlaceholder = () => <h2>Analytics</h2>;
 const CoachAI = Coach;
 
 function App() {
+    const [isCollapsed, setIsCollapsed] = React.useState(false);
+
     return (
         <Router>
-            <div className="app-container">
+            <div className={`app-container ${isCollapsed ? 'collapsed' : ''}`}>
                 <nav className="sidebar">
-                    <div className="logo">HevyDash</div>
-                    <ul className="nav-links">
-                        <li><Link to="/"><LayoutDashboard size={20} /> Dashboard</Link></li>
-                        <li><Link to="/workouts"><Dumbbell size={20} /> Workouts</Link></li>
-                        <li><Link to="/progression"><TrendingUp size={20} /> Progression</Link></li>
-                        <li><Link to="/routines"><Notebook size={20} /> Routines</Link></li>
-                        <li><Link to="/analytics"><BarChart2 size={20} /> Analytics</Link></li>
-                        <li><Link to="/coach"><MessageSquare size={20} /> Coach AI</Link></li>
-                        <li className="settings-link"><Link to="/settings"><SettingsIcon size={20} /> Settings</Link></li>
-                    </ul>
+                    <div className="logo-container">
+                        <div className="logo-text">{isCollapsed ? 'HD' : 'HEVY DASH'}</div>
+                    </div>
+
+                    <div className="sidebar-nav">
+                        <NavLink to="/" className={({ isActive }) => `nav-item ${isActive ? 'active' : ''}`} title="Panel de Control">
+                            <LayoutDashboard className="nav-icon" size={22} />
+                            {!isCollapsed && <span className="nav-text">Panel de Control</span>}
+                        </NavLink>
+
+                        <NavLink to="/workouts" className={({ isActive }) => `nav-item ${isActive ? 'active' : ''}`} title="Entrenamientos">
+                            <Dumbbell className="nav-icon" size={22} />
+                            {!isCollapsed && <span className="nav-text">Entrenamientos</span>}
+                        </NavLink>
+
+                        <NavLink to="/progression" className={({ isActive }) => `nav-item ${isActive ? 'active' : ''}`} title="Progresión">
+                            <TrendingUp className="nav-icon" size={22} />
+                            {!isCollapsed && <span className="nav-text">Progresión</span>}
+                        </NavLink>
+
+                        <NavLink to="/routines" className={({ isActive }) => `nav-item ${isActive ? 'active' : ''}`} title="Rutinas">
+                            <Notebook className="nav-icon" size={22} />
+                            {!isCollapsed && <span className="nav-text">Rutinas</span>}
+                        </NavLink>
+
+                        <NavLink to="/analytics" className={({ isActive }) => `nav-item ${isActive ? 'active' : ''}`} title="Análisis">
+                            <BarChart2 className="nav-icon" size={22} />
+                            {!isCollapsed && <span className="nav-text">Análisis</span>}
+                        </NavLink>
+
+                        <NavLink to="/coach" className={({ isActive }) => `nav-item ${isActive ? 'active' : ''}`} title="Entrenador AI">
+                            <MessageSquare className="nav-icon" size={22} />
+                            {!isCollapsed && <span className="nav-text">Entrenador AI</span>}
+                        </NavLink>
+
+                        <div style={{ marginTop: 'auto' }}>
+                            <NavLink to="/settings" className={({ isActive }) => `nav-item ${isActive ? 'active' : ''}`} title="Ajustes">
+                                <SettingsIcon className="nav-icon" size={22} />
+                                {!isCollapsed && <span className="nav-text">Ajustes</span>}
+                            </NavLink>
+                        </div>
+                    </div>
                 </nav>
+                <button className="collapse-btn" onClick={() => setIsCollapsed(!isCollapsed)}>
+                    <ChevronLeft size={14} />
+                </button>
                 <main className="content">
                     <Routes>
                         <Route path="/" element={<Dashboard />} />

@@ -21,7 +21,7 @@ const Workouts = () => {
             setWorkouts(res.data);
             setError(null);
         } catch (err) {
-            setError('Failed to load workouts');
+            setError('Error al cargar los entrenamientos');
             console.error(err);
         } finally {
             setLoading(false);
@@ -37,7 +37,7 @@ const Workouts = () => {
             fetchWorkouts();
         } catch (err) {
             console.error("Sync failed", err);
-            setError('Sync failed. Check API Key in Settings.');
+            setError('Sincronización fallida. Revisa la API Key en Ajustes.');
         } finally {
             setSyncing(false);
         }
@@ -57,25 +57,25 @@ const Workouts = () => {
     return (
         <div className="workouts-page">
             <div className="header">
-                <h2>Workouts</h2>
+                <h2>Entrenamientos</h2>
                 <button
                     className={`sync-btn ${syncing ? 'spinning' : ''}`}
                     onClick={handleSync}
                     disabled={syncing}
                 >
                     <RefreshCw size={18} />
-                    {syncing ? 'Syncing...' : 'Sync Hevy Data'}
+                    {syncing ? 'Sincronizando...' : 'Sincronizar datos de Hevy'}
                 </button>
             </div>
 
             {error && <div className="error-banner">{error}</div>}
 
             {loading && workouts.length === 0 ? (
-                <div className="loading">Loading workouts...</div>
+                <div className="loading">Cargando entrenamientos...</div>
             ) : (
                 <div className="workouts-list">
                     {workouts.length === 0 ? (
-                        <div className="empty-state">No workouts found. Try syncing!</div>
+                        <div className="empty-state">No se encontraron entrenamientos. ¡Intenta sincronizar!</div>
                     ) : (
                         workouts.map(workout => (
                             <div key={workout.id} className="workout-card">
@@ -89,14 +89,14 @@ const Workouts = () => {
                                 <div className="workout-stats">
                                     <div className="stat">
                                         <Dumbbell size={16} />
-                                        <span>{workout.volume_kg} kg Volume</span>
+                                        <span>{workout.volume_kg} kg de Volumen</span>
                                     </div>
                                     <div className="stat">
                                         <Clock size={16} />
                                         <span>{formatDuration(workout.start_time, workout.end_time)}</span>
                                     </div>
                                     <div className="stat">
-                                        <span>{workout.raw_data.exercise_count || workout.raw_data.exercises?.length || 0} Exercises</span>
+                                        <span>{workout.raw_data.exercise_count || workout.raw_data.exercises?.length || 0} Ejercicios</span>
                                     </div>
                                 </div>
                                 {/* Expandable details could go here */}
@@ -107,9 +107,9 @@ const Workouts = () => {
             )}
 
             <div className="pagination">
-                <button disabled={page === 1} onClick={() => setPage(p => p - 1)}>Prev</button>
-                <span>Page {page}</span>
-                <button onClick={() => setPage(p => p + 1)}>Next</button>
+                <button disabled={page === 1} onClick={() => setPage(p => p - 1)}>Anterior</button>
+                <span>Página {page}</span>
+                <button onClick={() => setPage(p => p + 1)}>Siguiente</button>
             </div>
         </div>
     );

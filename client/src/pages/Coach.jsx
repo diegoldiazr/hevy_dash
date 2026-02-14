@@ -4,7 +4,7 @@ import { Send, User, Bot } from 'lucide-react';
 
 const Coach = () => {
     const [messages, setMessages] = useState([
-        { role: 'system', content: 'Hello! I am your AI Coach. How can I help you with your training today?' }
+        { role: 'system', content: '¡Hola! Soy tu Entrenador AI. ¿En qué puedo ayudarte con tu entrenamiento hoy?' }
     ]);
     const [input, setInput] = useState('');
     const [loading, setLoading] = useState(false);
@@ -41,7 +41,7 @@ const Coach = () => {
             setMessages(prev => [...prev, botMessage]);
         } catch (error) {
             console.error(error);
-            setMessages(prev => [...prev, { role: 'system', content: 'Sorry, I encountered an error communicating with the server.' }]);
+            setMessages(prev => [...prev, { role: 'system', content: 'Lo siento, he encontrado un error al comunicarme con el servidor.' }]);
         } finally {
             setLoading(false);
         }
@@ -49,7 +49,7 @@ const Coach = () => {
 
     return (
         <div className="coach-page">
-            <h2>AI Personal Coach</h2>
+            <h2>Entrenador Personal AI</h2>
             <div className="chat-container">
                 <div className="messages-list">
                     {messages.map((msg, idx) => (
@@ -65,7 +65,7 @@ const Coach = () => {
                     {loading && (
                         <div className="message-bubble assistant loading">
                             <div className="avatar"><Bot size={18} /></div>
-                            <div className="content">Thinking...</div>
+                            <div className="content">Pensando...</div>
                         </div>
                     )}
                     <div ref={messagesEndRef} />
@@ -76,7 +76,7 @@ const Coach = () => {
                         type="text"
                         value={input}
                         onChange={(e) => setInput(e.target.value)}
-                        placeholder="Ask about your workout, form, or nutrition..."
+                        placeholder="Pregunta sobre tu entrenamiento, técnica o nutrición..."
                         disabled={loading}
                     />
                     <button type="submit" disabled={loading || !input.trim()}>

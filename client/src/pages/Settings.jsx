@@ -57,11 +57,11 @@ const Settings = () => {
         }
     };
 
-    if (loading) return <div>Loading...</div>;
+    if (loading) return <div>Cargando...</div>;
 
     return (
         <div className="settings-page">
-            <h2>App Settings</h2>
+            <h2>Ajustes de la Aplicación</h2>
 
             {message && (
                 <div className={`message ${message.type}`}>
@@ -72,7 +72,7 @@ const Settings = () => {
 
             <form onSubmit={handleSubmit} className="settings-form">
                 <section className="settings-section">
-                    <h3>API Integrations</h3>
+                    <h3>Integraciones API</h3>
                     <div className="form-group">
                         <label>Hevy API Key</label>
                         <input
@@ -80,9 +80,9 @@ const Settings = () => {
                             name="hevy_api_key"
                             value={formData.hevy_api_key}
                             onChange={handleChange}
-                            placeholder="Start with 'hv_...'"
+                            placeholder="Empieza por 'hv_...'"
                         />
-                        <small>Required to fetch your workouts.</small>
+                        <small>Necesaria para obtener tus entrenamientos.</small>
                     </div>
                     <div className="form-group">
                         <label>OpenAI/Gemini API Key</label>
@@ -93,45 +93,45 @@ const Settings = () => {
                             onChange={handleChange}
                             placeholder="sk-..."
                         />
-                        <small>Required for Coach AI.</small>
+                        <small>Necesaria para el Entrenador AI.</small>
                     </div>
                 </section>
 
                 <section className="settings-section">
-                    <h3>Personal Stats</h3>
+                    <h3>Datos Personales</h3>
                     <div className="row">
                         <div className="form-group">
-                            <label>Age</label>
+                            <label>Edad</label>
                             <input type="number" name="age" value={formData.age} onChange={handleChange} />
                         </div>
                         <div className="form-group">
-                            <label>Gender</label>
+                            <label>Género</label>
                             <select name="gender" value={formData.gender} onChange={handleChange}>
-                                <option value="male">Male</option>
-                                <option value="female">Female</option>
-                                <option value="other">Other</option>
+                                <option value="male">Masculino</option>
+                                <option value="female">Femenino</option>
+                                <option value="other">Otro</option>
                             </select>
                         </div>
                         <div className="form-group">
-                            <label>Weight (kg)</label>
+                            <label>Peso (kg)</label>
                             <input type="number" step="0.1" name="weight" value={formData.weight} onChange={handleChange} />
                         </div>
                     </div>
                     <div className="form-group">
-                        <label>Goal</label>
+                        <label>Objetivo</label>
                         <textarea
                             name="goal"
                             value={formData.goal}
                             onChange={handleChange}
                             rows="3"
-                            placeholder="e.g. Increase bench press to 100kg, lose 5kg body fat..."
+                            placeholder="ej. Aumentar press de banca a 100kg, perder 5kg de grasa corporal..."
                         />
                     </div>
                 </section>
 
                 <button type="submit" className="save-btn" disabled={saving}>
                     <Save size={18} />
-                    {saving ? 'Saving...' : 'Save Settings'}
+                    {saving ? 'Guardando...' : 'Guardar Ajustes'}
                 </button>
             </form>
         </div>

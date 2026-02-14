@@ -49,16 +49,16 @@ const Progression = () => {
 
     return (
         <div className="progression-page">
-            <h2>Progression Analysis</h2>
+            <h2>Análisis de Progresión</h2>
 
             <div className="controls">
-                <label>Select Exercise:</label>
+                <label>Seleccionar Ejercicio:</label>
                 <select
                     value={selectedExercise}
                     onChange={(e) => setSelectedExercise(e.target.value)}
                     disabled={exercises.length === 0}
                 >
-                    {exercises.length === 0 && <option>No exercises found</option>}
+                    {exercises.length === 0 && <option>No se encontraron ejercicios</option>}
                     {exercises.map(ex => (
                         <option key={ex} value={ex}>{ex}</option>
                     ))}
@@ -66,53 +66,53 @@ const Progression = () => {
             </div>
 
             {loading ? (
-                <div className="loading">Loading data...</div>
+                <div className="loading">Cargando datos...</div>
             ) : history.length === 0 ? (
-                <div className="empty-state">No history available for this exercise.</div>
+                <div className="empty-state">No hay historial disponible para este ejercicio.</div>
             ) : (
                 <div className="analysis-content">
                     <div className="chart-section">
-                        <h3>1RM / Max Weight Progression</h3>
+                        <h3>Progresión de 1RM / Peso Máximo</h3>
                         <div className="chart-container">
                             <ResponsiveContainer width="100%" height={300}>
                                 <LineChart data={history}>
-                                    <CartesianGrid strokeDasharray="3 3" stroke="#333" />
-                                    <XAxis dataKey="date" stroke="#888" />
-                                    <YAxis stroke="#888" />
-                                    <Tooltip contentStyle={{ backgroundColor: '#222', border: '1px solid #444' }} />
+                                    <CartesianGrid strokeDasharray="3 3" stroke="var(--border-color)" />
+                                    <XAxis dataKey="date" stroke="var(--text-secondary)" />
+                                    <YAxis stroke="var(--text-secondary)" />
+                                    <Tooltip contentStyle={{ backgroundColor: 'var(--card-bg)', border: '1px solid var(--border-color)', color: 'var(--text-primary)' }} />
                                     <Legend />
-                                    <Line type="monotone" dataKey="maxWeight" stroke="#03dac6" strokeWidth={2} activeDot={{ r: 6 }} name="Max Weight (kg)" />
+                                    <Line type="monotone" dataKey="maxWeight" stroke="var(--accent-color)" strokeWidth={2} activeDot={{ r: 6 }} name="Peso Máximo (kg)" />
                                 </LineChart>
                             </ResponsiveContainer>
                         </div>
                     </div>
 
                     <div className="chart-section">
-                        <h3>Volume Progression</h3>
+                        <h3>Progresión de Volumen</h3>
                         <div className="chart-container">
                             <ResponsiveContainer width="100%" height={300}>
                                 <LineChart data={history}>
-                                    <CartesianGrid strokeDasharray="3 3" stroke="#333" />
-                                    <XAxis dataKey="date" stroke="#888" />
-                                    <YAxis stroke="#888" />
-                                    <Tooltip contentStyle={{ backgroundColor: '#222', border: '1px solid #444' }} />
+                                    <CartesianGrid strokeDasharray="3 3" stroke="var(--border-color)" />
+                                    <XAxis dataKey="date" stroke="var(--text-secondary)" />
+                                    <YAxis stroke="var(--text-secondary)" />
+                                    <Tooltip contentStyle={{ backgroundColor: 'var(--card-bg)', border: '1px solid var(--border-color)', color: 'var(--text-primary)' }} />
                                     <Legend />
-                                    <Line type="monotone" dataKey="volume" stroke="#bb86fc" strokeWidth={2} name="Total Volume (kg)" />
+                                    <Line type="monotone" dataKey="volume" stroke="#10b981" strokeWidth={2} name="Volumen Total (kg)" />
                                 </LineChart>
                             </ResponsiveContainer>
                         </div>
                     </div>
 
                     <div className="muscle-guide" style={{ marginTop: '30px' }}>
-                        <h3>Form & Muscle Engagement</h3>
+                        <h3>Técnica y Compromiso Muscular</h3>
                         <div className="muscle-card">
                             <Target size={40} className="muscle-icon" />
                             <div className="muscle-info">
                                 <h4>{selectedExercise}</h4>
-                                <p>To perform this exercise correctly, maintain a stable core and controlled movement. Focus on the target muscle group.</p>
+                                <p>Para realizar este ejercicio correctamente, mantén el núcleo estable y un movimiento controlado. Concéntrate en el grupo muscular objetivo.</p>
                                 {/* Placeholder for real muscle map */}
                                 <div className="muscle-map-placeholder">
-                                    [Muscle Map Visualization Placeholder]
+                                    [Visualización del Mapa Muscular]
                                 </div>
                             </div>
                         </div>

@@ -45,7 +45,7 @@ const Routines = () => {
             setExpanded(prev => ({ ...prev, [id]: true }));
         } catch (err) {
             console.error("Analysis failed", err);
-            alert("Failed to analyze routine. Check OpenAI Key.");
+            alert("Error al analizar la rutina. Revisa la OpenAI Key en Ajustes.");
         } finally {
             setAnalyzing(null);
         }
@@ -58,27 +58,27 @@ const Routines = () => {
     return (
         <div className="routines-page">
             <div className="header">
-                <h2>My Routines</h2>
+                <h2>Mis Rutinas</h2>
                 <button
                     className={`sync-btn ${syncing ? 'spinning' : ''}`}
                     onClick={handleSync}
                     disabled={syncing}
                 >
                     <RefreshCw size={18} />
-                    {syncing ? 'Syncing...' : 'Sync Routines'}
+                    {syncing ? 'Sincronizando...' : 'Sincronizar Rutinas'}
                 </button>
             </div>
 
-            {loading ? <div className="loading">Loading routines...</div> : (
+            {loading ? <div className="loading">Cargando rutinas...</div> : (
                 <div className="routines-list">
-                    {routines.length === 0 ? <div className="empty-state">No routines found. Sync to import from Hevy.</div> : (
+                    {routines.length === 0 ? <div className="empty-state">No se encontraron rutinas. Sincroniza para importar desde Hevy.</div> : (
                         routines.map(routine => (
                             <div key={routine.id} className="routine-card">
                                 <div className="routine-header">
                                     <div className="title-section">
                                         <h3>{routine.title}</h3>
                                         <span className="exercise-count">
-                                            {routine.raw_data.exercises ? routine.raw_data.exercises.length : 0} Exercises
+                                            {routine.raw_data.exercises ? routine.raw_data.exercises.length : 0} Ejercicios
                                         </span>
                                     </div>
                                     <div className="actions">
@@ -88,7 +88,7 @@ const Routines = () => {
                                             disabled={analyzing === routine.id}
                                         >
                                             <BrainCircuit size={16} />
-                                            {analyzing === routine.id ? 'Thinking...' : 'Analyze'}
+                                            {analyzing === routine.id ? 'Pensando...' : 'Analizar'}
                                         </button>
                                         <button className="expand-btn" onClick={() => toggleExpand(routine.id)}>
                                             {expanded[routine.id] ? <ChevronUp size={20} /> : <ChevronDown size={20} />}
@@ -99,16 +99,16 @@ const Routines = () => {
                                 {expanded[routine.id] && (
                                     <div className="routine-details">
                                         <div className="exercises-list">
-                                            <h4>Exercises:</h4>
+                                            <h4>Ejercicios:</h4>
                                             <ul>
                                                 {routine.raw_data.exercises && routine.raw_data.exercises.map((ex, idx) => (
-                                                    <li key={idx}>{ex.title} <span className="sets-info">({ex.sets.length} sets)</span></li>
+                                                    <li key={idx}>{ex.title} <span className="sets-info">({ex.sets.length} series)</span></li>
                                                 ))}
                                             </ul>
                                         </div>
                                         {analyses[routine.id] && (
                                             <div className="ai-analysis">
-                                                <h4><BrainCircuit size={16} /> AI Analysis:</h4>
+                                                <h4><BrainCircuit size={16} /> Análisis de IA:</h4>
                                                 <p>{analyses[routine.id]}</p>
                                             </div>
                                         )}

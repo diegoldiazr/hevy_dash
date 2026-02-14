@@ -1,30 +1,93 @@
+/* Analytics Dashboard */
 .analytics-page {
     display: flex;
     flex-direction: column;
-    gap: 30px;
+    gap: 32px;
+    animation: fadeIn 0.4s ease-out;
 }
 
+/* Charts Grid */
 .analytics-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
-    gap: 20px;
+    grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+    gap: 32px;
 }
 
+/* Chart Card */
 .chart-card {
-    background-color: #1e1e1e;
-    padding: 20px;
-    border-radius: 12px;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+    background: var(--bg-card);
+    border: 1px solid var(--border-subtle);
+    border-radius: var(--radius-lg);
+    padding: 32px;
+    box-shadow: var(--shadow-sm);
+    transition: transform 0.2s, box-shadow 0.2s;
+    position: relative;
+    overflow: hidden;
+}
+
+.chart-card:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-md);
+    border-color: var(--primary);
 }
 
 .chart-card h3 {
-    margin-top: 0;
-    margin-bottom: 20px;
-    color: #bb86fc;
+    font-family: 'Outfit', sans-serif;
+    font-size: 1.4rem;
+    font-weight: 700;
+    margin-bottom: 24px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    color: var(--text-main);
+    border-bottom: 1px solid var(--border-subtle);
+    padding-bottom: 12px;
 }
 
+/* Insight Card */
 .insight-section {
-    background-color: #1e1e1e;
-    padding: 20px;
-    border-radius: 12px;
+    background: var(--bg-card);
+    border: 1px solid var(--border-subtle);
+    border-left: 4px solid var(--primary);
+    /* Accent line */
+    border-radius: var(--radius-md);
+    padding: 32px;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
+    margin-top: 16px;
+}
+
+.insight-section h3 {
+    font-size: 1.6rem;
+    font-weight: 700;
+    color: var(--primary);
+    margin-bottom: 16px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.insight-section p {
+    font-size: 1.1rem;
+    line-height: 1.6;
+    color: var(--text-muted);
+    max-width: 800px;
+}
+
+/* Chart Customization Override */
+.recharts-legend-item-text {
+    color: var(--text-dim) !important;
+    font-size: 0.9rem !important;
+}
+
+.recharts-tooltip-cursor {
+    fill: rgba(88, 101, 242, 0.1) !important;
+}
+
+.recharts-tooltip-wrapper {
+    background: var(--bg-card-hover) !important;
+    border: 1px solid var(--border-subtle) !important;
+    border-radius: 8px !important;
+    box-shadow: var(--shadow-lg) !important;
+    padding: 8px 12px !important;
+    color: var(--text-main) !important;
 }
