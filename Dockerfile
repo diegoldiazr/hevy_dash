@@ -13,9 +13,11 @@ COPY server/package*.json ./server/
 WORKDIR /app/server
 RUN npm install --production
 
-# Copy built frontend assets to server
-COPY --from=client-build /app/client/dist /app/server/public
+# Copy server code
 COPY server/ ./
+
+# Copy built frontend assets to server (comes after server code to ensure public/ is fresh)
+COPY --from=client-build /app/client/dist /app/server/public
 
 # Create directory for SQLite db
 RUN mkdir -p /app/server/data

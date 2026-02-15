@@ -243,17 +243,25 @@ const fetchRoutinesFromApi = async (apiKey) => {
     let page = 1;
     let hasMore = true;
     try {
-        while (hasMore && page <= 20) {
-            const response = await axios.get(`${HEVY_API_BASE}/routines`, {
-                headers: { 'api-key': apiKey },
-                params: { page, page_size: 50 }
-            });
-            const routines = response.data.routines || [];
-            allRoutines = allRoutines.concat(routines);
-            if (routines.length < 50) {
-                hasMore = false;
-            } else {
-                page++;
+        while (hasMore && page <= 50) {
+            try {
+                const response = await axios.get(`${HEVY_API_BASE}/routines`, {
+                    headers: { 'api-key': apiKey },
+                    params: { page, page_size: 10 }
+                });
+                const routines = response.data.routines || [];
+                if (routines.length === 0) {
+                    hasMore = false;
+                } else {
+                    allRoutines = allRoutines.concat(routines);
+                    page++;
+                }
+            } catch (error) {
+                if (error.response && error.response.status === 404) {
+                    hasMore = false;
+                    break;
+                }
+                throw error;
             }
         }
         return { routines: allRoutines };
@@ -267,17 +275,25 @@ const fetchRoutineFoldersFromApi = async (apiKey) => {
     let page = 1;
     let hasMore = true;
     try {
-        while (hasMore && page <= 5) {
-            const response = await axios.get(`${HEVY_API_BASE}/routine_folders`, {
-                headers: { 'api-key': apiKey },
-                params: { page, page_size: 100 }
-            });
-            const folders = response.data.routine_folders || [];
-            allFolders = allFolders.concat(folders);
-            if (folders.length < 100) {
-                hasMore = false;
-            } else {
-                page++;
+        while (hasMore && page <= 20) {
+            try {
+                const response = await axios.get(`${HEVY_API_BASE}/routine_folders`, {
+                    headers: { 'api-key': apiKey },
+                    params: { page, page_size: 10 }
+                });
+                const folders = response.data.routine_folders || [];
+                if (folders.length === 0) {
+                    hasMore = false;
+                } else {
+                    allFolders = allFolders.concat(folders);
+                    page++;
+                }
+            } catch (error) {
+                if (error.response && error.response.status === 404) {
+                    hasMore = false;
+                    break;
+                }
+                throw error;
             }
         }
         return { routine_folders: allFolders };
