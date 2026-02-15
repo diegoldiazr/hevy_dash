@@ -13,11 +13,17 @@ const Progression = () => {
     useEffect(() => {
         const fetchExercises = async () => {
             try {
-                const res = await axios.get('/api/exercises');
+                const res = await axios.get(`/api/exercises?period=${timePeriod}`);
                 setExercises(res.data);
+
+                // If there are exercises and the currently selected one is not in the new list,
+                // or if no exercise was selected yet, select the first one.
                 if (res.data.length > 0) {
-                    setSelectedExercise(res.data[0]);
+                    if (!res.data.includes(selectedExercise)) {
+                        setSelectedExercise(res.data[0]);
+                    }
                 } else {
+                    setSelectedExercise('');
                     setLoading(false);
                 }
             } catch (err) {
@@ -26,7 +32,7 @@ const Progression = () => {
             }
         };
         fetchExercises();
-    }, []);
+    }, [timePeriod]);
 
     useEffect(() => {
         if (!selectedExercise) return;

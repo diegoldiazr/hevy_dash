@@ -4,7 +4,23 @@ const db = require('../db');
 
 // Get list of all exercises found in workouts
 router.get('/', (req, res) => {
-    const sql = `SELECT raw_data FROM workouts`;
+    const period = req.query.period || 'all'; // 'month', 'year', 'all'
+
+    // Calculate date filter
+    let dateFilter = '';
+    const now = new Date();
+
+    if (period === 'month') {
+        const monthAgo = new Date(now);
+        monthAgo.setMonth(monthAgo.getMonth() - 1);
+        dateFilter = ` WHERE start_time >= '${monthAgo.toISOString()}'`;
+    } else if (period === 'year') {
+        const yearAgo = new Date(now);
+        yearAgo.setFullYear(yearAgo.getFullYear() - 1);
+        dateFilter = ` WHERE start_time >= '${yearAgo.toISOString()}'`;
+    }
+
+    const sql = `SELECT raw_data FROM workouts${dateFilter}`;
 
     db.all(sql, [], (err, rows) => {
         if (err) return res.status(500).json({ error: err.message });
