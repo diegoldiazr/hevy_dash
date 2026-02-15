@@ -85,12 +85,16 @@ const Progression = () => {
                                     <span className="value">{history[history.length - 1].workoutTitle}</span>
                                 </div>
                                 <div className="session-info-item">
-                                    <span className="label">Rutina</span>
+                                    <span className="label">Carpeta</span>
                                     <span className="value">{history[history.length - 1].routineTitle}</span>
                                 </div>
                                 <div className="session-info-item">
                                     <span className="label">E1RM</span>
                                     <span className="value">{history[history.length - 1].e1rm} kg</span>
+                                </div>
+                                <div className="session-info-item">
+                                    <span className="label">Reps Totales</span>
+                                    <span className="value">{history[history.length - 1].totalReps}</span>
                                 </div>
                             </div>
 
@@ -135,7 +139,7 @@ const Progression = () => {
                     </div>
 
                     <div className="chart-section">
-                        <h3>Progresión de Volumen</h3>
+                        <h3>Progresión de Volumen (Peso × Reps)</h3>
                         <div className="chart-container">
                             <ResponsiveContainer width="100%" height={300}>
                                 <LineChart data={history}>
@@ -155,6 +159,34 @@ const Progression = () => {
                                         dot={{ r: 4, fill: '#10B981' }}
                                         activeDot={{ r: 8, stroke: '#FFFFFF', strokeWidth: 2 }}
                                         name="Volumen Total (kg)"
+                                        connectNulls={true}
+                                    />
+                                </LineChart>
+                            </ResponsiveContainer>
+                        </div>
+                    </div>
+
+                    <div className="chart-section">
+                        <h3>Progresión de Repeticiones Totales</h3>
+                        <div className="chart-container">
+                            <ResponsiveContainer width="100%" height={300}>
+                                <LineChart data={history}>
+                                    <CartesianGrid strokeDasharray="3 3" stroke="var(--border-subtle)" vertical={false} />
+                                    <XAxis dataKey="date" stroke="var(--text-muted)" tick={{ fontSize: 10 }} />
+                                    <YAxis stroke="var(--text-muted)" tick={{ fontSize: 10 }} />
+                                    <Tooltip
+                                        contentStyle={{ backgroundColor: 'var(--bg-card)', border: '1px solid var(--border-subtle)', borderRadius: '8px' }}
+                                        itemStyle={{ color: 'var(--text-main)' }}
+                                    />
+                                    <Legend />
+                                    <Line
+                                        type="monotone"
+                                        dataKey="totalReps"
+                                        stroke="#F59E0B"
+                                        strokeWidth={3}
+                                        dot={{ r: 4, fill: '#F59E0B' }}
+                                        activeDot={{ r: 8, stroke: '#FFFFFF', strokeWidth: 2 }}
+                                        name="Repeticiones Totales"
                                         connectNulls={true}
                                     />
                                 </LineChart>

@@ -222,11 +222,6 @@ const Dashboard = () => {
                                     fill="var(--primary)"
                                     fillOpacity={0.6}
                                 />
-                                <Tooltip
-                                    contentStyle={{ backgroundColor: 'var(--bg-card)', border: '1px solid var(--border-subtle)', borderRadius: '8px' }}
-                                    itemStyle={{ color: 'var(--text-main)' }}
-                                    formatter={(value) => [`${value.toFixed(1)}/10`, 'Intensidad']}
-                                />
                             </RadarChart>
                         </ResponsiveContainer>
                     </div>
