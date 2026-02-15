@@ -3,7 +3,7 @@ version: '3'
 services:
   app:
     build: .
-    image: hevy-dash:latest
+    image: diegoldiazr/hevy_dash:latest
     container_name: hevy-dash
     ports:
       - "3000:3000"
