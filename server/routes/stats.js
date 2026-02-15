@@ -173,4 +173,19 @@ router.get('/muscles', (req, res) => {
     });
 });
 
+router.get('/calendar', (req, res) => {
+    // Return dates of all workouts to populate the calendar heatmap
+    const sql = `
+        SELECT date(start_time) as date, COUNT(*) as count 
+        FROM workouts 
+        GROUP BY date 
+        ORDER BY date ASC
+    `;
+
+    db.all(sql, [], (err, rows) => {
+        if (err) return res.status(500).json({ error: err.message });
+        res.json(rows);
+    });
+});
+
 module.exports = router;

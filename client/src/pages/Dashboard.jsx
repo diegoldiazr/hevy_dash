@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import { Dumbbell, Activity, Calendar, RefreshCw, Clock } from 'lucide-react';
 import { ComposedChart, Bar, Line, XAxis, YAxis, Tooltip, ResponsiveContainer, LabelList, CartesianGrid, BarChart, Radar, RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis } from 'recharts';
+import TrainingCalendar from '../components/TrainingCalendar';
 
 const Dashboard = () => {
     const [stats, setStats] = useState({
@@ -162,6 +163,8 @@ const Dashboard = () => {
                 </div>
             </div>
 
+
+
             <div className="chart-section">
                 <div className="chart-header">
                     <h3>Volumen Reciente (kg)</h3>
@@ -247,17 +250,23 @@ const Dashboard = () => {
                 </div>
             </div>
 
-            <div className="recent-list">
-                <h3>Actividad Reciente</h3>
-                <ul>
-                    {stats.recentWorkouts.map(w => (
-                        <li key={w.id} className="workout-item">
-                            <span className="title">{w.title}</span>
-                            <span className="date">{new Date(w.start_time).toLocaleDateString()}</span>
-                            <span className="volume">{w.volume_kg} kg</span>
-                        </li>
-                    ))}
-                </ul>
+            <div className="bottom-grid">
+                <div className="recent-list">
+                    <h3>Actividad Reciente</h3>
+                    <ul>
+                        {stats.recentWorkouts.map(w => (
+                            <li key={w.id} className="workout-item">
+                                <span className="title">{w.title}</span>
+                                <span className="date">{new Date(w.start_time).toLocaleDateString()}</span>
+                                <span className="volume">{w.volume_kg} kg</span>
+                            </li>
+                        ))}
+                    </ul>
+                </div>
+
+                <div className="dashboard-calendar-wrapper">
+                    <TrainingCalendar />
+                </div>
             </div>
         </div>
     );
