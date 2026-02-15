@@ -4,15 +4,26 @@ const db = require('../db');
 const hevyService = require('../services/hevy');
 const aiService = require('../services/ai');
 
-// List Routines
+// List Routines with Folders
 router.get('/', (req, res) => {
-    db.all('SELECT * FROM routines ORDER BY created_at DESC', (err, rows) => {
+    // Fetch Folders
+    db.all('SELECT * FROM routine_folders ORDER BY folder_index ASC', (err, folders) => {
         if (err) return res.status(500).json({ error: err.message });
-        const routines = rows.map(row => ({
-            ...row,
-            raw_data: JSON.parse(row.raw_data)
-        }));
-        res.json(routines);
+
+        // Fetch Routines sorted by updated_at (most recent first)
+        db.all('SELECT * FROM routines ORDER BY updated_at DESC', (err, routineRows) => {
+            if (err) return res.status(500).json({ error: err.message });
+
+            const routines = routineRows.map(row => ({
+                ...row,
+                raw_data: JSON.parse(row.raw_data)
+            }));
+
+            res.json({
+                folders: folders,
+                routines: routines
+            });
+        });
     });
 });
 

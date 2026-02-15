@@ -41,21 +41,29 @@ router.get('/:name/history', (req, res) => {
                 if (data.exercises) {
                     const exercise = data.exercises.find(ex => ex.title === exerciseName);
                     if (exercise) {
-                        // Calculate max weight, total volume for this session
+                        // Calculate max weight, total volume and estimated 1RM for this session
                         let maxWeight = 0;
                         let volume = 0;
+                        let bestE1RM = 0;
 
                         exercise.sets.forEach(set => {
                             if (set.weight_kg) {
                                 if (set.weight_kg > maxWeight) maxWeight = set.weight_kg;
                                 volume += set.weight_kg * (set.reps || 0);
+
+                                // Epley Formula for 1RM: weight * (1 + reps/30)
+                                if (set.reps > 0) {
+                                    const e1rm = set.weight_kg * (1 + (set.reps / 30));
+                                    if (e1rm > bestE1RM) bestE1RM = e1rm;
+                                }
                             }
                         });
 
                         history.push({
                             date: row.start_time,
                             maxWeight,
-                            volume
+                            volume,
+                            e1rm: Math.round(bestE1RM * 10) / 10
                         });
                     }
                 }

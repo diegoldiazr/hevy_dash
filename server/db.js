@@ -5,23 +5,23 @@ const fs = require('fs');
 // Ensure data directory exists
 const dataDir = path.join(__dirname, 'data');
 if (!fs.existsSync(dataDir)) {
-    fs.mkdirSync(dataDir);
+  fs.mkdirSync(dataDir);
 }
 
 const dbPath = path.join(dataDir, 'hevy_dash.db');
 const db = new sqlite3.Database(dbPath, (err) => {
-    if (err) {
-        console.error('Could not connect to database', err);
-    } else {
-        console.log('Connected to SQLite database');
-        initDb();
-    }
+  if (err) {
+    console.error('Could not connect to database', err);
+  } else {
+    console.log('Connected to SQLite database');
+    initDb();
+  }
 });
 
 const initDb = () => {
-    db.serialize(() => {
-        // User Settings Table
-        db.run(`
+  db.serialize(() => {
+    // User Settings Table
+    db.run(`
       CREATE TABLE IF NOT EXISTS user_settings (
         id INTEGER PRIMARY KEY CHECK (id = 1),
         hevy_api_key TEXT,
@@ -34,10 +34,10 @@ const initDb = () => {
       )
     `);
 
-        db.run(`INSERT OR IGNORE INTO user_settings (id) VALUES (1)`);
+    db.run(`INSERT OR IGNORE INTO user_settings (id) VALUES (1)`);
 
-        // Workouts Table
-        db.run(`
+    // Workouts Table
+    db.run(`
       CREATE TABLE IF NOT EXISTS workouts (
         id TEXT PRIMARY KEY,
         title TEXT,
@@ -49,16 +49,29 @@ const initDb = () => {
       )
     `);
 
-        // Routines Table
-        db.run(`
+    // Routine Folders Table
+    db.run(`
+      CREATE TABLE IF NOT EXISTS routine_folders (
+        id INTEGER PRIMARY KEY,
+        title TEXT,
+        folder_index INTEGER,
+        created_at DATETIME,
+        updated_at DATETIME
+      )
+    `);
+
+    // Routines Table
+    db.run(`
       CREATE TABLE IF NOT EXISTS routines (
         id TEXT PRIMARY KEY,
         title TEXT,
+        folder_id INTEGER,
+        updated_at DATETIME,
         raw_data JSON,
         created_at DATETIME DEFAULT CURRENT_TIMESTAMP
       )
     `);
-    });
+  });
 };
 
 module.exports = db;

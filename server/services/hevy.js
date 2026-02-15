@@ -131,23 +131,30 @@ const syncWorkouts = async (fullSync = false) => {
     try {
         // 1. Fetch muscle mapping from exercise templates
         const templates = await fetchExerciseTemplates(apiKey);
-        const muscleMap = {};
+        const exerciseTemplateMap = {};
+        if (templates.length > 0) {
+            fs.appendFileSync(logPath, `DEBUG: Template keys: ${Object.keys(templates[0]).join(', ')}\n`);
+        }
         templates.forEach(t => {
-            muscleMap[t.id] = {
+            exerciseTemplateMap[t.id] = {
                 primary: t.primary_muscle_group,
-                secondary: t.secondary_muscle_groups || []
+                secondary: t.secondary_muscle_groups || [],
+                thumbnail: t.thumbnail_url || t.image_thumbnail_url || null,
+                image: t.image_url || null
             };
         });
-        fs.appendFileSync(logPath, `Fetched ${templates.length} exercise templates for muscle mapping.\n`);
+        fs.appendFileSync(logPath, `Fetched ${templates.length} exercise templates for mapping.\n`);
 
         const enrichWorkout = (workout) => {
             if (workout.exercises) {
                 workout.exercises = workout.exercises.map(ex => {
-                    const mapping = muscleMap[ex.exercise_template_id] || { primary: 'Other', secondary: [] };
+                    const mapping = exerciseTemplateMap[ex.exercise_template_id] || { primary: 'Other', secondary: [], thumbnail: null, image: null };
                     return {
                         ...ex,
                         primary_muscle_group: mapping.primary,
-                        secondary_muscle_groups: mapping.secondary
+                        secondary_muscle_groups: mapping.secondary,
+                        thumbnail_url: mapping.thumbnail,
+                        image_url: mapping.image
                     };
                 });
             }
@@ -232,13 +239,50 @@ const syncWorkouts = async (fullSync = false) => {
 };
 
 const fetchRoutinesFromApi = async (apiKey) => {
+    let allRoutines = [];
+    let page = 1;
+    let hasMore = true;
     try {
-        const response = await axios.get(`${HEVY_API_BASE}/routines`, {
-            headers: { 'api-key': apiKey }
-        });
-        return response.data;
+        while (hasMore && page <= 20) {
+            const response = await axios.get(`${HEVY_API_BASE}/routines`, {
+                headers: { 'api-key': apiKey },
+                params: { page, page_size: 50 }
+            });
+            const routines = response.data.routines || [];
+            allRoutines = allRoutines.concat(routines);
+            if (routines.length < 50) {
+                hasMore = false;
+            } else {
+                page++;
+            }
+        }
+        return { routines: allRoutines };
     } catch (error) {
         throw new Error(`Failed to fetch routines: ${error.message}`);
+    }
+};
+
+const fetchRoutineFoldersFromApi = async (apiKey) => {
+    let allFolders = [];
+    let page = 1;
+    let hasMore = true;
+    try {
+        while (hasMore && page <= 5) {
+            const response = await axios.get(`${HEVY_API_BASE}/routine_folders`, {
+                headers: { 'api-key': apiKey },
+                params: { page, page_size: 100 }
+            });
+            const folders = response.data.routine_folders || [];
+            allFolders = allFolders.concat(folders);
+            if (folders.length < 100) {
+                hasMore = false;
+            } else {
+                page++;
+            }
+        }
+        return { routine_folders: allFolders };
+    } catch (error) {
+        throw new Error(`Failed to fetch routine folders: ${error.message}`);
     }
 };
 
@@ -246,6 +290,20 @@ const syncRoutines = async () => {
     const apiKey = await getApiKey();
     if (!apiKey) throw new Error('Hevy API Key not found');
 
+    // 1. Sync Folders
+    const foldersData = await fetchRoutineFoldersFromApi(apiKey);
+    const folders = foldersData.routine_folders || [];
+
+    for (const folder of folders) {
+        await new Promise((resolve, reject) => {
+            db.run(`INSERT OR REPLACE INTO routine_folders (id, title, folder_index, created_at, updated_at) VALUES (?, ?, ?, ?, ?)`,
+                [folder.id, folder.title, folder.index, folder.created_at, folder.updated_at],
+                (err) => err ? reject(err) : resolve()
+            );
+        });
+    }
+
+    // 2. Sync Routines
     const data = await fetchRoutinesFromApi(apiKey);
     const routines = data.routines;
 
@@ -253,13 +311,14 @@ const syncRoutines = async () => {
 
     for (const routine of routines) {
         await new Promise((resolve, reject) => {
-            db.run(`INSERT OR REPLACE INTO routines (id, title, raw_data) VALUES (?, ?, ?)`,
-                [routine.id, routine.title, JSON.stringify(routine)],
+            db.run(`INSERT OR REPLACE INTO routines (id, title, folder_id, updated_at, raw_data) VALUES (?, ?, ?, ?, ?)`,
+                [routine.id, routine.title, routine.folder_id, routine.updated_at, JSON.stringify(routine)],
                 (err) => err ? reject(err) : resolve()
             );
         });
     }
-    return { status: 'success', count: routines.length };
+
+    return { status: 'success', count: routines.length, folders: folders.length };
 };
 
 module.exports = {

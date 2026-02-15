@@ -72,16 +72,28 @@ const Progression = () => {
             ) : (
                 <div className="analysis-content">
                     <div className="chart-section">
-                        <h3>Progresión de 1RM / Peso Máximo</h3>
+                        <h3>Progresión de 1RM Estimado</h3>
                         <div className="chart-container">
                             <ResponsiveContainer width="100%" height={300}>
                                 <LineChart data={history}>
-                                    <CartesianGrid strokeDasharray="3 3" stroke="var(--border-color)" />
-                                    <XAxis dataKey="date" stroke="var(--text-secondary)" />
-                                    <YAxis stroke="var(--text-secondary)" />
-                                    <Tooltip contentStyle={{ backgroundColor: 'var(--card-bg)', border: '1px solid var(--border-color)', color: 'var(--text-primary)' }} />
+                                    <CartesianGrid strokeDasharray="3 3" stroke="var(--border-subtle)" vertical={false} />
+                                    <XAxis dataKey="date" stroke="var(--text-muted)" tick={{ fontSize: 10 }} />
+                                    <YAxis stroke="var(--text-muted)" tick={{ fontSize: 10 }} />
+                                    <Tooltip
+                                        contentStyle={{ backgroundColor: 'var(--bg-card)', border: '1px solid var(--border-subtle)', borderRadius: '8px' }}
+                                        itemStyle={{ color: 'var(--text-main)' }}
+                                    />
                                     <Legend />
-                                    <Line type="monotone" dataKey="maxWeight" stroke="var(--accent-color)" strokeWidth={2} activeDot={{ r: 6 }} name="Peso Máximo (kg)" />
+                                    <Line
+                                        type="monotone"
+                                        dataKey="e1rm"
+                                        stroke="#5865F2"
+                                        strokeWidth={3}
+                                        dot={{ r: 4, fill: '#5865F2' }}
+                                        activeDot={{ r: 8, stroke: '#FFFFFF', strokeWidth: 2 }}
+                                        name="1RM Estimado (kg)"
+                                        connectNulls={true}
+                                    />
                                 </LineChart>
                             </ResponsiveContainer>
                         </div>
@@ -92,12 +104,24 @@ const Progression = () => {
                         <div className="chart-container">
                             <ResponsiveContainer width="100%" height={300}>
                                 <LineChart data={history}>
-                                    <CartesianGrid strokeDasharray="3 3" stroke="var(--border-color)" />
-                                    <XAxis dataKey="date" stroke="var(--text-secondary)" />
-                                    <YAxis stroke="var(--text-secondary)" />
-                                    <Tooltip contentStyle={{ backgroundColor: 'var(--card-bg)', border: '1px solid var(--border-color)', color: 'var(--text-primary)' }} />
+                                    <CartesianGrid strokeDasharray="3 3" stroke="var(--border-subtle)" vertical={false} />
+                                    <XAxis dataKey="date" stroke="var(--text-muted)" tick={{ fontSize: 10 }} />
+                                    <YAxis stroke="var(--text-muted)" tick={{ fontSize: 10 }} />
+                                    <Tooltip
+                                        contentStyle={{ backgroundColor: 'var(--bg-card)', border: '1px solid var(--border-subtle)', borderRadius: '8px' }}
+                                        itemStyle={{ color: 'var(--text-main)' }}
+                                    />
                                     <Legend />
-                                    <Line type="monotone" dataKey="volume" stroke="#10b981" strokeWidth={2} name="Volumen Total (kg)" />
+                                    <Line
+                                        type="monotone"
+                                        dataKey="volume"
+                                        stroke="#10B981"
+                                        strokeWidth={3}
+                                        dot={{ r: 4, fill: '#10B981' }}
+                                        activeDot={{ r: 8, stroke: '#FFFFFF', strokeWidth: 2 }}
+                                        name="Volumen Total (kg)"
+                                        connectNulls={true}
+                                    />
                                 </LineChart>
                             </ResponsiveContainer>
                         </div>

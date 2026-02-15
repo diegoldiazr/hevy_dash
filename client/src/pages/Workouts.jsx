@@ -53,6 +53,72 @@ const Workouts = () => {
         return hours > 0 ? `${hours}h ${mins}m` : `${mins}m`;
     };
 
+    const getExerciseImage = (exercise) => {
+        if (!exercise) return null;
+
+        // Use synced URLs if they exist (Hevy might add them in the future)
+        if (exercise.thumbnail_url) return exercise.thumbnail_url;
+        if (exercise.image_url) return exercise.image_url;
+
+        let id = exercise.exercise_template_id;
+        const muscle = exercise.primary_muscle_group;
+
+        if (!id || !muscle) return null;
+
+        // Map muscle to the capitalized version used in CloudFront
+        const muscleMap = {
+            'chest': 'Chest',
+            'shoulders': 'Shoulders',
+            'back': 'Back',
+            'triceps': 'Triceps',
+            'biceps': 'Biceps',
+            'abs': 'Abs',
+            'legs': 'Legs',
+            'quads': 'Quads',
+            'hamstrings': 'Hamstrings',
+            'glutes': 'Hips', // Hevy uses 'Hips' for glutes in thumbnails
+            'calves': 'Calves',
+            'traps': 'Shoulders',
+            'forearms': 'Arms',
+            'lower_back': 'Back'
+        };
+
+        const capitalizedMuscle = muscleMap[muscle.toLowerCase()] || 'Chest';
+
+        // Mapping Hex API IDs (e.g. 79D0BB3A) to 8-digit Numeric CDN IDs (e.g. 00251201)
+        const hexToNumeric = {
+            '79D0BB3A': { id: '00251201', slug: 'Barbell-Bench-Press' },
+            '9237BAD1': { id: '14541201', slug: 'Lever-Seated-Shoulder-Press' },
+            'D04AC939': { id: '00151201', slug: 'Barbell-Back-Squat' },
+            'C6272009': { id: '22111201', slug: 'Barbell-Deadlift' },
+            '6A6C31A5': { id: '21251201', slug: 'Lat-Pulldown-Cable' },
+            '3601968B': { id: '01201201', slug: 'Dumbbell-Bench-Press' },
+            '878CD1D0': { id: '03921201', slug: 'Dumbbell-Shoulder-Press' },
+            'F1E57334': { id: '21201201', slug: 'Dumbbell-Row' },
+            '7B8D84E8': { id: '06511201', slug: 'Overhead-Press-Barbell' },
+            'A5AC6449': { id: '03931201', slug: 'Barbell-Curl' },
+            '7EB3F7C3': { id: '05761201', slug: 'Iso-Lateral-Chest-Press-Machine' },
+            '75A4F6C4': { id: '10211201', slug: 'Leg-Extension-Machine' },
+            'C3BCABB3': { id: '21301201', slug: 'Seated-Cable-Row' },
+            '10301201': { id: '10301201', slug: 'Lever-Pec-Deck-Fly' }
+        };
+
+        let slug = '';
+        const mapped = hexToNumeric[id];
+
+        if (mapped) {
+            id = mapped.id;
+            slug = mapped.slug;
+        } else {
+            // Attempt to guess slug: "Title (Equip)" -> "Equip-Title" or "Title"
+            // Hevy usually does Equip-Title
+            let cleanTitle = exercise.title.replace(/[()]/g, '').trim();
+            slug = cleanTitle.split(' ').join('-');
+        }
+
+        return `https://d2l9nsnmtah87f.cloudfront.net/exercise-thumbnails/${id}-${slug}_${capitalizedMuscle}_thumbnail@3x.jpg`;
+    };
+
     return (
         <div className="workouts-page">
             <div className="header">
@@ -93,7 +159,7 @@ const Workouts = () => {
                                                 </span>
                                             </div>
                                             <div className="workout-stats-summary">
-                                                <span>{workout.volume_kg} kg</span>
+                                                <span>{Math.round(workout.volume_kg)} kg</span>
                                                 <span className="dot"></span>
                                                 <span>{formatDuration(workout.start_time, workout.end_time)}</span>
                                             </div>
@@ -135,7 +201,7 @@ const Workouts = () => {
                                     </div>
                                     <div className="meta-item">
                                         <Dumbbell size={18} />
-                                        <span>{selectedWorkout.volume_kg} kg volumen total</span>
+                                        <span>{Math.round(selectedWorkout.volume_kg)} kg volumen total</span>
                                     </div>
                                 </div>
                             </div>
@@ -143,9 +209,25 @@ const Workouts = () => {
                             <div className="exercise-list">
                                 {selectedWorkout.raw_data.exercises?.map((exercise, idx) => (
                                     <div key={idx} className="exercise-item">
-                                        <div className="exercise-info">
-                                            <h4>{exercise.title}</h4>
-                                            <span className="muscle-label">{exercise.primary_muscle_group || 'Otros'}</span>
+                                        <div className="exercise-header-row">
+                                            <div className="exercise-image-container">
+                                                <img
+                                                    src={getExerciseImage(exercise)}
+                                                    alt={exercise.title}
+                                                    className="exercise-thumb"
+                                                    onError={(e) => {
+                                                        e.target.style.display = 'none';
+                                                        e.target.parentElement.classList.add('fallback');
+                                                    }}
+                                                />
+                                                <div className="muscle-fallback-icon">
+                                                    <Dumbbell size={24} />
+                                                </div>
+                                            </div>
+                                            <div className="exercise-info">
+                                                <h4>{exercise.title}</h4>
+                                                <span className="muscle-label">{exercise.primary_muscle_group || 'Otros'}</span>
+                                            </div>
                                         </div>
                                         <div className="sets-table">
                                             <div className="sets-header">
