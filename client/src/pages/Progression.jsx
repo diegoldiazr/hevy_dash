@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend } from 'recharts';
-import { Target } from 'lucide-react';
+import { Target, Activity } from 'lucide-react';
 
 const Progression = () => {
     const [exercises, setExercises] = useState([]);
@@ -71,6 +71,41 @@ const Progression = () => {
                 <div className="empty-state">No hay historial disponible para este ejercicio.</div>
             ) : (
                 <div className="analysis-content">
+                    {/* Last Session Info */}
+                    {history.length > 0 && (
+                        <div className="last-session-card">
+                            <h3><Activity size={20} color="var(--primary)" /> Última Sesión</h3>
+                            <div className="last-session-header">
+                                <div className="session-info-item">
+                                    <span className="label">Fecha</span>
+                                    <span className="value">{history[history.length - 1].date}</span>
+                                </div>
+                                <div className="session-info-item">
+                                    <span className="label">Entrenamiento</span>
+                                    <span className="value">{history[history.length - 1].workoutTitle}</span>
+                                </div>
+                                <div className="session-info-item">
+                                    <span className="label">Rutina</span>
+                                    <span className="value">{history[history.length - 1].routineTitle}</span>
+                                </div>
+                                <div className="session-info-item">
+                                    <span className="label">E1RM</span>
+                                    <span className="value">{history[history.length - 1].e1rm} kg</span>
+                                </div>
+                            </div>
+
+                            <div className="sets-summary">
+                                {history[history.length - 1].sets?.map((set, idx) => (
+                                    <div key={idx} className="set-badge">
+                                        <span className="set-number">S{idx + 1}</span>
+                                        <span className="set-weight">{set.weight_kg} kg</span>
+                                        <span className="set-reps">{set.reps} reps</span>
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
+                    )}
+
                     <div className="chart-section">
                         <h3>Progresión de 1RM Estimado</h3>
                         <div className="chart-container">

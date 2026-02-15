@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { RefreshCw, Calendar, Dumbbell, Clock, ChevronRight, X } from 'lucide-react';
+import { Radar, RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis, ResponsiveContainer, Tooltip } from 'recharts';
 
 const Workouts = () => {
     const [workouts, setWorkouts] = useState([]);
@@ -53,6 +54,31 @@ const Workouts = () => {
         return hours > 0 ? `${hours}h ${mins}m` : `${mins}m`;
     };
 
+    const calculateRadarData = (workout) => {
+        if (!workout || !workout.raw_data.exercises) return [];
+
+        const mapping = {
+            'chest': 'Torso', 'abs': 'Torso', 'abdominals': 'Torso',
+            'legs': 'Piernas', 'quads': 'Piernas', 'hamstrings': 'Piernas', 'glutes': 'Piernas', 'calves': 'Piernas', 'quadriceps': 'Piernas',
+            'biceps': 'Brazos', 'triceps': 'Brazos', 'forearms': 'Brazos',
+            'back': 'Espalda', 'traps': 'Espalda', 'lats': 'Espalda', 'lower_back': 'Espalda',
+            'shoulders': 'Hombros'
+        };
+
+        const categories = { 'Torso': 0, 'Piernas': 0, 'Brazos': 0, 'Espalda': 0, 'Hombros': 0 };
+
+        workout.raw_data.exercises.forEach(ex => {
+            const muscle = (ex.primary_muscle_group || 'other').toLowerCase();
+            const cat = mapping[muscle];
+            if (cat) categories[cat] += (ex.sets ? ex.sets.length : 0);
+        });
+
+        return Object.entries(categories).map(([name, count]) => ({
+            subject: name,
+            A: Math.min(10, count), // 10 sets in one session is a "10" intensity focus
+            fullMark: 10
+        }));
+    };
     const getExerciseImage = (exercise) => {
         if (!exercise) return null;
 
@@ -190,18 +216,36 @@ const Workouts = () => {
                         <div className="detail-content">
                             <div className="detail-top-info">
                                 <h1>{selectedWorkout.title}</h1>
-                                <div className="detail-meta">
-                                    <div className="meta-item">
-                                        <Calendar size={18} />
-                                        <span>{new Date(selectedWorkout.start_time).toLocaleString()}</span>
+                                <div className="detail-meta-container">
+                                    <div className="detail-meta">
+                                        <div className="meta-item">
+                                            <Calendar size={18} />
+                                            <span>{new Date(selectedWorkout.start_time).toLocaleString()}</span>
+                                        </div>
+                                        <div className="meta-item">
+                                            <Clock size={18} />
+                                            <span>{formatDuration(selectedWorkout.start_time, selectedWorkout.end_time)}</span>
+                                        </div>
+                                        <div className="meta-item">
+                                            <Dumbbell size={18} />
+                                            <span>{Math.round(selectedWorkout.volume_kg)} kg</span>
+                                        </div>
                                     </div>
-                                    <div className="meta-item">
-                                        <Clock size={18} />
-                                        <span>{formatDuration(selectedWorkout.start_time, selectedWorkout.end_time)}</span>
-                                    </div>
-                                    <div className="meta-item">
-                                        <Dumbbell size={18} />
-                                        <span>{Math.round(selectedWorkout.volume_kg)} kg volumen total</span>
+
+                                    <div className="workout-radar-container">
+                                        <ResponsiveContainer width="100%" height={220}>
+                                            <RadarChart cx="50%" cy="50%" outerRadius="70%" data={calculateRadarData(selectedWorkout)}>
+                                                <PolarGrid gridType="polygon" stroke="rgba(255,255,255,0.05)" />
+                                                <PolarAngleAxis dataKey="subject" tick={{ fill: '#888', fontSize: 10 }} />
+                                                <Radar
+                                                    name="Enfoque"
+                                                    dataKey="A"
+                                                    stroke="var(--primary)"
+                                                    fill="var(--primary)"
+                                                    fillOpacity={0.6}
+                                                />
+                                            </RadarChart>
+                                        </ResponsiveContainer>
                                     </div>
                                 </div>
                             </div>

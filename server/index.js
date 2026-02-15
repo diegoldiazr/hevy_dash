@@ -23,6 +23,7 @@ const workoutRoutes = require('./routes/workouts');
 const exerciseRoutes = require('./routes/exercises');
 const routineRoutes = require('./routes/routines');
 const analyticsRoutes = require('./routes/analytics');
+const measurementsRoutes = require('./routes/measurements');
 
 app.use('/api/settings', settingsRoutes);
 app.use('/api/hevy', hevyRoutes);
@@ -32,6 +33,7 @@ app.use('/api/workouts', workoutRoutes);
 app.use('/api/exercises', exerciseRoutes);
 app.use('/api/routines', routineRoutes);
 app.use('/api/analytics', analyticsRoutes);
+app.use('/api/measurements', measurementsRoutes);
 
 app.get('/api/health', (req, res) => {
     res.json({ status: 'ok', message: 'Hevy Dashboard API is running' });

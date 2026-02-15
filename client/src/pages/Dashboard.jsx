@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import { Dumbbell, Activity, Calendar, RefreshCw, Clock } from 'lucide-react';
-import { ComposedChart, Bar, Line, XAxis, YAxis, Tooltip, ResponsiveContainer, LabelList, CartesianGrid, BarChart } from 'recharts';
+import { ComposedChart, Bar, Line, XAxis, YAxis, Tooltip, ResponsiveContainer, LabelList, CartesianGrid, BarChart, Radar, RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis } from 'recharts';
 
 const Dashboard = () => {
     const [stats, setStats] = useState({
@@ -25,6 +25,7 @@ const Dashboard = () => {
 
     const [recentMuscleStats, setRecentMuscleStats] = useState([]);
     const [musclePeriod, setMusclePeriod] = useState('month');
+    const [radarData, setRadarData] = useState([]);
 
     const currentYear = new Date().getFullYear();
 
@@ -58,7 +59,38 @@ const Dashboard = () => {
     const fetchMuscleStats = async (period) => {
         try {
             const res = await axios.get(`/api/stats/muscles?period=${period}`);
-            setRecentMuscleStats(res.data);
+            const data = res.data;
+            setRecentMuscleStats(data);
+
+            // Group for Radar Chart
+            // Categories: Torso, Legs, Arms, Back, Shoulders
+            const mapping = {
+                'Pecho': 'Torso', 'Abdominales': 'Torso', 'Abdominals': 'Torso', 'Chest': 'Torso', 'Abs': 'Torso',
+                'Cuádriceps': 'Piernas', 'Isquios': 'Piernas', 'Glúteos': 'Piernas', 'Gemelos': 'Piernas', 'Quadriceps': 'Piernas', 'Hamstrings': 'Piernas', 'Glutes': 'Piernas', 'Calves': 'Piernas', 'Legs': 'Piernas',
+                'Bíceps': 'Brazos', 'Tríceps': 'Brazos', 'Antebrazos': 'Brazos', 'Biceps': 'Brazos', 'Triceps': 'Brazos', 'Forearms': 'Brazos',
+                'Espalda': 'Espalda', 'Trapecio': 'Espalda', 'Dorsales': 'Espalda', 'Lumbar': 'Espalda', 'Back': 'Espalda', 'Traps': 'Espalda', 'Lats': 'Espalda', 'Lower_back': 'Espalda',
+                'Hombros': 'Hombros', 'Shoulders': 'Hombros'
+            };
+
+            const categories = { 'Torso': 0, 'Piernas': 0, 'Brazos': 0, 'Espalda': 0, 'Hombros': 0 };
+            data.forEach(m => {
+                const cat = mapping[m.name];
+                if (cat) categories[cat] += m.count;
+            });
+
+            // Normalize to 1-10 scale
+            // Target: Number of sets per group to reach "10" intensity
+            // Monthly: 70 sets, Year: 840, All: 4000
+            const targets = { month: 70, year: 840, all: 4000 };
+            const target = targets[period] || 100;
+
+            const radar = Object.entries(categories).map(([name, count]) => ({
+                subject: name,
+                A: Math.min(10, Math.max(0, (count / target) * 10)),
+                fullMark: 10
+            }));
+
+            setRadarData(radar);
         } catch (error) {
             console.error("Failed to fetch muscle stats", error);
         }
@@ -172,22 +204,51 @@ const Dashboard = () => {
                 </div>
             </div>
 
-            <div className="chart-section">
-                <div className="chart-header">
-                    <h3>Top 10 Músculos Entrenados</h3>
-                    <PeriodSelector current={musclePeriod} onChange={setMusclePeriod} />
+            <div className="chart-grid">
+                <div className="chart-section">
+                    <div className="chart-header">
+                        <h3>Enfoque Muscular (Radar)</h3>
+                        <PeriodSelector current={musclePeriod} onChange={setMusclePeriod} />
+                    </div>
+                    <div className="chart-container radar-container">
+                        <ResponsiveContainer width="100%" height={350}>
+                            <RadarChart cx="50%" cy="50%" outerRadius="80%" data={radarData}>
+                                <PolarGrid gridType="polygon" stroke="rgba(255,255,255,0.05)" />
+                                <PolarAngleAxis dataKey="subject" tick={{ fill: '#888', fontSize: 12 }} />
+                                <Radar
+                                    name="Nivel"
+                                    dataKey="A"
+                                    stroke="var(--primary)"
+                                    fill="var(--primary)"
+                                    fillOpacity={0.6}
+                                />
+                                <Tooltip
+                                    contentStyle={{ backgroundColor: 'var(--bg-card)', border: '1px solid var(--border-subtle)', borderRadius: '8px' }}
+                                    itemStyle={{ color: 'var(--text-main)' }}
+                                    formatter={(value) => [`${value.toFixed(1)}/10`, 'Intensidad']}
+                                />
+                            </RadarChart>
+                        </ResponsiveContainer>
+                    </div>
                 </div>
-                <div className="chart-container">
-                    <ResponsiveContainer width="100%" height={350}>
-                        <BarChart data={recentMuscleStats} layout="vertical">
-                            <XAxis type="number" hide />
-                            <YAxis dataKey="name" type="category" stroke="#888" width={100} fontSize={12} tickLine={false} axisLine={false} />
-                            <Tooltip contentStyle={{ backgroundColor: 'var(--bg-card)', border: '1px solid var(--border-subtle)', borderRadius: '8px' }} itemStyle={{ color: 'var(--text-main)' }} cursor={{ fill: 'transparent' }} />
-                            <Bar dataKey="count" fill="var(--primary)" radius={[0, 4, 4, 0]}>
-                                <LabelList dataKey="count" position="right" style={{ fill: 'var(--text-muted)', fontSize: '12px' }} formatter={(v) => `${v} series`} />
-                            </Bar>
-                        </BarChart>
-                    </ResponsiveContainer>
+
+                <div className="chart-section">
+                    <div className="chart-header">
+                        <h3>Top 10 Músculos</h3>
+                        <PeriodSelector current={musclePeriod} onChange={setMusclePeriod} />
+                    </div>
+                    <div className="chart-container">
+                        <ResponsiveContainer width="100%" height={350}>
+                            <BarChart data={recentMuscleStats} layout="vertical">
+                                <XAxis type="number" hide />
+                                <YAxis dataKey="name" type="category" stroke="#888" width={100} fontSize={12} tickLine={false} axisLine={false} />
+                                <Tooltip contentStyle={{ backgroundColor: 'var(--bg-card)', border: '1px solid var(--border-subtle)', borderRadius: '8px' }} itemStyle={{ color: 'var(--text-main)' }} cursor={{ fill: 'transparent' }} />
+                                <Bar dataKey="count" fill="var(--primary)" radius={[0, 4, 4, 0]}>
+                                    <LabelList dataKey="count" position="right" style={{ fill: 'var(--text-muted)', fontSize: '12px' }} formatter={(v) => `${v} series`} />
+                                </Bar>
+                            </BarChart>
+                        </ResponsiveContainer>
+                    </div>
                 </div>
             </div>
 

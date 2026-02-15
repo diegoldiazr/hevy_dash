@@ -28,13 +28,34 @@ const initDb = () => {
         openai_api_key TEXT,
         age INTEGER,
         gender TEXT,
-        weight REAL,
+        height REAL,
         goal TEXT,
         updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
       )
-    `);
+    `, () => {
+      // Ensure height column exists (for existing DBs)
+      db.run("ALTER TABLE user_settings ADD COLUMN height REAL", (err) => {
+        if (err && !err.message.includes("duplicate column name")) {
+          // Ignore error if column already exists
+        }
+      });
+    });
 
     db.run(`INSERT OR IGNORE INTO user_settings (id) VALUES (1)`);
+
+    // Body Measurements Table
+    db.run(`
+      CREATE TABLE IF NOT EXISTS body_measurements (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        date DATE UNIQUE,
+        weight REAL,
+        chest REAL,
+        neck REAL,
+        waist REAL,
+        hips REAL,
+        created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+      )
+    `);
 
     // Workouts Table
     db.run(`
@@ -45,9 +66,12 @@ const initDb = () => {
         end_time DATETIME,
         volume_kg REAL,
         raw_data JSON,
+        muscle_map JSON,
         created_at DATETIME DEFAULT CURRENT_TIMESTAMP
       )
-    `);
+    `, () => {
+      db.run("ALTER TABLE workouts ADD COLUMN muscle_map JSON", (err) => { });
+    });
 
     // Routine Folders Table
     db.run(`

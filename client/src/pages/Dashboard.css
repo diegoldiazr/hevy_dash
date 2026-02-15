@@ -270,3 +270,22 @@
 .chart-container {
     margin-top: 10px;
 }
+
+/* Chart Grid Layout */
+.chart-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(450px, 1fr));
+    gap: 32px;
+}
+
+.radar-container {
+    background: radial-gradient(circle at center, rgba(88, 101, 242, 0.05) 0%, transparent 70%);
+}
+
+.recharts-polar-grid-concentric-path {
+    stroke: rgba(255, 255, 255, 0.1) !important;
+}
+
+.recharts-polar-grid-angle-line {
+    stroke: rgba(255, 255, 255, 0.1) !important;
+}

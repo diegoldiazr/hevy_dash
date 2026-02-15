@@ -14,7 +14,7 @@ router.get('/', (req, res) => {
 
 // UPDATE settings
 router.post('/', (req, res) => {
-    const { hevy_api_key, openai_api_key, age, gender, weight, goal } = req.body;
+    const { hevy_api_key, openai_api_key, age, gender, height, goal } = req.body;
 
     const sql = `
     UPDATE user_settings 
@@ -22,13 +22,13 @@ router.post('/', (req, res) => {
         openai_api_key = ?, 
         age = ?, 
         gender = ?, 
-        weight = ?, 
+        height = ?, 
         goal = ?,
         updated_at = CURRENT_TIMESTAMP
     WHERE id = 1
   `;
 
-    db.run(sql, [hevy_api_key, openai_api_key, age, gender, weight, goal], function (err) {
+    db.run(sql, [hevy_api_key, openai_api_key, age, gender, height, goal], function (err) {
         if (err) {
             return res.status(500).json({ error: err.message });
         }

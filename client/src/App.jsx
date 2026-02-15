@@ -1,6 +1,6 @@
 import React from 'react'
 import { BrowserRouter as Router, Routes, Route, NavLink } from 'react-router-dom';
-import { LayoutDashboard, Dumbbell, TrendingUp, Notebook, BarChart2, MessageSquare, Settings as SettingsIcon, ChevronLeft } from 'lucide-react';
+import { LayoutDashboard, Dumbbell, TrendingUp, Notebook, BarChart2, MessageSquare, Settings as SettingsIcon, ChevronLeft, Ruler } from 'lucide-react';
 
 import Settings from './pages/Settings';
 import './pages/Settings.css';
@@ -23,6 +23,9 @@ import './pages/Routines.css';
 
 import Analytics from './pages/Analytics';
 import './pages/Analytics.css';
+
+import Measurements from './pages/Measurements';
+import './pages/Measurements.css';
 
 // Placeholder Components
 // const DashboardPlaceholder = () => <h2>Dashboard</h2>;
@@ -74,6 +77,11 @@ function App() {
                             {!isCollapsed && <span className="nav-text">Entrenador AI</span>}
                         </NavLink>
 
+                        <NavLink to="/measurements" className={({ isActive }) => `nav-item ${isActive ? 'active' : ''}`} title="Registro">
+                            <Ruler className="nav-icon" size={22} />
+                            {!isCollapsed && <span className="nav-text">Registro</span>}
+                        </NavLink>
+
                         <div style={{ marginTop: 'auto' }}>
                             <NavLink to="/settings" className={({ isActive }) => `nav-item ${isActive ? 'active' : ''}`} title="Ajustes">
                                 <SettingsIcon className="nav-icon" size={22} />
@@ -93,6 +101,7 @@ function App() {
                         <Route path="/routines" element={<Routines />} />
                         <Route path="/analytics" element={<Analytics />} />
                         <Route path="/coach" element={<CoachAI />} />
+                        <Route path="/measurements" element={<Measurements />} />
                         <Route path="/settings" element={<Settings />} />
                     </Routes>
                 </main>

@@ -8,7 +8,7 @@ const Settings = () => {
         openai_api_key: '',
         age: '',
         gender: 'male',
-        weight: '',
+        height: '',
         goal: ''
     });
     const [loading, setLoading] = useState(true);
@@ -28,7 +28,7 @@ const Settings = () => {
                     openai_api_key: res.data.openai_api_key || '',
                     age: res.data.age || '',
                     gender: res.data.gender || 'male',
-                    weight: res.data.weight || '',
+                    height: res.data.height || '',
                     goal: res.data.goal || ''
                 });
             }
@@ -113,8 +113,8 @@ const Settings = () => {
                             </select>
                         </div>
                         <div className="form-group">
-                            <label>Peso (kg)</label>
-                            <input type="number" step="0.1" name="weight" value={formData.weight} onChange={handleChange} />
+                            <label>Altura (cm)</label>
+                            <input type="number" step="0.1" name="height" value={formData.height} onChange={handleChange} placeholder="cm" />
                         </div>
                     </div>
                     <div className="form-group">

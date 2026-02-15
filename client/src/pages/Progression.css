@@ -127,3 +127,92 @@
     line-height: 1.6;
     max-width: 600px;
 }
+
+/* Last Session Card */
+.last-session-card {
+    background: var(--bg-card);
+    border: 1px solid var(--border-subtle);
+    border-radius: var(--radius-lg);
+    padding: 32px;
+    margin-bottom: 24px;
+    background: linear-gradient(135deg, var(--bg-card) 0%, rgba(88, 101, 242, 0.05) 100%);
+    box-shadow: var(--shadow-lg);
+    border-left: 4px solid var(--primary);
+}
+
+.last-session-card h3 {
+    font-size: 1.5rem;
+    margin-bottom: 24px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    color: var(--text-main);
+}
+
+.last-session-header {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 24px;
+    margin-bottom: 24px;
+}
+
+.session-info-item {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.session-info-item .label {
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    color: var(--text-dim);
+    letter-spacing: 0.05em;
+    font-weight: 700;
+}
+
+.session-info-item .value {
+    font-size: 1.1rem;
+    color: var(--text-main);
+    font-weight: 600;
+}
+
+.sets-summary {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-top: 16px;
+    padding-top: 20px;
+    border-top: 1px solid var(--border-subtle);
+}
+
+.set-badge {
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid var(--border-subtle);
+    padding: 6px 12px;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 0.9rem;
+    transition: all 0.2s;
+}
+
+.set-badge:hover {
+    border-color: var(--primary);
+    background: rgba(88, 101, 242, 0.1);
+}
+
+.set-badge .set-number {
+    color: var(--primary);
+    font-weight: 800;
+    font-size: 0.75rem;
+}
+
+.set-badge .set-weight {
+    color: var(--text-main);
+    font-weight: 600;
+}
+
+.set-badge .set-reps {
+    color: var(--text-muted);
+}
