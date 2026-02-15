@@ -3,9 +3,12 @@ const path = require('path');
 const fs = require('fs');
 
 // Ensure data directory exists
-const dataDir = path.join(__dirname, 'data');
+// In Docker, we can override this with DATA_DIR environment variable to point to a volume
+const dataDir = process.env.DATA_DIR || path.join(__dirname, 'data');
+
 if (!fs.existsSync(dataDir)) {
-  fs.mkdirSync(dataDir);
+  console.log(`Creating data directory at: ${dataDir}`);
+  fs.mkdirSync(dataDir, { recursive: true });
 }
 
 const dbPath = path.join(dataDir, 'hevy_dash.db');

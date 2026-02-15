@@ -19,8 +19,8 @@ COPY server/ ./
 # Copy built frontend assets to server (comes after server code to ensure public/ is fresh)
 COPY --from=client-build /app/client/dist /app/server/public
 
-# Create directory for SQLite db
-RUN mkdir -p /app/server/data
+# Create persistent data directory
+RUN mkdir -p /app/data
 
 EXPOSE 3000
 CMD ["node", "index.js"]
