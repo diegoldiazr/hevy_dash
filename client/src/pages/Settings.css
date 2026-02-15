@@ -6,7 +6,14 @@
     gap: 32px;
 }
 
-.settings-page h2 {
+.settings-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-bottom: 12px;
+}
+
+.settings-header h2 {
     font-size: 2.5rem;
     letter-spacing: -0.04em;
     background: var(--gradient-primary);

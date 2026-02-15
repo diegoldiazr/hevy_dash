@@ -135,7 +135,7 @@ const Routines = () => {
 
     return (
         <div className="routines-page">
-            <div className="dashboard-header">
+            <div className="routines-header">
                 <h2>Mis Rutinas</h2>
                 <button
                     className={`sync-btn ${syncing ? 'spinning' : ''}`}

@@ -242,8 +242,8 @@
 /* Chart Override */
 .recharts-cartesian-grid-horizontal line,
 .recharts-cartesian-grid-vertical line {
-    stroke: var(--border-subtle);
-    opacity: 0.4;
+    stroke: var(--chart-grid);
+    opacity: 1;
 }
 
 .recharts-tooltip-cursor {

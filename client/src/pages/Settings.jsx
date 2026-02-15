@@ -72,7 +72,9 @@ const Settings = () => {
 
     return (
         <div className="settings-page">
-            <h2>Ajustes de la Aplicación</h2>
+            <div className="settings-header">
+                <h2>Ajustes de la Aplicación</h2>
+            </div>
 
             {message && (
                 <div className={`message ${message.type}`}>

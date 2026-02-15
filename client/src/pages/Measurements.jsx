@@ -65,7 +65,7 @@ const Measurements = () => {
             <div className="chart-wrapper">
                 <ResponsiveContainer width="100%" height={200}>
                     <LineChart data={history}>
-                        <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.05)" vertical={false} />
+                        <CartesianGrid strokeDasharray="3 3" stroke="var(--chart-grid)" vertical={false} />
                         <XAxis dataKey="date" hide />
                         <YAxis stroke="#888" fontSize={10} tickLine={false} axisLine={false} domain={['auto', 'auto']} />
                         <Tooltip

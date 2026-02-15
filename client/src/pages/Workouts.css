@@ -11,14 +11,14 @@
 }
 
 /* Header */
-.header {
+.workouts-header {
     display: flex;
     justify-content: space-between;
     align-items: center;
     padding-bottom: 12px;
 }
 
-.header h2 {
+.workouts-header h2 {
     font-size: 2.5rem;
     letter-spacing: -0.04em;
     background: var(--gradient-primary);

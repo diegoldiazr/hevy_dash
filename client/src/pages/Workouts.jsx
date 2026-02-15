@@ -147,7 +147,7 @@ const Workouts = () => {
 
     return (
         <div className="workouts-page">
-            <div className="header">
+            <div className="workouts-header">
                 <h2>Entrenamientos</h2>
                 <button
                     className={`sync-btn ${syncing ? 'spinning' : ''}`}
@@ -235,7 +235,7 @@ const Workouts = () => {
                                     <div className="workout-radar-container">
                                         <ResponsiveContainer width="100%" height={220}>
                                             <RadarChart cx="50%" cy="50%" outerRadius="70%" data={calculateRadarData(selectedWorkout)}>
-                                                <PolarGrid gridType="polygon" stroke="rgba(255,255,255,0.05)" />
+                                                <PolarGrid gridType="polygon" stroke="var(--chart-grid)" />
                                                 <PolarAngleAxis dataKey="subject" tick={{ fill: '#888', fontSize: 10 }} />
                                                 <Radar
                                                     name="Enfoque"

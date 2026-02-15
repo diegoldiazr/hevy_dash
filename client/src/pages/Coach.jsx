@@ -50,7 +50,9 @@ const Coach = () => {
 
     return (
         <div className="coach-page">
-            <h2>Entrenador Personal AI</h2>
+            <div className="coach-header">
+                <h2>Entrenador Personal AI</h2>
+            </div>
             <div className="chat-container">
                 <div className="messages-list">
                     {messages.map((msg, idx) => (
