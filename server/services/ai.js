@@ -53,7 +53,7 @@ const chat = async (message, context = []) => {
             const systemPrompt = "Eres un experto entrenador de fitness especializado en entrenamiento de fuerza y culturismo. Analizas datos de entrenamiento y das consejos accionables. Usa los datos del usuario (edad, altura, peso, medidas) para dar feedback preciso. Sé conciso y motivador. Responde siempre en español.";
 
             const model = genAI.getGenerativeModel({
-                model: "gemini-pro",
+                model: "gemini-1.5-flash",
                 systemInstruction: systemPrompt
             });
 
@@ -100,7 +100,7 @@ const chat = async (message, context = []) => {
                 { role: "user", content: message }
             ];
 
-            const model = provider === 'grok' ? "grok-2" : "gpt-3.5-turbo";
+            const model = provider === 'grok' ? "grok-2" : "gpt-4o-mini";
 
             const completion = await openai.createChatCompletion({
                 model: model,
