@@ -1,44 +1,82 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
-import { Dumbbell, Activity, Calendar, RefreshCw } from 'lucide-react';
-import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, LabelList } from 'recharts';
+import { Dumbbell, Activity, Calendar, RefreshCw, Clock } from 'lucide-react';
+import { ComposedChart, Bar, Line, XAxis, YAxis, Tooltip, ResponsiveContainer, LabelList, CartesianGrid, BarChart } from 'recharts';
 
 const Dashboard = () => {
     const [stats, setStats] = useState({
-        totalWorkouts: 0,
-        yearWorkouts: 0,
-        totalVolume: 0,
-        yearVolume: 0,
+        workouts: { month: 0, year: 0, all: 0 },
+        volume: { month: 0, year: 0, all: 0 },
+        duration: { month: 0, year: 0, all: 0 },
         recentWorkouts: []
     });
     const [loading, setLoading] = useState(true);
     const [syncing, setSyncing] = useState(false);
-    const [showAllWorkouts, setShowAllWorkouts] = useState(false);
-    const [showAllVolume, setShowAllVolume] = useState(false);
+
+    // Independent periods
+    const [workoutsPeriod, setWorkoutsPeriod] = useState('year');
+    const [totalVolumePeriod, setTotalVolumePeriod] = useState('year');
+
+    const [volumeChartData, setVolumeChartData] = useState([]);
+    const [volumePeriod, setVolumePeriod] = useState('month');
+
+    const [durationChartData, setDurationChartData] = useState([]);
+    const [durationPeriod, setDurationPeriod] = useState('month');
+
+    const [recentMuscleStats, setRecentMuscleStats] = useState([]);
+    const [musclePeriod, setMusclePeriod] = useState('month');
 
     const currentYear = new Date().getFullYear();
 
-    useEffect(() => {
-        const fetchStats = async () => {
-            try {
-                const res = await axios.get('/api/stats');
-                setStats(res.data);
-            } catch (error) {
-                console.error("Failed to fetch stats", error);
-            } finally {
-                setLoading(false);
+    const fetchCoreStats = async () => {
+        try {
+            const res = await axios.get('/api/stats');
+            setStats(res.data);
+        } catch (error) {
+            console.error("Failed to fetch core stats", error);
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    const fetchChartData = async (metric, period, setter) => {
+        try {
+            const res = await axios.get(`/api/stats/chart?metric=${metric}&period=${period}`);
+            // Calculate average
+            const data = res.data || [];
+            if (data.length > 0) {
+                const avg = data.reduce((acc, curr) => acc + curr.value, 0) / data.length;
+                setter(data.map(item => ({ ...item, average: Math.round(avg) })));
+            } else {
+                setter([]);
             }
-        };
-        fetchStats();
-    }, []);
+        } catch (error) {
+            console.error(`Failed to fetch ${metric} chart data`, error);
+        }
+    };
+
+    const fetchMuscleStats = async (period) => {
+        try {
+            const res = await axios.get(`/api/stats/muscles?period=${period}`);
+            setRecentMuscleStats(res.data);
+        } catch (error) {
+            console.error("Failed to fetch muscle stats", error);
+        }
+    };
+
+    useEffect(() => { fetchCoreStats(); }, []);
+    useEffect(() => { fetchChartData('volume', volumePeriod, setVolumeChartData); }, [volumePeriod]);
+    useEffect(() => { fetchChartData('duration', durationPeriod, setDurationChartData); }, [durationPeriod]);
+    useEffect(() => { fetchMuscleStats(musclePeriod); }, [musclePeriod]);
 
     const handleSync = async () => {
         setSyncing(true);
         try {
-            await axios.post('/api/hevy/sync');
-            const res = await axios.get('/api/stats');
-            console.log("Stats updated:", res.data);
-            setStats(res.data);
+            await axios.post('/api/hevy/sync?fullSync=true');
+            await fetchCoreStats();
+            await fetchChartData('volume', volumePeriod, setVolumeChartData);
+            await fetchChartData('duration', durationPeriod, setDurationChartData);
+            await fetchMuscleStats(musclePeriod);
         } catch (error) {
             console.error("Failed to sync", error);
         } finally {
@@ -46,26 +84,21 @@ const Dashboard = () => {
         }
     };
 
-    if (loading) return <div className="loading">Cargando Panel...</div>;
+    const PeriodSelector = ({ current, onChange }) => (
+        <div className="period-selector mini">
+            <button className={`period-btn ${current === 'month' ? 'active' : ''}`} onClick={(e) => { e.stopPropagation(); onChange('month'); }}>Mes</button>
+            <button className={`period-btn ${current === 'year' ? 'active' : ''}`} onClick={(e) => { e.stopPropagation(); onChange('year'); }}>Año</button>
+            <button className={`period-btn ${current === 'all' ? 'active' : ''}`} onClick={(e) => { e.stopPropagation(); onChange('all'); }}>Todo</button>
+        </div>
+    );
 
-    // Mock data for the chart if no real data
-    const chartData = stats.recentWorkouts.length > 0
-        ? stats.recentWorkouts.map(w => ({ name: new Date(w.start_time).toLocaleDateString(), volume: w.volume_kg })).reverse()
-        : [
-            { name: 'Lun', volume: 4000 },
-            { name: 'Mié', volume: 3000 },
-            { name: 'Vie', volume: 5000 },
-        ];
+    if (loading) return <div className="loading">Cargando Panel...</div>;
 
     return (
         <div className="dashboard-page">
             <div className="dashboard-header">
                 <h2>Panel de Control</h2>
-                <button
-                    className={`sync-btn ${syncing ? 'spinning' : ''}`}
-                    onClick={handleSync}
-                    disabled={syncing}
-                >
+                <button className={`sync-btn ${syncing ? 'spinning' : ''}`} onClick={handleSync} disabled={syncing}>
                     <RefreshCw size={18} />
                     {syncing ? 'Sincronizando...' : 'Sincronizar Hevy'}
                 </button>
@@ -75,31 +108,17 @@ const Dashboard = () => {
                 <div className="stat-card">
                     <div className="icon-wrapper"><Dumbbell size={24} /></div>
                     <div className="stat-info">
-                        <h3>{showAllWorkouts ? stats.totalWorkouts : stats.yearWorkouts}</h3>
-                        <p>{showAllWorkouts ? 'Entrenamientos Totales' : `Entrenamientos ${currentYear}`}</p>
-                        <label className="stat-toggle">
-                            <input
-                                type="checkbox"
-                                checked={showAllWorkouts}
-                                onChange={(e) => setShowAllWorkouts(e.target.checked)}
-                            />
-                            <span>Ver histórico</span>
-                        </label>
+                        <h3>{workoutsPeriod === 'month' ? stats.workouts.month : (workoutsPeriod === 'year' ? stats.workouts.year : stats.workouts.all)}</h3>
+                        <p>{workoutsPeriod === 'month' ? 'Este Mes' : (workoutsPeriod === 'year' ? `Año ${currentYear}` : 'Histórico')}</p>
+                        <div className="stat-period-wrapper"><PeriodSelector current={workoutsPeriod} onChange={setWorkoutsPeriod} /></div>
                     </div>
                 </div>
                 <div className="stat-card">
                     <div className="icon-wrapper"><Activity size={24} /></div>
                     <div className="stat-info">
-                        <h3>{((showAllVolume ? stats.totalVolume : stats.yearVolume) / 1000).toFixed(1)}k kg</h3>
-                        <p>{showAllVolume ? 'Volumen Total' : `Volumen ${currentYear}`}</p>
-                        <label className="stat-toggle">
-                            <input
-                                type="checkbox"
-                                checked={showAllVolume}
-                                onChange={(e) => setShowAllVolume(e.target.checked)}
-                            />
-                            <span>Ver histórico</span>
-                        </label>
+                        <h3>{((totalVolumePeriod === 'month' ? stats.volume.month : (totalVolumePeriod === 'year' ? stats.volume.year : stats.volume.all)) / 1000).toFixed(1)}k kg</h3>
+                        <p>{totalVolumePeriod === 'month' ? 'Este Mes' : (totalVolumePeriod === 'year' ? `Año ${currentYear}` : 'Histórico')}</p>
+                        <div className="stat-period-wrapper"><PeriodSelector current={totalVolumePeriod} onChange={setTotalVolumePeriod} /></div>
                     </div>
                 </div>
                 <div className="stat-card">
@@ -112,24 +131,60 @@ const Dashboard = () => {
             </div>
 
             <div className="chart-section">
-                <h3>Volumén Reciente</h3>
+                <div className="chart-header">
+                    <h3>Volumen Reciente (kg)</h3>
+                    <PeriodSelector current={volumePeriod} onChange={setVolumePeriod} />
+                </div>
                 <div className="chart-container">
                     <ResponsiveContainer width="100%" height={300}>
-                        <BarChart data={chartData}>
-                            <XAxis dataKey="name" stroke="#888" />
-                            <YAxis stroke="#888" />
-                            <Tooltip
-                                contentStyle={{ backgroundColor: 'var(--card-bg)', border: '1px solid var(--border-color)' }}
-                                itemStyle={{ color: 'var(--text-primary)' }}
-                            />
-                            <Bar dataKey="volume" fill="#2563eb" radius={[4, 4, 0, 0]}>
-                                <LabelList
-                                    dataKey="volume"
-                                    position="inside"
-                                    fill="white"
-                                    formatter={(value) => `${value} kg`}
-                                    style={{ fontSize: '12px', fontWeight: 'bold' }}
-                                />
+                        <ComposedChart data={volumeChartData}>
+                            <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.05)" vertical={false} />
+                            <XAxis dataKey="name" stroke="#888" fontSize={10} tickLine={false} axisLine={false} />
+                            <YAxis stroke="#888" fontSize={10} tickLine={false} axisLine={false} />
+                            <Tooltip contentStyle={{ backgroundColor: 'var(--bg-card)', border: '1px solid var(--border-subtle)', borderRadius: '8px' }} itemStyle={{ color: 'var(--text-main)' }} />
+                            <Bar dataKey="value" fill="#5865f2" radius={[4, 4, 0, 0]} barSize={volumePeriod === 'month' ? 30 : 40}>
+                                <LabelList dataKey="value" position="top" fill="#888" formatter={(v) => `${v}`} style={{ fontSize: '10px' }} />
+                            </Bar>
+                            <Line type="monotone" dataKey="average" stroke="#ff4757" strokeWidth={2} dot={false} strokeDasharray="5 5" name="Media" />
+                        </ComposedChart>
+                    </ResponsiveContainer>
+                </div>
+            </div>
+
+            <div className="chart-section">
+                <div className="chart-header">
+                    <h3>Tiempo de Sesión (min)</h3>
+                    <PeriodSelector current={durationPeriod} onChange={setDurationPeriod} />
+                </div>
+                <div className="chart-container">
+                    <ResponsiveContainer width="100%" height={300}>
+                        <ComposedChart data={durationChartData}>
+                            <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.05)" vertical={false} />
+                            <XAxis dataKey="name" stroke="#888" fontSize={10} tickLine={false} axisLine={false} />
+                            <YAxis stroke="#888" fontSize={10} tickLine={false} axisLine={false} />
+                            <Tooltip contentStyle={{ backgroundColor: 'var(--bg-card)', border: '1px solid var(--border-subtle)', borderRadius: '8px' }} itemStyle={{ color: 'var(--text-main)' }} />
+                            <Bar dataKey="value" fill="#10b981" radius={[4, 4, 0, 0]} barSize={durationPeriod === 'month' ? 30 : 40}>
+                                <LabelList dataKey="value" position="top" fill="#888" formatter={(v) => `${v}`} style={{ fontSize: '10px' }} />
+                            </Bar>
+                            <Line type="monotone" dataKey="average" stroke="#eccc68" strokeWidth={2} dot={false} strokeDasharray="5 5" name="Media" />
+                        </ComposedChart>
+                    </ResponsiveContainer>
+                </div>
+            </div>
+
+            <div className="chart-section">
+                <div className="chart-header">
+                    <h3>Top 10 Músculos Entrenados</h3>
+                    <PeriodSelector current={musclePeriod} onChange={setMusclePeriod} />
+                </div>
+                <div className="chart-container">
+                    <ResponsiveContainer width="100%" height={350}>
+                        <BarChart data={recentMuscleStats} layout="vertical">
+                            <XAxis type="number" hide />
+                            <YAxis dataKey="name" type="category" stroke="#888" width={100} fontSize={12} tickLine={false} axisLine={false} />
+                            <Tooltip contentStyle={{ backgroundColor: 'var(--bg-card)', border: '1px solid var(--border-subtle)', borderRadius: '8px' }} itemStyle={{ color: 'var(--text-main)' }} cursor={{ fill: 'transparent' }} />
+                            <Bar dataKey="count" fill="var(--primary)" radius={[0, 4, 4, 0]}>
+                                <LabelList dataKey="count" position="right" style={{ fill: 'var(--text-muted)', fontSize: '12px' }} formatter={(v) => `${v} series`} />
                             </Bar>
                         </BarChart>
                     </ResponsiveContainer>
@@ -138,19 +193,15 @@ const Dashboard = () => {
 
             <div className="recent-list">
                 <h3>Actividad Reciente</h3>
-                {stats.recentWorkouts.length === 0 ? (
-                    <p className="no-data">No hay entrenamientos registrados. ¡Sincroniza con Hevy para ver tus datos!</p>
-                ) : (
-                    <ul>
-                        {stats.recentWorkouts.map(w => (
-                            <li key={w.id} className="workout-item">
-                                <span className="title">{w.title}</span>
-                                <span className="date">{new Date(w.start_time).toLocaleDateString()}</span>
-                                <span className="volume">{w.volume_kg} kg</span>
-                            </li>
-                        ))}
-                    </ul>
-                )}
+                <ul>
+                    {stats.recentWorkouts.map(w => (
+                        <li key={w.id} className="workout-item">
+                            <span className="title">{w.title}</span>
+                            <span className="date">{new Date(w.start_time).toLocaleDateString()}</span>
+                            <span className="volume">{w.volume_kg} kg</span>
+                        </li>
+                    ))}
+                </ul>
             </div>
         </div>
     );
