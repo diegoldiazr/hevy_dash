@@ -85,15 +85,15 @@ const Settings = () => {
                         <small>Necesaria para obtener tus entrenamientos.</small>
                     </div>
                     <div className="form-group">
-                        <label>OpenAI/Gemini API Key</label>
+                        <label>AI API Key (Gemini, OpenAI, Grok)</label>
                         <input
                             type="password"
                             name="openai_api_key"
                             value={formData.openai_api_key}
                             onChange={handleChange}
-                            placeholder="sk-..."
+                            placeholder="Introduce tu clave..."
                         />
-                        <small>Necesaria para el Entrenador AI.</small>
+                        <small>Auto-detecta automáticamente el proveedor (Gemini, ChatGPT o Grok).</small>
                     </div>
                 </section>
 
