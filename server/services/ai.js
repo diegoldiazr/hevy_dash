@@ -53,7 +53,7 @@ const chat = async (message, context = []) => {
             const systemPrompt = "Eres un experto entrenador de fitness especializado en entrenamiento de fuerza y culturismo. Analizas datos de entrenamiento y das consejos accionables. Usa los datos del usuario (edad, altura, peso, medidas) para dar feedback preciso. Sé conciso y motivador. Responde siempre en español.";
 
             const model = genAI.getGenerativeModel({
-                model: "gemini-1.5-flash",
+                model: "gemini-1.5-pro",
                 systemInstruction: systemPrompt
             });
 
@@ -95,12 +95,12 @@ const chat = async (message, context = []) => {
 
         try {
             const messages = [
-                { role: "system", content: "You are an expert fitness coach specific to strength training and bodybuilding. You analyze workout data and provide actionable advice. Use the user's data (age, height, weight charts, body measurements) to give precise feedback. Be concise and motivational." },
+                { role: "system", content: "Eres un experto entrenador de fitness especializado en entrenamiento de fuerza y culturismo. Analizas datos de entrenamiento y das consejos accionables. Usa los datos del usuario (edad, altura, peso, medidas) para dar feedback preciso. Sé conciso y motivador. Responde siempre en español." },
                 ...context,
                 { role: "user", content: message }
             ];
 
-            const model = provider === 'grok' ? "grok-beta" : "gpt-3.5-turbo";
+            const model = provider === 'grok' ? "grok-2" : "gpt-3.5-turbo";
 
             const completion = await openai.createChatCompletion({
                 model: model,

@@ -41,7 +41,8 @@ const Coach = () => {
             setMessages(prev => [...prev, botMessage]);
         } catch (error) {
             console.error(error);
-            setMessages(prev => [...prev, { role: 'system', content: 'Lo siento, he encontrado un error al comunicarme con el servidor.' }]);
+            const errorMsg = error.response?.data?.error || 'Lo siento, he encontrado un error al comunicarme con el servidor.';
+            setMessages(prev => [...prev, { role: 'system', content: errorMsg }]);
         } finally {
             setLoading(false);
         }
