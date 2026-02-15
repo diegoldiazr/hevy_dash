@@ -1,4 +1,3 @@
-/* Modern AI Chat Interface */
 .coach-page {
     height: calc(100vh - 100px);
     max-width: 900px;
@@ -6,6 +5,17 @@
     display: flex;
     flex-direction: column;
 }
+
+.coach-page h2 {
+    font-size: 2.5rem;
+    letter-spacing: -0.04em;
+    background: var(--gradient-primary);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    margin: 0 0 24px 0;
+}
+
 
 .chat-container {
     flex: 1;

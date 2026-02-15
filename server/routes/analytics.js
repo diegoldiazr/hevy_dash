@@ -7,13 +7,29 @@ router.get('/', (req, res) => {
     // 2. Consistency (Dates of workouts)
     // 3. Weekly Volume
 
+    const period = req.query.period || 'all'; // 'month', 'year', 'all'
+
+    // Calculate date filter
+    let dateFilter = '';
+    const now = new Date();
+
+    if (period === 'month') {
+        const monthAgo = new Date(now);
+        monthAgo.setMonth(monthAgo.getMonth() - 1);
+        dateFilter = ` WHERE start_time >= '${monthAgo.toISOString()}'`;
+    } else if (period === 'year') {
+        const yearAgo = new Date(now);
+        yearAgo.setFullYear(yearAgo.getFullYear() - 1);
+        dateFilter = ` WHERE start_time >= '${yearAgo.toISOString()}'`;
+    }
+
     const analytics = {
         muscleSplit: {},
         consistency: [],
         weeklyVolume: []
     };
 
-    db.all('SELECT start_time, volume_kg, raw_data FROM workouts ORDER BY start_time ASC', (err, rows) => {
+    db.all(`SELECT start_time, volume_kg, raw_data FROM workouts${dateFilter} ORDER BY start_time ASC`, (err, rows) => {
         if (err) return res.status(500).json({ error: err.message });
 
         const muscleCounts = {};

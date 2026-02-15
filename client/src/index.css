@@ -6,43 +6,6 @@
 @tailwind utilities;
 
 :root {
-    /* Color Palette - Elegant Dark Mode (Inspired by Hevy/Modern Fitness Apps) */
-    --bg-dark: #050505;
-    /* Ultra dark background */
-    --bg-card: #121212;
-    /* Slightly lighter for cards */
-    --bg-card-hover: #1E1E1E;
-    /* Hover state */
-
-    --primary: #5865F2;
-    /* Vibrant Blurple/Indigo (Like Discord/Hevy modern) */
-    --primary-glow: rgba(88, 101, 242, 0.5);
-
-    --secondary: #1E1F22;
-    /* Secondary UI elements */
-
-    --text-main: #FFFFFF;
-    --text-muted: #9CA3AF;
-    /* Cool gray */
-    --text-dim: #4B5563;
-
-    --border-subtle: #2A2A2A;
-    --border-active: #404040;
-
-    --success: #2ECC71;
-    --warning: #F1C40F;
-    --error: #E74C3C;
-
-    /* Gradients */
-    --gradient-primary: linear-gradient(135deg, #5865F2 0%, #4752C4 100%);
-    --gradient-surface: linear-gradient(180deg, rgba(255, 255, 255, 0.03) 0%, rgba(255, 255, 255, 0) 100%);
-
-    /* Shadows */
-    --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.5);
-    --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.5), 0 2px 4px -1px rgba(0, 0, 0, 0.3);
-    --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.5), 0 4px 6px -2px rgba(0, 0, 0, 0.3);
-    --shadow-glow: 0 0 20px var(--primary-glow);
-
     /* Spacing & Radius */
     --radius-sm: 8px;
     --radius-md: 16px;
@@ -51,6 +14,107 @@
     /* Transitions */
     --transition-fast: 0.15s ease;
     --transition-normal: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Dark Theme (Default) */
+body[data-theme="dark"],
+body:not([data-theme]) {
+    /* Color Palette - Elegant Dark Mode */
+    --bg-dark: #050505;
+    --bg-card: #121212;
+    --bg-card-hover: #1E1E1E;
+
+    --primary: #6B7FFF;
+    /* Brighter blue for better readability */
+    --primary-hover: #8B9AFF;
+    --primary-glow: rgba(107, 127, 255, 0.5);
+
+    --secondary: #1E1F22;
+
+    --text-main: #FFFFFF;
+    --text-muted: #B4B9C5;
+    /* Lighter gray for better readability */
+    --text-dim: #6B7280;
+
+    --border-subtle: #2A2A2A;
+    --border-active: #404040;
+
+    --success: #3DD68C;
+    /* Brighter green */
+    --warning: #FFC940;
+    /* Brighter yellow */
+    --error: #FF5C5C;
+    /* Brighter red */
+
+    /* Chart Colors - High Contrast */
+    --chart-1: #6B7FFF;
+    --chart-2: #3DD68C;
+    --chart-3: #FFC940;
+    --chart-4: #FF5C5C;
+    --chart-5: #A78BFA;
+    --chart-6: #34D399;
+    --chart-7: #60A5FA;
+
+    /* Chart Grid Lines */
+    --chart-grid: rgba(255, 255, 255, 0.08);
+
+    /* Gradients */
+    --gradient-primary: linear-gradient(135deg, #6B7FFF 0%, #5865F2 100%);
+    --gradient-surface: linear-gradient(180deg, rgba(255, 255, 255, 0.03) 0%, rgba(255, 255, 255, 0) 100%);
+
+    /* Shadows */
+    --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.5);
+    --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.5), 0 2px 4px -1px rgba(0, 0, 0, 0.3);
+    --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.5), 0 4px 6px -2px rgba(0, 0, 0, 0.3);
+    --shadow-glow: 0 0 20px var(--primary-glow);
+}
+
+/* Light Theme */
+body[data-theme="light"] {
+    /* Color Palette - Clean Light Mode */
+    --bg-dark: #F5F7FA;
+    --bg-card: #FFFFFF;
+    --bg-card-hover: #F8FAFC;
+
+    --primary: #4F5FD9;
+    /* Darker blue for contrast on light bg */
+    --primary-hover: #3D4EC4;
+    --primary-glow: rgba(79, 95, 217, 0.3);
+
+    --secondary: #E5E7EB;
+
+    --text-main: #1F2937;
+    --text-muted: #6B7280;
+    --text-dim: #9CA3AF;
+
+    --border-subtle: #E5E7EB;
+    --border-active: #CBD5E1;
+
+    --success: #059669;
+    --warning: #D97706;
+    --error: #DC2626;
+
+    /* Chart Colors - Vibrant for Light Mode */
+    --chart-1: #4F5FD9;
+    --chart-2: #059669;
+    --chart-3: #D97706;
+    --chart-4: #DC2626;
+    --chart-5: #7C3AED;
+    --chart-6: #0891B2;
+    --chart-7: #2563EB;
+
+    /* Chart Grid Lines */
+    --chart-grid: rgba(0, 0, 0, 0.1);
+
+    /* Gradients */
+    --gradient-primary: linear-gradient(135deg, #4F5FD9 0%, #3D4EC4 100%);
+    --gradient-surface: linear-gradient(180deg, rgba(0, 0, 0, 0.02) 0%, rgba(0, 0, 0, 0) 100%);
+
+    /* Shadows */
+    --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+    --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+    --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+    --shadow-glow: 0 0 20px var(--primary-glow);
 }
 
 * {

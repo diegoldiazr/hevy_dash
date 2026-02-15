@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-import { Save, CheckCircle, AlertCircle } from 'lucide-react';
+import { Save, CheckCircle, AlertCircle, Moon, Sun } from 'lucide-react';
 
 const Settings = () => {
     const [formData, setFormData] = useState({
@@ -11,13 +11,24 @@ const Settings = () => {
         height: '',
         goal: ''
     });
+    const [theme, setTheme] = useState(() => {
+        return localStorage.getItem('theme') || 'dark';
+    });
     const [loading, setLoading] = useState(true);
     const [saving, setSaving] = useState(false);
     const [message, setMessage] = useState(null);
 
     useEffect(() => {
         fetchSettings();
+        // Apply theme on mount
+        document.body.setAttribute('data-theme', theme);
     }, []);
+
+    useEffect(() => {
+        // Update theme when it changes
+        document.body.setAttribute('data-theme', theme);
+        localStorage.setItem('theme', theme);
+    }, [theme]);
 
     const fetchSettings = async () => {
         try {
@@ -71,6 +82,32 @@ const Settings = () => {
             )}
 
             <form onSubmit={handleSubmit} className="settings-form">
+                <section className="settings-section">
+                    <h3>Apariencia</h3>
+                    <div className="form-group">
+                        <label>Tema de la Aplicación</label>
+                        <div className="theme-toggle">
+                            <button
+                                type="button"
+                                className={`theme-btn ${theme === 'dark' ? 'active' : ''}`}
+                                onClick={() => setTheme('dark')}
+                            >
+                                <Moon size={18} />
+                                Oscuro
+                            </button>
+                            <button
+                                type="button"
+                                className={`theme-btn ${theme === 'light' ? 'active' : ''}`}
+                                onClick={() => setTheme('light')}
+                            >
+                                <Sun size={18} />
+                                Claro
+                            </button>
+                        </div>
+                        <small>Cambia entre tema oscuro y claro para mejor legibilidad.</small>
+                    </div>
+                </section>
+
                 <section className="settings-section">
                     <h3>Integraciones API</h3>
                     <div className="form-group">

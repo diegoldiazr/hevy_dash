@@ -11,6 +11,24 @@
     /* Center content */
 }
 
+/* Dashboard Header */
+.dashboard-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-bottom: 12px;
+}
+
+.dashboard-header h2 {
+    font-size: 2.5rem;
+    letter-spacing: -0.04em;
+    background: var(--gradient-primary);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    margin: 0;
+}
+
 /* Stats Row */
 .stats-grid {
     display: grid;

@@ -1,10 +1,19 @@
-/* Modern Settings Layout */
 .settings-page {
     max-width: 960px;
     margin: 0 auto;
     display: flex;
     flex-direction: column;
     gap: 32px;
+}
+
+.settings-page h2 {
+    font-size: 2.5rem;
+    letter-spacing: -0.04em;
+    background: var(--gradient-primary);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    margin: 0;
 }
 
 .settings-section {
@@ -85,6 +94,50 @@
 .row .form-group {
     flex: 1;
 }
+
+/* Theme Toggle */
+.theme-toggle {
+    display: flex;
+    gap: 12px;
+    margin-bottom: 8px;
+}
+
+.theme-btn {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    padding: 14px 24px;
+    background: var(--bg-card-hover);
+    border: 2px solid var(--border-subtle);
+    border-radius: var(--radius-sm);
+    color: var(--text-muted);
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.theme-btn:hover {
+    border-color: var(--border-active);
+    background: var(--bg-card);
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-md);
+}
+
+.theme-btn.active {
+    background: var(--gradient-primary);
+    border-color: var(--primary);
+    color: white;
+    box-shadow: 0 4px 16px var(--primary-glow);
+}
+
+.theme-btn.active:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px var(--primary-glow);
+}
+
 
 /* Save Button */
 .save-btn {

@@ -173,7 +173,7 @@ const Dashboard = () => {
                 <div className="chart-container">
                     <ResponsiveContainer width="100%" height={300}>
                         <ComposedChart data={volumeChartData}>
-                            <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.05)" vertical={false} />
+                            <CartesianGrid strokeDasharray="3 3" stroke="var(--chart-grid)" vertical={false} />
                             <XAxis dataKey="name" stroke="#888" fontSize={10} tickLine={false} axisLine={false} />
                             <YAxis stroke="#888" fontSize={10} tickLine={false} axisLine={false} />
                             <Tooltip contentStyle={{ backgroundColor: 'var(--bg-card)', border: '1px solid var(--border-subtle)', borderRadius: '8px' }} itemStyle={{ color: 'var(--text-main)' }} />
@@ -194,7 +194,7 @@ const Dashboard = () => {
                 <div className="chart-container">
                     <ResponsiveContainer width="100%" height={300}>
                         <ComposedChart data={durationChartData}>
-                            <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.05)" vertical={false} />
+                            <CartesianGrid strokeDasharray="3 3" stroke="var(--chart-grid)" vertical={false} />
                             <XAxis dataKey="name" stroke="#888" fontSize={10} tickLine={false} axisLine={false} />
                             <YAxis stroke="#888" fontSize={10} tickLine={false} axisLine={false} />
                             <Tooltip contentStyle={{ backgroundColor: 'var(--bg-card)', border: '1px solid var(--border-subtle)', borderRadius: '8px' }} itemStyle={{ color: 'var(--text-main)' }} />
@@ -216,7 +216,7 @@ const Dashboard = () => {
                     <div className="chart-container radar-container">
                         <ResponsiveContainer width="100%" height={350}>
                             <RadarChart cx="50%" cy="50%" outerRadius="80%" data={radarData}>
-                                <PolarGrid gridType="polygon" stroke="rgba(255,255,255,0.05)" />
+                                <PolarGrid gridType="polygon" stroke="var(--chart-grid)" />
                                 <PolarAngleAxis dataKey="subject" tick={{ fill: '#888', fontSize: 12 }} />
                                 <Radar
                                     name="Nivel"

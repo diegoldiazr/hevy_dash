@@ -8,6 +8,7 @@ const Progression = () => {
     const [selectedExercise, setSelectedExercise] = useState('');
     const [history, setHistory] = useState([]);
     const [loading, setLoading] = useState(true);
+    const [timePeriod, setTimePeriod] = useState('all'); // 'month', 'year', 'all'
 
     useEffect(() => {
         const fetchExercises = async () => {
@@ -33,7 +34,7 @@ const Progression = () => {
         const fetchHistory = async () => {
             setLoading(true);
             try {
-                const res = await axios.get(`/api/exercises/${encodeURIComponent(selectedExercise)}/history`);
+                const res = await axios.get(`/api/exercises/${encodeURIComponent(selectedExercise)}/history?period=${timePeriod}`);
                 setHistory(res.data.map(h => ({
                     ...h,
                     date: new Date(h.date).toLocaleDateString()
@@ -45,11 +46,33 @@ const Progression = () => {
             }
         };
         fetchHistory();
-    }, [selectedExercise]);
+    }, [selectedExercise, timePeriod]);
 
     return (
         <div className="progression-page">
-            <h2>Análisis de Progresión</h2>
+            <div className="page-header">
+                <h2>Análisis de Progresión</h2>
+                <div className="time-period-toggle">
+                    <button
+                        className={`period-btn ${timePeriod === 'month' ? 'active' : ''}`}
+                        onClick={() => setTimePeriod('month')}
+                    >
+                        Mes
+                    </button>
+                    <button
+                        className={`period-btn ${timePeriod === 'year' ? 'active' : ''}`}
+                        onClick={() => setTimePeriod('year')}
+                    >
+                        Año
+                    </button>
+                    <button
+                        className={`period-btn ${timePeriod === 'all' ? 'active' : ''}`}
+                        onClick={() => setTimePeriod('all')}
+                    >
+                        Todos
+                    </button>
+                </div>
+            </div>
 
             <div className="controls">
                 <label>Seleccionar Ejercicio:</label>
@@ -115,7 +138,7 @@ const Progression = () => {
                         <div className="chart-container">
                             <ResponsiveContainer width="100%" height={300}>
                                 <LineChart data={history}>
-                                    <CartesianGrid strokeDasharray="3 3" stroke="var(--border-subtle)" vertical={false} />
+                                    <CartesianGrid strokeDasharray="3 3" stroke="var(--chart-grid)" vertical={false} />
                                     <XAxis dataKey="date" stroke="var(--text-muted)" tick={{ fontSize: 10 }} />
                                     <YAxis stroke="var(--text-muted)" tick={{ fontSize: 10 }} />
                                     <Tooltip
@@ -126,9 +149,9 @@ const Progression = () => {
                                     <Line
                                         type="monotone"
                                         dataKey="e1rm"
-                                        stroke="#5865F2"
+                                        stroke="var(--chart-1)"
                                         strokeWidth={3}
-                                        dot={{ r: 4, fill: '#5865F2' }}
+                                        dot={{ r: 4, fill: 'var(--chart-1)' }}
                                         activeDot={{ r: 8, stroke: '#FFFFFF', strokeWidth: 2 }}
                                         name="1RM Estimado (kg)"
                                         connectNulls={true}
@@ -154,9 +177,9 @@ const Progression = () => {
                                     <Line
                                         type="monotone"
                                         dataKey="volume"
-                                        stroke="#10B981"
+                                        stroke="var(--chart-2)"
                                         strokeWidth={3}
-                                        dot={{ r: 4, fill: '#10B981' }}
+                                        dot={{ r: 4, fill: 'var(--chart-2)' }}
                                         activeDot={{ r: 8, stroke: '#FFFFFF', strokeWidth: 2 }}
                                         name="Volumen Total (kg)"
                                         connectNulls={true}
@@ -182,9 +205,9 @@ const Progression = () => {
                                     <Line
                                         type="monotone"
                                         dataKey="totalReps"
-                                        stroke="#F59E0B"
+                                        stroke="var(--chart-3)"
                                         strokeWidth={3}
-                                        dot={{ r: 4, fill: '#F59E0B' }}
+                                        dot={{ r: 4, fill: 'var(--chart-3)' }}
                                         activeDot={{ r: 8, stroke: '#FFFFFF', strokeWidth: 2 }}
                                         name="Repeticiones Totales"
                                         connectNulls={true}

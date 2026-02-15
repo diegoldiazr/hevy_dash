@@ -28,6 +28,21 @@ router.get('/', (req, res) => {
 // Get history for a specific exercise
 router.get('/:name/history', (req, res) => {
     const exerciseName = req.params.name;
+    const period = req.query.period || 'all'; // 'month', 'year', 'all'
+
+    // Calculate date filter
+    let dateFilter = '';
+    const now = new Date();
+
+    if (period === 'month') {
+        const monthAgo = new Date(now);
+        monthAgo.setMonth(monthAgo.getMonth() - 1);
+        dateFilter = ` WHERE start_time >= '${monthAgo.toISOString()}'`;
+    } else if (period === 'year') {
+        const yearAgo = new Date(now);
+        yearAgo.setFullYear(yearAgo.getFullYear() - 1);
+        dateFilter = ` WHERE start_time >= '${yearAgo.toISOString()}'`;
+    }
 
     // Fetch routines and folders to map routine_id -> folder_title
     db.all('SELECT id, folder_id FROM routines', [], (err, routineRows) => {
@@ -44,7 +59,7 @@ router.get('/:name/history', (req, res) => {
                 routineToFolderMap[r.id] = folderMap[r.folder_id] || 'Sin carpeta';
             });
 
-            const sql = `SELECT start_time, raw_data FROM workouts ORDER BY start_time ASC`;
+            const sql = `SELECT start_time, raw_data FROM workouts${dateFilter} ORDER BY start_time ASC`;
             db.all(sql, [], (err, rows) => {
                 if (err) return res.status(500).json({ error: err.message });
 

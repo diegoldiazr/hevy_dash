@@ -55,3 +55,14 @@ Una vez levantado el contenedor, accede a `http://localhost:3000` (o la IP de tu
 
 ---
 Desarrollado para optimizar tu rendimiento y salud física. 💪
+
+## 🛠 Solución de Problemas (Troubleshooting)
+
+### Error `ENOTFOUND` o problemas de conexión AI
+Si el Entrenador AI falla con un error tipo `getaddrinfo ENOTFOUND`, es probable que tu contenedor no pueda resolver nombres de dominio (común en NAS).
+**Solución**: En el `docker-compose.yml`, asegúrate de que la sección `dns` apunta a servidores públicos:
+```yaml
+dns:
+  - 8.8.8.8
+  - 1.1.1.1
+```
