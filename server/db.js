@@ -6,20 +6,30 @@ const fs = require('fs');
 // In Docker, we can override this with DATA_DIR environment variable to point to a volume
 const dataDir = process.env.DATA_DIR || path.join(__dirname, 'data');
 
+console.log(`[DB] Using data directory: ${dataDir}`);
+
 if (!fs.existsSync(dataDir)) {
-  console.log(`Creating data directory at: ${dataDir}`);
-  fs.mkdirSync(dataDir, { recursive: true });
+  console.log(`[DB] Creating data directory: ${dataDir}`);
+  try {
+    fs.mkdirSync(dataDir, { recursive: true });
+  } catch (err) {
+    console.error(`[DB] Failed to create data directory: ${err.message}`);
+  }
 }
 
 const dbPath = path.join(dataDir, 'hevy_dash.db');
+console.log(`[DB] SQLite database path: ${dbPath}`);
+
 const db = new sqlite3.Database(dbPath, (err) => {
   if (err) {
-    console.error('Could not connect to database', err);
+    console.error(`[DB] CRITICAL: Could not connect to database at ${dbPath}`, err);
   } else {
-    console.log('Connected to SQLite database');
+    console.log(`[DB] Successfully connected to SQLite database`);
     initDb();
   }
 });
+
+db.dataDir = dataDir;
 
 const initDb = () => {
   db.serialize(() => {

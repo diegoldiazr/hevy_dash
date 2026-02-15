@@ -125,7 +125,7 @@ const syncWorkouts = async (fullSync = false) => {
     const apiKey = await getApiKey();
     if (!apiKey) throw new Error('Hevy API Key not found');
 
-    const logPath = path.join(__dirname, '../sync.log');
+    const logPath = path.join(db.dataDir, 'sync.log');
     fs.appendFileSync(logPath, `\n--- Sync started (${fullSync ? 'FULL' : 'INCREMENTAL'}) at ${new Date().toISOString()} ---\n`);
 
     try {
