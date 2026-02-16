@@ -98,6 +98,18 @@
     box-shadow: 0 0 12px var(--primary-glow);
 }
 
+.exercise-count-badge {
+    background: rgba(107, 127, 255, 0.1);
+    color: var(--primary);
+    padding: 6px 14px;
+    border-radius: 20px;
+    font-size: 0.85rem;
+    font-weight: 700;
+    border: 1px solid rgba(107, 127, 255, 0.3);
+    white-space: nowrap;
+    animation: fadeIn 0.3s ease-out;
+}
+
 /* Chart sections */
 .chart-section {
     background: var(--bg-card);

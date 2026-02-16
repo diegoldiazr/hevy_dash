@@ -41,51 +41,6 @@ const fetchWorkoutsFromApi = async (apiKey, page = 1, pageSize = 10) => {
     }
 };
 
-const getExerciseTranslation = (titleEn) => {
-    return new Promise((resolve, reject) => {
-        db.get('SELECT title_es FROM exercise_translations WHERE title_en = ?', [titleEn], (err, row) => {
-            if (err) reject(err);
-            else resolve(row ? row.title_es : null);
-        });
-    });
-};
-
-const saveExerciseTranslation = (titleEn, titleEs) => {
-    return new Promise((resolve, reject) => {
-        const sql = `INSERT OR REPLACE INTO exercise_translations (title_en, title_es) VALUES (?, ?)`;
-        db.run(sql, [titleEn, titleEs], (err) => {
-            if (err) reject(err);
-            else resolve();
-        });
-    });
-};
-
-const translateExerciseTitle = async (titleEn) => {
-    const cached = await getExerciseTranslation(titleEn);
-    if (cached) return cached;
-
-    // To prevent spamming AI if quota is hit during a large sync
-    if (global.translationQuotaExceeded) {
-        return titleEn;
-    }
-
-    try {
-        console.log(`[AI] Translating exercise: ${titleEn}`);
-        const response = await ai.chat(`Return ONLY the natural Spanish name for the fitness exercise "${titleEn}". No extra words, no punctuation.`);
-        const titleEs = response.content.trim().replace(/[".]/g, '');
-        await saveExerciseTranslation(titleEn, titleEs);
-        return titleEs;
-    } catch (err) {
-        if (err.message.includes('429') || err.message.includes('quota')) {
-            console.warn(`[AI] Quota exceeded. Using English names for the remaining exercises.`);
-            global.translationQuotaExceeded = true;
-        } else {
-            console.error(`[AI] Translation failed for ${titleEn}:`, err.message);
-        }
-        return titleEn; // Fallback to English
-    }
-};
-
 const fetchWorkoutEvents = async (apiKey, since) => {
     try {
         const response = await axios.get(`${HEVY_API_BASE}/workouts/events`, {
@@ -173,7 +128,6 @@ const syncWorkouts = async (fullSync = false) => {
 
     const logPath = path.join(db.dataDir, 'sync.log');
     fs.appendFileSync(logPath, `\n--- Sync started (${fullSync ? 'FULL' : 'INCREMENTAL'}) at ${new Date().toISOString()} ---\n`);
-    global.translationQuotaExceeded = false;
 
     try {
         // 1. Fetch muscle mapping from exercise templates
@@ -183,24 +137,21 @@ const syncWorkouts = async (fullSync = false) => {
             fs.appendFileSync(logPath, `DEBUG: Template keys: ${Object.keys(templates[0]).join(', ')}\n`);
         }
         for (const t of templates) {
-            const titleEs = await translateExerciseTitle(t.title);
             exerciseTemplateMap[t.id] = {
                 title_en: t.title,
-                title_es: titleEs,
                 primary: t.primary_muscle_group,
                 secondary: t.secondary_muscle_groups || [],
                 thumbnail: t.thumbnail_url || t.image_thumbnail_url || null,
                 image: t.image_url || null
             };
         }
-        fs.appendFileSync(logPath, `Fetched and translated ${templates.length} exercise templates.\n`);
+        fs.appendFileSync(logPath, `Fetched ${templates.length} exercise templates.\n`);
 
         const enrichWorkout = (workout) => {
             if (workout.exercises) {
                 workout.exercises = workout.exercises.map(ex => {
                     const mapping = exerciseTemplateMap[ex.exercise_template_id] || {
                         title_en: ex.title,
-                        title_es: ex.title,
                         primary: 'Other',
                         secondary: [],
                         thumbnail: null,
@@ -208,8 +159,9 @@ const syncWorkouts = async (fullSync = false) => {
                     };
                     return {
                         ...ex,
+                        title: mapping.title_en,
                         title_en: mapping.title_en,
-                        title_es: mapping.title_es,
+                        title_es: mapping.title_en, // Force English even in ES field
                         primary_muscle_group: mapping.primary,
                         secondary_muscle_groups: mapping.secondary,
                         thumbnail_url: mapping.thumbnail,

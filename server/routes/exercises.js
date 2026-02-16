@@ -23,27 +23,21 @@ router.get('/', (req, res) => {
         dateFilter = ` WHERE start_time >= '${yearAgo.toISOString()}'`;
     }
 
-    const sql = `SELECT raw_data FROM workouts${dateFilter}`;
+    // Use SQLite JSON functions to extract unique titles directly from the database
+    // This is much faster and more accurate for filtering by period
+    const sql = `
+        SELECT DISTINCT 
+            COALESCE(json_extract(ex.value, '$.title_en'), json_extract(ex.value, '$.title')) as exercise_name
+        FROM workouts, json_each(json_extract(raw_data, '$.exercises')) as ex
+        ${dateFilter}
+        ORDER BY exercise_name ASC
+    `;
 
     db.all(sql, [], (err, rows) => {
         if (err) return res.status(500).json({ error: err.message });
 
-        const exercises = new Set();
-        rows.forEach(row => {
-            try {
-                const data = JSON.parse(row.raw_data);
-                if (data.exercises) {
-                    data.exercises.forEach(ex => {
-                        // Prioritize title_es if synced with enrichment, fallback to title
-                        exercises.add(ex.title_es || ex.title);
-                    });
-                }
-            } catch (e) {
-                // ignore parsing errors
-            }
-        });
-
-        res.json(Array.from(exercises).sort());
+        const exerciseList = rows.map(r => r.exercise_name).filter(Boolean);
+        res.json(exerciseList);
     });
 });
 
@@ -81,8 +75,23 @@ router.get('/:name/history', (req, res) => {
                 routineToFolderMap[r.id] = folderMap[r.folder_id] || 'Sin carpeta';
             });
 
-            const sql = `SELECT start_time, raw_data FROM workouts${dateFilter} ORDER BY start_time ASC`;
-            db.all(sql, [], (err, rows) => {
+            // Optimized query to fetch only relevant workouts for this exercise
+            const sql = `
+                SELECT 
+                    w.start_time, 
+                    w.title as workout_title,
+                    w.raw_data
+                FROM workouts w, json_each(json_extract(w.raw_data, '$.exercises')) as ex
+                WHERE (
+                    json_extract(ex.value, '$.title') = ? OR 
+                    json_extract(ex.value, '$.title_es') = ? OR 
+                    json_extract(ex.value, '$.title_en') = ?
+                )
+                ${dateFilter ? dateFilter.replace('WHERE', 'AND') : ''}
+                ORDER BY w.start_time ASC
+            `;
+
+            db.all(sql, [exerciseName, exerciseName, exerciseName], (err, rows) => {
                 if (err) return res.status(500).json({ error: err.message });
 
                 const history = [];
@@ -91,7 +100,13 @@ router.get('/:name/history', (req, res) => {
                     try {
                         const data = JSON.parse(row.raw_data);
                         if (data.exercises) {
-                            const exercise = data.exercises.find(ex => (ex.title_es || ex.title) === exerciseName);
+                            // Find the specific exercise instance in this workout
+                            const exercise = data.exercises.find(ex =>
+                                ex.title === exerciseName ||
+                                ex.title_es === exerciseName ||
+                                ex.title_en === exerciseName
+                            );
+
                             if (exercise) {
                                 let maxWeight = 0;
                                 let volume = 0;
@@ -103,13 +118,12 @@ router.get('/:name/history', (req, res) => {
                                     const w = set.weight_kg || 0;
                                     const r = set.reps || 0;
 
-                                    totalReps += r;
-                                    if (r > maxReps) maxReps = r;
-                                    if (w > maxWeight) maxWeight = w;
-
-                                    volume += w * r;
-
                                     if (r > 0) {
+                                        totalReps += r;
+                                        if (r > maxReps) maxReps = r;
+                                        if (w > maxWeight) maxWeight = w;
+                                        volume += w * r;
+
                                         // Epley Formula for 1RM: weight * (1 + reps/30)
                                         const e1rm = w * (1 + (r / 30));
                                         if (e1rm > bestE1RM) bestE1RM = e1rm;
@@ -118,7 +132,7 @@ router.get('/:name/history', (req, res) => {
 
                                 history.push({
                                     date: row.start_time,
-                                    workoutTitle: data.title,
+                                    workoutTitle: row.workout_title,
                                     routineTitle: routineToFolderMap[data.routine_id] || 'Sin carpeta',
                                     sets: exercise.sets,
                                     maxWeight,
@@ -156,14 +170,7 @@ router.get('/:name/details', async (req, res) => {
 
         // Not in cache, try to scrape
         try {
-            // Try to find English name for scraping
-            const translationRow = await new Promise(resolve => {
-                db.get('SELECT title_en FROM exercise_translations WHERE title_es = ? OR title_en = ?', [exerciseName, exerciseName], (err, row) => {
-                    resolve(row);
-                });
-            });
-
-            const searchName = translationRow ? translationRow.title_en : exerciseName;
+            const searchName = exerciseName;
 
             const generateSlug = (name) => {
                 return name.toLowerCase()
@@ -184,34 +191,13 @@ router.get('/:name/details', async (req, res) => {
                 let fallbackUrl = `https://www.hevyapp.com/exercises/how-to-${slug}/`;
                 console.log(`[Exercise] 404, trying fallback: ${fallbackUrl}`);
                 response = await fetch(fallbackUrl);
-
-                // If still 404 and we don't have a translation yet, maybe AI can help
-                if (response.status === 404 && !translationRow) {
-                    try {
-                        console.log(`[Exercise] No translation found, asking AI for English name for "${exerciseName}"...`);
-                        const translation = await ai.chat(`Return ONLY the standard English name (title) for the fitness exercise "${exerciseName}" as it appears in Hevy. No extra words, no punctuation.`);
-                        const englishName = translation.content.trim().replace(/[".]/g, '');
-                        console.log(`[Exercise] AI suggests English name: ${englishName}`);
-
-                        slug = generateSlug(englishName);
-                        url = `https://www.hevyapp.com/exercises/${slug}/`;
-                        response = await fetch(url);
-
-                        if (response.status === 404) {
-                            fallbackUrl = `https://www.hevyapp.com/exercises/how-to-${slug}/`;
-                            response = await fetch(fallbackUrl);
-                        }
-                    } catch (aiErr) {
-                        console.error("[Exercise] AI fallback failed:", aiErr.message);
-                    }
-                }
             }
 
             if (!response.ok) {
                 // Return defaults if not found
                 return res.json({
                     title: exerciseName,
-                    technique: ["Realiza el ejercicio con forma controlada.", "Mantén el núcleo estable.", "Concéntrate en el músculo objetivo."],
+                    technique: ["Perform the exercise with controlled form.", "Keep your core stable.", "Focus on the target muscle."],
                     muscle_image_url: null,
                     execution_video_url: null
                 });
@@ -226,21 +212,8 @@ router.get('/:name/details', async (req, res) => {
                 technique.push($(el).text().trim());
             });
 
-            // Translate technique to Spanish if found
-            if (technique.length > 0) {
-                try {
-                    console.log(`[Exercise] Translating technique for "${exerciseName}" to Spanish...`);
-                    const techniqueStr = technique.join("\n");
-                    const translation = await ai.chat(`Traduce los siguientes pasos técnicos de un ejercicio de fitness al español de forma natural y profesional. Mantén el formato de lista (un paso por línea):\n\n${techniqueStr}`);
-                    const translatedSteps = translation.content.trim().split("\n").filter(s => s.length > 0);
-                    if (translatedSteps.length > 0) {
-                        technique = translatedSteps;
-                    }
-                } catch (aiErr) {
-                    console.error("[Exercise] Technique translation failed:", aiErr.message);
-                }
-            } else {
-                technique = ["Realiza el ejercicio con forma controlada.", "Mantén el núcleo estable.", "Concéntrate en el músculo objetivo."];
+            if (technique.length === 0) {
+                technique = ["Perform the exercise with controlled form.", "Keep your core stable.", "Focus on the target muscle."];
             }
 
             // 3. Extract Muscle Image (usually the one with anatomy/muscle in path)

@@ -108,6 +108,11 @@ const Progression = () => {
                         <option key={ex} value={ex}>{ex}</option>
                     ))}
                 </select>
+                {exercises.length > 0 && (
+                    <span className="exercise-count-badge">
+                        {exercises.length} ejercicios
+                    </span>
+                )}
             </div>
 
             {loading ? (
