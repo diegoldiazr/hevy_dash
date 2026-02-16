@@ -231,3 +231,43 @@ body[data-theme='light'] .form-group textarea {
     color: var(--error);
     border: 1px solid rgba(231, 76, 60, 0.2);
 }
+
+/* Danger Zone */
+.settings-section.danger-zone {
+    border: 1px solid rgba(239, 68, 68, 0.3);
+    background: rgba(239, 68, 68, 0.02);
+}
+
+.danger-title {
+    color: #ef4444 !important;
+    border-bottom: 3px solid rgba(239, 68, 68, 0.5) !important;
+}
+
+.danger-text {
+    color: var(--text-muted);
+    margin-bottom: 24px;
+    font-size: 0.95rem;
+}
+
+.delete-btn {
+    background: rgba(239, 68, 68, 0.1);
+    color: #ef4444;
+    border: 1px solid rgba(239, 68, 68, 0.3);
+    padding: 14px 24px;
+    border-radius: var(--radius-sm);
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    transition: all 0.2s;
+    width: fit-content;
+}
+
+.delete-btn:hover {
+    background: #ef4444;
+    color: white;
+    box-shadow: 0 4px 12px rgba(239, 68, 68, 0.4);
+    transform: translateY(-2px);
+}

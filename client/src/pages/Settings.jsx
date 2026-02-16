@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-import { Save, CheckCircle, AlertCircle, Moon, Sun } from 'lucide-react';
+import { Save, CheckCircle, AlertCircle, Moon, Sun, Trash2 } from 'lucide-react';
 
 const Settings = () => {
     const [formData, setFormData] = useState({
@@ -52,6 +52,30 @@ const Settings = () => {
 
     const handleChange = (e) => {
         setFormData({ ...formData, [e.target.name]: e.target.value });
+    };
+
+    const handleReset = async () => {
+        if (window.confirm('⚠️ ¿ESTÁS SEGURO?\n\nEsta acción borrará TODOS tus entrenamientos, configuración y progreso.\n\nEsta acción NO se puede deshacer.')) {
+            setSaving(true);
+            setMessage(null);
+            try {
+                await axios.delete('/api/settings/reset');
+                setFormData({
+                    hevy_api_key: '',
+                    openai_api_key: '',
+                    age: '',
+                    gender: 'male',
+                    height: '',
+                    goal: ''
+                });
+                setMessage({ type: 'success', text: 'Todos los datos han sido eliminados correctamente.' });
+            } catch (err) {
+                console.error("Reset failed", err);
+                setMessage({ type: 'error', text: 'Error al reiniciar la base de datos.' });
+            } finally {
+                setSaving(false);
+            }
+        }
     };
 
     const handleSubmit = async (e) => {
@@ -165,6 +189,17 @@ const Settings = () => {
                             rows="3"
                             placeholder="ej. Aumentar press de banca a 100kg, perder 5kg de grasa corporal..."
                         />
+                    </div>
+                </section>
+
+                <section className="settings-section danger-zone">
+                    <h3 className="danger-title">Zona de Peligro</h3>
+                    <div className="form-group">
+                        <p className="danger-text">Esta acción borrará permanentemente todos tus entrenamientos, configuración y progreso. No se puede deshacer.</p>
+                        <button type="button" className="delete-btn" onClick={handleReset} disabled={saving}>
+                            <Trash2 size={18} />
+                            Borrar Base de Datos y Reiniciar
+                        </button>
                     </div>
                 </section>
 

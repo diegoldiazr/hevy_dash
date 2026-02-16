@@ -36,4 +36,20 @@ router.post('/', (req, res) => {
     });
 });
 
+// RESET ALL DATA
+router.delete('/reset', (req, res) => {
+    db.serialize(() => {
+        db.run('DELETE FROM user_settings');
+        db.run('INSERT INTO user_settings (id) VALUES (1)');
+        db.run('DELETE FROM body_measurements');
+        db.run('DELETE FROM workouts');
+        db.run('DELETE FROM routine_folders');
+        db.run('DELETE FROM routines');
+        db.run('DELETE FROM exercise_details');
+        db.run('DELETE FROM exercise_translations');
+    });
+
+    res.json({ message: 'All data has been reset.' });
+});
+
 module.exports = router;
