@@ -193,6 +193,12 @@
   background: radial-gradient(circle at top right, rgba(88, 101, 242, 0.04), transparent 40%),
     radial-gradient(circle at bottom left, rgba(88, 101, 242, 0.02), transparent 40%);
   position: relative;
+  transition: padding 0.4s var(--transition-normal);
+}
+
+.app-container.collapsed .content {
+  padding: 40px 80px;
+  /* Increased side padding when collapsed for elegance */
 }
 
 /* Global Heading Overrides within App context */
