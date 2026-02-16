@@ -17,15 +17,15 @@ const Settings = () => {
     const [loading, setLoading] = useState(true);
     const [saving, setSaving] = useState(false);
     const [message, setMessage] = useState(null);
+    const [showResetModal, setShowResetModal] = useState(false);
 
     useEffect(() => {
         fetchSettings();
-        // Apply theme on mount
+        // and apply theme
         document.body.setAttribute('data-theme', theme);
     }, []);
 
     useEffect(() => {
-        // Update theme when it changes
         document.body.setAttribute('data-theme', theme);
         localStorage.setItem('theme', theme);
     }, [theme]);
@@ -54,27 +54,30 @@ const Settings = () => {
         setFormData({ ...formData, [e.target.name]: e.target.value });
     };
 
-    const handleReset = async () => {
-        if (window.confirm('⚠️ ¿ESTÁS SEGURO?\n\nEsta acción borrará TODOS tus entrenamientos, configuración y progreso.\n\nEsta acción NO se puede deshacer.')) {
-            setSaving(true);
-            setMessage(null);
-            try {
-                await axios.delete('/api/settings/reset');
-                setFormData({
-                    hevy_api_key: '',
-                    openai_api_key: '',
-                    age: '',
-                    gender: 'male',
-                    height: '',
-                    goal: ''
-                });
-                setMessage({ type: 'success', text: 'Todos los datos han sido eliminados correctamente.' });
-            } catch (err) {
-                console.error("Reset failed", err);
-                setMessage({ type: 'error', text: 'Error al reiniciar la base de datos.' });
-            } finally {
-                setSaving(false);
-            }
+    const handleReset = () => {
+        setShowResetModal(true);
+    };
+
+    const confirmReset = async () => {
+        setSaving(true);
+        setMessage(null);
+        try {
+            await axios.delete('/api/settings/reset');
+            setFormData({
+                hevy_api_key: '',
+                openai_api_key: '',
+                age: '',
+                gender: 'male',
+                height: '',
+                goal: ''
+            });
+            setMessage({ type: 'success', text: 'Todos los datos han sido eliminados correctamente.' });
+            setShowResetModal(false);
+        } catch (err) {
+            console.error("Reset failed", err);
+            setMessage({ type: 'error', text: 'Error al reiniciar la base de datos.' });
+        } finally {
+            setSaving(false);
         }
     };
 
@@ -208,6 +211,33 @@ const Settings = () => {
                     {saving ? 'Guardando...' : 'Guardar Ajustes'}
                 </button>
             </form>
+
+            {showResetModal && (
+                <div className="modal-overlay">
+                    <div className="modal-content danger-modal">
+                        <div className="modal-header">
+                            <AlertCircle size={48} className="danger-icon" />
+                            <h2>¿Estás seguro?</h2>
+                        </div>
+                        <div className="modal-body">
+                            <p>Esta acción borrará <strong>permanentemente</strong>:</p>
+                            <ul>
+                                <li>Todos tus entrenamientos importados</li>
+                                <li>Tus medidas corporales</li>
+                                <li>Tu configuración y claves API</li>
+                                <li>Rutinas y detalles de ejercicios</li>
+                            </ul>
+                            <p className="warning-text">Esta acción no se puede deshacer.</p>
+                        </div>
+                        <div className="modal-actions">
+                            <button className="cancel-btn" onClick={() => setShowResetModal(false)}>Cancelar</button>
+                            <button className="confirm-delete-btn" onClick={confirmReset} disabled={saving}>
+                                {saving ? 'Borrando...' : 'Sí, borrar todo'}
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
         </div>
     );
 };
