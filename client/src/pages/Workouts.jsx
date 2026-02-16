@@ -82,7 +82,15 @@ const Workouts = () => {
     const getExerciseImage = (exercise) => {
         if (!exercise) return null;
 
-        // Use synced URLs if they exist (Hevy might add them in the future)
+        // 1. Database / Scraped Images (Prioritize GIFs for motion, then static images)
+        if (exercise.execution_video_url && exercise.execution_video_url.endsWith('.gif')) {
+            return exercise.execution_video_url;
+        }
+        if (exercise.muscle_image_url) {
+            return exercise.muscle_image_url;
+        }
+
+        // 2. Hevy Synced URLs
         if (exercise.thumbnail_url) return exercise.thumbnail_url;
         if (exercise.image_url) return exercise.image_url;
 

@@ -77,27 +77,32 @@
     transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-.stat-info {
+/* Stat Info Header and Content */
+.stat-card .stat-card-header {
     display: flex;
-    flex-direction: column;
+    align-items: center;
+    gap: 16px;
+    margin-bottom: 12px;
 }
 
-.stat-info h3 {
-    font-size: 2.25rem;
-    /* ~36px Big Numbers */
-    font-weight: 700;
-    line-height: 1.1;
-    color: var(--text-main);
-    margin-bottom: 4px;
+.stat-card .stat-card-header h3 {
+    font-size: 1.8rem;
+    font-weight: 800;
+    margin: 0;
     letter-spacing: -0.02em;
 }
 
-.stat-info p {
-    font-size: 0.875rem;
-    font-weight: 500;
+.stat-card .stat-info {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+}
+
+.stat-card .stat-info p {
     color: var(--text-muted);
-    text-transform: uppercase;
-    letter-spacing: 0.05em;
+    font-size: 0.9rem;
+    font-weight: 500;
     margin: 0;
 }
 

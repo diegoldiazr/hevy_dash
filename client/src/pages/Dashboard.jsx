@@ -106,12 +106,16 @@ const Dashboard = () => {
         setSyncing(true);
         try {
             await axios.post('/api/hevy/sync?fullSync=true');
-            await fetchCoreStats();
-            await fetchChartData('volume', volumePeriod, setVolumeChartData);
-            await fetchChartData('duration', durationPeriod, setDurationChartData);
-            await fetchMuscleStats(musclePeriod);
-        } catch (error) {
-            console.error("Failed to sync", error);
+            // Refresh dashboard data
+            await Promise.all([
+                fetchCoreStats(),
+                fetchChartData('volume', volumePeriod, setVolumeChartData),
+                fetchChartData('duration', durationPeriod, setDurationChartData),
+                fetchMuscleStats(musclePeriod)
+            ]);
+        } catch (err) {
+            console.error("Sync failed", err);
+            // Optionally show error toast
         } finally {
             setSyncing(false);
         }
@@ -139,25 +143,31 @@ const Dashboard = () => {
 
             <div className="stats-grid">
                 <div className="stat-card">
-                    <div className="icon-wrapper"><Dumbbell size={24} /></div>
-                    <div className="stat-info">
+                    <div className="stat-card-header">
+                        <div className="icon-wrapper"><Dumbbell size={24} /></div>
                         <h3>{workoutsPeriod === 'month' ? stats.workouts.month : (workoutsPeriod === 'year' ? stats.workouts.year : stats.workouts.all)}</h3>
-                        <p>{workoutsPeriod === 'month' ? 'Este Mes' : (workoutsPeriod === 'year' ? `Año ${currentYear}` : 'Histórico')}</p>
-                        <div className="stat-period-wrapper"><PeriodSelector current={workoutsPeriod} onChange={setWorkoutsPeriod} /></div>
+                    </div>
+                    <div className="stat-info">
+                        <p>{workoutsPeriod === 'month' ? 'Entrenamientos (Mes)' : (workoutsPeriod === 'year' ? `Entrenamientos (${currentYear})` : 'Entrenamientos (Total)')}</p>
+                        <PeriodSelector current={workoutsPeriod} onChange={setWorkoutsPeriod} />
                     </div>
                 </div>
                 <div className="stat-card">
-                    <div className="icon-wrapper"><Activity size={24} /></div>
-                    <div className="stat-info">
+                    <div className="stat-card-header">
+                        <div className="icon-wrapper"><Activity size={24} /></div>
                         <h3>{((totalVolumePeriod === 'month' ? stats.volume.month : (totalVolumePeriod === 'year' ? stats.volume.year : stats.volume.all)) / 1000).toFixed(1)}k kg</h3>
-                        <p>{totalVolumePeriod === 'month' ? 'Este Mes' : (totalVolumePeriod === 'year' ? `Año ${currentYear}` : 'Histórico')}</p>
-                        <div className="stat-period-wrapper"><PeriodSelector current={totalVolumePeriod} onChange={setTotalVolumePeriod} /></div>
+                    </div>
+                    <div className="stat-info">
+                        <p>{totalVolumePeriod === 'month' ? 'Volumen (Mes)' : (totalVolumePeriod === 'year' ? `Volumen (${currentYear})` : 'Volumen (Total)')}</p>
+                        <PeriodSelector current={totalVolumePeriod} onChange={setTotalVolumePeriod} />
                     </div>
                 </div>
                 <div className="stat-card">
-                    <div className="icon-wrapper"><Calendar size={24} /></div>
-                    <div className="stat-info">
+                    <div className="stat-card-header">
+                        <div className="icon-wrapper"><Calendar size={24} /></div>
                         <h3>{stats.recentWorkouts.length > 0 ? new Date(stats.recentWorkouts[0].start_time).toLocaleDateString() : 'N/A'}</h3>
+                    </div>
+                    <div className="stat-info">
                         <p>Último Entrenamiento</p>
                     </div>
                 </div>

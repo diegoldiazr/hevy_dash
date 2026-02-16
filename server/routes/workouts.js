@@ -17,14 +17,69 @@ router.get('/', (req, res) => {
     db.all(sql, [pageSize, offset], (err, rows) => {
         if (err) return res.status(500).json({ error: err.message });
 
-        // Parse raw_data if needed, but for list view usually top columns are enough
-        // We might want to return stats like 'exercise_count'
-        const workouts = rows.map(row => ({
-            ...row,
-            raw_data: JSON.parse(row.raw_data)
-        }));
+        try {
+            const workouts = rows.map(row => {
+                try {
+                    return {
+                        ...row,
+                        raw_data: JSON.parse(row.raw_data)
+                    };
+                } catch (e) {
+                    console.error(`Error parsing workout ${row.id}:`, e);
+                    return { ...row, raw_data: {} };
+                }
+            });
 
-        res.json(workouts);
+            // Collect all exercise names to fetch their details
+            const exerciseNames = new Set();
+            workouts.forEach(w => {
+                if (w.raw_data && w.raw_data.exercises) {
+                    w.raw_data.exercises.forEach(e => {
+                        if (e && e.title) exerciseNames.add(e.title);
+                    });
+                }
+            });
+
+            if (exerciseNames.size === 0) {
+                return res.json(workouts);
+            }
+
+            const placeholders = Array.from(exerciseNames).map(() => '?').join(',');
+            const detailsSql = `SELECT title, muscle_image_url, execution_video_url FROM exercise_details WHERE title IN (${placeholders})`;
+
+            db.all(detailsSql, Array.from(exerciseNames), (err, detailsRows) => {
+                if (err) {
+                    console.error("Failed to hydrate images", err);
+                    return res.json(workouts); // Return basic data if hydration fails
+                }
+
+                try {
+                    const detailsMap = {};
+                    detailsRows.forEach(row => {
+                        detailsMap[row.title] = row;
+                    });
+
+                    // Hydrate workouts
+                    workouts.forEach(w => {
+                        if (w.raw_data && w.raw_data.exercises) {
+                            w.raw_data.exercises = w.raw_data.exercises.map(e => ({
+                                ...e,
+                                muscle_image_url: (detailsMap[e.title] && detailsMap[e.title].muscle_image_url) || null,
+                                execution_video_url: (detailsMap[e.title] && detailsMap[e.title].execution_video_url) || null
+                            }));
+                        }
+                    });
+
+                    res.json(workouts);
+                } catch (innerErr) {
+                    console.error("Error processing workout details:", innerErr);
+                    res.json(workouts);
+                }
+            });
+        } catch (processErr) {
+            console.error("Error processing workouts row:", processErr);
+            res.status(500).json({ error: "Internal processing error" });
+        }
     });
 });
 
