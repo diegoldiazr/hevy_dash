@@ -178,35 +178,21 @@ router.get('/:name/details', async (req, res) => {
                     .join('-');
             };
 
-            // Generate possible slugs to try
-            const nameLower = exerciseName.toLowerCase();
-            const baseSlugs = [generateSlug(exerciseName)];
+            // Priority 1: Full name slug
+            const slugsToTry = [generateSlug(exerciseName)];
 
-            // If contains "(Machine)", try "Machine [Name]" and just "[Name]"
-            if (nameLower.includes('(machine)')) {
-                const clean = exerciseName.replace(/\(machine\)/i, '').trim();
-                baseSlugs.push(`machine-${generateSlug(clean)}`);
-                baseSlugs.push(generateSlug(clean));
-            }
-            // If contains "(Dumbbell)", etc.
-            if (nameLower.includes('(dumbbell)')) {
-                const clean = exerciseName.replace(/\(dumbbell\)/i, '').trim();
-                baseSlugs.push(`dumbbell-${generateSlug(clean)}`);
-                baseSlugs.push(generateSlug(clean));
-            }
-            if (nameLower.includes('(barbell)')) {
-                const clean = exerciseName.replace(/\(barbell\)/i, '').trim();
-                baseSlugs.push(`barbell-${generateSlug(clean)}`);
-                baseSlugs.push(generateSlug(clean));
-            }
-            if (nameLower.includes('(cable)')) {
-                const clean = exerciseName.replace(/\(cable\)/i, '').trim();
-                baseSlugs.push(`cable-${generateSlug(clean)}`);
-                baseSlugs.push(generateSlug(clean));
+            // Priority 2: Without parentheses
+            if (exerciseName.includes('(')) {
+                const cleanName = exerciseName.replace(/\(.*\)/, '').trim();
+                const cleanSlug = generateSlug(cleanName);
+                if (cleanSlug && cleanSlug !== slugsToTry[0]) {
+                    slugsToTry.push(cleanSlug);
+                }
             }
 
-            // De-duplicate slugs
-            const slugsToTry = [...new Set(baseSlugs)];
+
+
+
             let response = null;
             let usedSlug = slugsToTry[0];
 
