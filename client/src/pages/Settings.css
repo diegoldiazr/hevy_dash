@@ -23,6 +23,12 @@
     margin: 0;
 }
 
+.settings-form {
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+}
+
 .settings-section {
     background: var(--bg-card);
     border: 1px solid var(--border-subtle);
@@ -39,12 +45,13 @@
 
 .settings-section h3 {
     font-size: 1.4rem;
-    font-weight: 700;
+    font-weight: 800;
     margin-bottom: 32px;
     padding-bottom: 12px;
-    border-bottom: 2px solid var(--primary-glow);
+    border-bottom: 3px solid var(--primary);
     display: inline-block;
-    color: var(--primary);
+    color: var(--text-main);
+    letter-spacing: -0.02em;
 }
 
 .form-group {
@@ -64,9 +71,8 @@
 .form-group input,
 .form-group select,
 .form-group textarea {
-    background: rgba(255, 255, 255, 0.03);
-    /* Subtle backdrop */
-    border: 1px solid var(--border-subtle);
+    background: var(--bg-card);
+    border: 1px solid var(--border-active);
     color: var(--text-main);
     padding: 14px 18px;
     border-radius: var(--radius-sm);
@@ -80,8 +86,7 @@
 .form-group textarea:focus {
     outline: none;
     border-color: var(--primary);
-    background: rgba(255, 255, 255, 0.08);
-    /* Brighter on focus */
+    background: var(--bg-card);
     box-shadow: 0 0 16px var(--primary-glow);
 }
 
@@ -136,8 +141,12 @@
 .theme-btn.active {
     background: var(--gradient-primary);
     border-color: var(--primary);
-    color: white;
+    color: white !important;
     box-shadow: 0 4px 16px var(--primary-glow);
+}
+
+.theme-btn.active svg {
+    color: white;
 }
 
 .theme-btn.active:hover {
@@ -147,34 +156,57 @@
 
 
 /* Save Button */
-.save-btn {
+.settings-form .save-btn {
     background: var(--gradient-primary);
     color: white;
     border: none;
-    padding: 18px 48px;
+    padding: 16px 48px;
     border-radius: var(--radius-md);
     font-size: 1.1rem;
     font-weight: 700;
     cursor: pointer;
-    box-shadow: 0 8px 32px rgba(88, 101, 242, 0.3);
+    box-shadow: 0 4px 14px var(--primary-glow);
     transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
-    margin-top: 16px;
+    margin-top: 12px;
     align-self: flex-start;
     display: flex;
     align-items: center;
+    justify-content: center;
     gap: 12px;
 }
 
-.save-btn:hover {
+.settings-form .save-btn:hover {
     transform: translateY(-2px);
-    box-shadow: 0 12px 48px rgba(88, 101, 242, 0.5);
+    box-shadow: 0 12px 32px var(--primary-glow);
     filter: brightness(1.1);
 }
 
-.save-btn:disabled {
+.settings-form .save-btn:disabled {
     opacity: 0.5;
     cursor: not-allowed;
     filter: grayscale(1);
+}
+
+/* Light Theme Specific Adjustments */
+body[data-theme='light'] .settings-form .save-btn {
+    box-shadow: 0 4px 12px var(--primary-glow);
+    border: 1px solid rgba(0, 0, 0, 0.1);
+}
+
+body[data-theme='light'] .settings-form .save-btn:hover {
+    filter: brightness(0.9);
+    box-shadow: 0 6px 16px var(--primary-glow);
+}
+
+body[data-theme='light'] .settings-section {
+    border-color: #E2E8F0;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+}
+
+body[data-theme='light'] .form-group input,
+body[data-theme='light'] .form-group select,
+body[data-theme='light'] .form-group textarea {
+    border-color: #CBD5E1;
 }
 
 /* Status Message */
