@@ -178,10 +178,8 @@ router.get('/:name/details', async (req, res) => {
                     .join('-');
             };
 
-            // Priority 1: Full name slug
+            // 1. TRY HEVYAPP (Following priorities)
             const slugsToTry = [generateSlug(exerciseName)];
-
-            // Priority 2: Without parentheses
             if (exerciseName.includes('(')) {
                 const cleanName = exerciseName.replace(/\(.*\)/, '').trim();
                 const cleanSlug = generateSlug(cleanName);
@@ -189,9 +187,6 @@ router.get('/:name/details', async (req, res) => {
                     slugsToTry.push(cleanSlug);
                 }
             }
-
-
-
 
             let response = null;
             let usedSlug = slugsToTry[0];
@@ -201,94 +196,205 @@ router.get('/:name/details', async (req, res) => {
                     `https://www.hevyapp.com/exercises/${s}/`,
                     `https://www.hevyapp.com/exercises/how-to-${s}/`
                 ];
-
                 for (const url of urls) {
-                    console.log(`[Exercise] Trying: ${url}`);
-                    const res = await fetch(url);
-                    if (res.ok) {
-                        response = res;
-                        usedSlug = s;
-                        break;
-                    }
+                    try {
+                        console.log(`[Exercise] Trying Hevy: ${url}`);
+                        const res = await fetch(url, { headers: { 'User-Agent': 'Mozilla/5.0' } });
+                        if (res.ok) {
+                            response = res;
+                            usedSlug = s;
+                            break;
+                        }
+                    } catch (err) { }
                 }
                 if (response) break;
             }
 
-            if (!response) {
-                // Return defaults if not found
-                return res.json({
+            let foundDetails = null;
+
+            if (response) {
+                const html = await response.text();
+                const $ = cheerio.load(html);
+
+                let technique = [];
+                $('.wp-block-columns ol li, ol li').each((i, el) => {
+                    technique.push($(el).text().trim());
+                });
+
+                let muscle_image_url = null;
+                $('img').each((i, el) => {
+                    const src = $(el).attr('src');
+                    const alt = $(el).attr('alt') || '';
+                    if (src && (src.includes('muscle') || src.includes('anatomy') || alt.toLowerCase().includes('muscle'))) {
+                        muscle_image_url = src.trim();
+                    }
+                });
+                if (!muscle_image_url) {
+                    $('img').each((i, el) => {
+                        const src = $(el).attr('src');
+                        if (src && src.includes('wp-content/uploads')) {
+                            muscle_image_url = src.trim();
+                            return false;
+                        }
+                    });
+                }
+
+                let execution_video_url = $('video source').attr('src') || $('video').attr('src');
+                if (execution_video_url) execution_video_url = execution_video_url.trim();
+
+                foundDetails = {
                     title: exerciseName,
+                    slug: usedSlug,
+                    technique: technique.length > 0 ? technique : null,
+                    muscle_image_url,
+                    execution_video_url
+                };
+            }
+
+            // 2. TRY JEFIT (If Hevy failed)
+            if (!foundDetails || !foundDetails.technique) {
+                console.log(`[Exercise] Hevy failed, trying Jefit for: ${exerciseName}`);
+                const jefit = await scrapeJefit(exerciseName);
+                if (jefit && jefit.technique) {
+                    foundDetails = { ...jefit, slug: generateSlug(exerciseName) };
+                }
+            }
+
+            // 3. TRY GOOGLE (If Hevy and Jefit failed)
+            if (!foundDetails || !foundDetails.technique) {
+                console.log(`[Exercise] Hevy/Jefit failed, trying Google search for: ${exerciseName}`);
+                const google = await scrapeGoogle(exerciseName);
+                if (google && google.technique) {
+                    foundDetails = { ...google, slug: generateSlug(exerciseName) };
+                }
+            }
+
+            // FINAL FALLBACK: If everything failed, use AI or Defaults
+            if (!foundDetails) {
+                foundDetails = {
+                    title: exerciseName,
+                    slug: generateSlug(exerciseName),
                     technique: ["Perform the exercise with controlled form.", "Keep your core stable.", "Focus on the target muscle."],
                     muscle_image_url: null,
                     execution_video_url: null
-                });
+                };
             }
 
-            const html = await response.text();
-            const $ = cheerio.load(html);
-            const slug = usedSlug;
-
-            // 2. Extract Technique
-            let technique = [];
-            $('.wp-block-columns ol li, ol li').each((i, el) => {
-                technique.push($(el).text().trim());
-            });
-
-            if (technique.length === 0) {
-                technique = ["Perform the exercise with controlled form.", "Keep your core stable.", "Focus on the target muscle."];
-            }
-
-            // 3. Extract Muscle Image (usually the one with anatomy/muscle in path)
-            let muscle_image_url = null;
-            $('img').each((i, el) => {
-                const src = $(el).attr('src');
-                const alt = $(el).attr('alt') || '';
-                if (src && (src.includes('muscle') || src.includes('anatomy') || alt.toLowerCase().includes('muscle'))) {
-                    muscle_image_url = src.trim();
-                }
-            });
-            // Fallback to first major image with 'wp-content' if no muscle specific one
-            if (!muscle_image_url) {
-                $('img').each((i, el) => {
-                    const src = $(el).attr('src');
-                    if (src && src.includes('wp-content/uploads')) {
-                        muscle_image_url = src.trim();
-                        return false; // break
-                    }
-                });
-            }
-
-            // 4. Extract Video/Animation
-            let execution_video_url = $('video source').attr('src') || $('video').attr('src');
-            if (execution_video_url) execution_video_url = execution_video_url.trim();
-
-            const details = {
-                title: exerciseName,
-                slug: slug,
-                technique: JSON.stringify(technique),
-                muscle_image_url: muscle_image_url,
-                execution_video_url: execution_video_url
-            };
+            // Normalize technique to array and then JSON for storage
+            const finalTechnique = Array.isArray(foundDetails.technique) ? foundDetails.technique :
+                (foundDetails.technique ? [foundDetails.technique] : []);
 
             // Save to cache
             db.run(`INSERT INTO exercise_details (title, slug, technique, muscle_image_url, execution_video_url)
                     VALUES (?, ?, ?, ?, ?)`,
-                [details.title, details.slug, details.technique, details.muscle_image_url, details.execution_video_url],
+                [exerciseName, foundDetails.slug, JSON.stringify(finalTechnique), foundDetails.muscle_image_url, foundDetails.execution_video_url],
                 (err) => {
                     if (err) console.error("[DB] Cache error:", err.message);
                 }
             );
 
             res.json({
-                ...details,
-                technique: JSON.parse(details.technique)
+                ...foundDetails,
+                technique: finalTechnique
             });
 
         } catch (error) {
-            console.error("[Exercise] Scrape Error:", error.message);
+            console.error("[Exercise] Details Error:", error.message);
             res.status(500).json({ error: "Failed to fetch exercise details" });
         }
     });
 });
+
+async function scrapeJefit(exerciseName) {
+    try {
+        const searchUrl = `https://www.jefit.com/exercises?search=${encodeURIComponent(exerciseName)}`;
+        const res = await fetch(searchUrl, { headers: { 'User-Agent': 'Mozilla/5.0' } });
+        if (!res.ok) return null;
+        const html = await res.text();
+        const $ = cheerio.load(html);
+
+        // Find the first result link
+        const firstLink = $('a[href^="/exercises/"]').first().attr('href');
+        if (!firstLink) return null;
+
+        const detailsRes = await fetch(`https://www.jefit.com${firstLink}`, { headers: { 'User-Agent': 'Mozilla/5.0' } });
+        if (!detailsRes.ok) return null;
+        const detailsHtml = await detailsRes.text();
+        const $d = cheerio.load(detailsHtml);
+
+        // 1. Extract Technique
+        let technique = [];
+        const techText = $d('p.whitespace-pre-wrap').text();
+        if (techText) {
+            // Jefit usually has "Steps : 1.) ... 2.) ..."
+            technique = techText
+                .replace(/^Steps\s*:\s*/i, '')
+                .split(/\d+\.\)\s+/)
+                .map(s => s.trim())
+                .filter(s => s.length > 5);
+        }
+
+        // 2. Extract Muscle Image
+        let muscle_image_url = null;
+        // Jefit shows muscle images as icons linked to category pages
+        $d('a[href*="/exercises/"]').each((i, el) => {
+            const href = $(el).attr('href');
+            const img = $(el).find('img');
+            if (img.length > 0 && !href.includes(firstLink)) {
+                // Potential muscle icon
+                muscle_image_url = img.attr('src');
+                return false; // break
+            }
+        });
+
+        // 3. Extract Execution GIF
+        let execution_video_url = null;
+        $d('img').each((i, el) => {
+            const src = $d(el).attr('src');
+            if (src && (src.includes('.gif') || src.includes('gifs/'))) {
+                execution_video_url = src;
+                return false;
+            }
+        });
+
+        // Helper to fix URLs
+        const fixUrl = (url) => {
+            if (!url) return null;
+            if (url.startsWith('//')) return `https:${url}`;
+            if (url.startsWith('/')) return `https://www.jefit.com${url}`;
+            return url;
+        };
+
+        return {
+            technique,
+            muscle_image_url: fixUrl(muscle_image_url),
+            execution_video_url: fixUrl(execution_video_url)
+        };
+    } catch (e) {
+        console.error("[Jefit Scrape] Error:", e.message);
+        return null;
+    }
+}
+
+async function scrapeGoogle(exerciseName) {
+    try {
+        const query = encodeURIComponent(`${exerciseName} exercise technique steps guide`);
+        const url = `https://www.google.com/search?q=${query}`;
+        const res = await fetch(url, {
+            headers: { 'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36' }
+        });
+        if (!res.ok) return null;
+        const html = await res.text();
+        const $ = cheerio.load(html);
+        let technique = [];
+        $('li').each((i, el) => {
+            const text = $(el).text().trim();
+            if (text.length > 20 && text.length < 300 && (text.match(/^\d/) || text.toLowerCase().includes('step'))) {
+                technique.push(text);
+            }
+        });
+        return technique.length > 0 ? { technique: technique.slice(0, 8) } : null;
+    } catch (e) { return null; }
+}
 
 module.exports = router;
