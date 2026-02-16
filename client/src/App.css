@@ -28,10 +28,14 @@
 }
 
 .app-container.collapsed .sidebar {
-  width: 0;
-  padding: 0;
-  border: none;
-  overflow: hidden;
+  width: 80px;
+  padding: 24px 12px;
+  border-right: 1px solid var(--border-subtle);
+}
+
+.app-container.collapsed .logo-container {
+  padding-left: 0;
+  align-items: center;
 }
 
 /* Logo */
@@ -60,9 +64,10 @@
 }
 
 .app-container.collapsed .logo-text {
-  opacity: 0;
-  width: 0;
-  pointer-events: none;
+  opacity: 1;
+  width: auto;
+  pointer-events: auto;
+  font-size: 1.5rem;
 }
 
 .version-text {
@@ -174,7 +179,7 @@
 }
 
 .app-container.collapsed .collapse-btn {
-  left: 14px;
+  left: 80px;
   transform: translateX(-50%) rotate(180deg);
 }
 
