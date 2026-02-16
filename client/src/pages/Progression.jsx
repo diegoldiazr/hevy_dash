@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend } from 'recharts';
-import { Target, Activity } from 'lucide-react';
+import { Target, Activity, Edit3, Save, X } from 'lucide-react';
 
 const Progression = () => {
     const [exercises, setExercises] = useState([]);
@@ -11,6 +11,12 @@ const Progression = () => {
     const [loading, setLoading] = useState(true);
     const [detailsLoading, setDetailsLoading] = useState(false);
     const [timePeriod, setTimePeriod] = useState('all'); // 'month', 'year', 'all'
+    const [isEditingDetails, setIsEditingDetails] = useState(false);
+    const [editForm, setEditForm] = useState({
+        technique: '',
+        muscle_image_url: '',
+        execution_video_url: ''
+    });
 
     useEffect(() => {
         const fetchExercises = async () => {
@@ -68,7 +74,39 @@ const Progression = () => {
 
         fetchHistory();
         fetchDetails();
+        setIsEditingDetails(false);
     }, [selectedExercise, timePeriod]);
+
+    const handleEditClick = () => {
+        setIsEditingDetails(true);
+        setEditForm({
+            technique: exerciseDetails?.technique?.join('\n') || '',
+            muscle_image_url: exerciseDetails?.muscle_image_url || '',
+            execution_video_url: exerciseDetails?.execution_video_url || ''
+        });
+    };
+
+    const handleSaveDetails = async () => {
+        try {
+            const techniqueArray = editForm.technique.split('\n').map(s => s.trim()).filter(s => s.length > 0);
+            await axios.post(`/api/exercises/${encodeURIComponent(selectedExercise)}/details`, {
+                technique: techniqueArray,
+                muscle_image_url: editForm.muscle_image_url,
+                execution_video_url: editForm.execution_video_url
+            });
+
+            setExerciseDetails({
+                ...exerciseDetails,
+                technique: techniqueArray,
+                muscle_image_url: editForm.muscle_image_url,
+                execution_video_url: editForm.execution_video_url
+            });
+            setIsEditingDetails(false);
+        } catch (err) {
+            console.error("Save error:", err);
+            alert("No se pudo guardar la información.");
+        }
+    };
 
     return (
         <div className="progression-page">
@@ -245,7 +283,14 @@ const Progression = () => {
                     </div>
 
                     <div className="muscle-guide" style={{ marginTop: '30px' }}>
-                        <h3>Técnica y Compromiso Muscular</h3>
+                        <div className="muscle-guide-header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                            <h3>Técnica y Compromiso Muscular</h3>
+                            {!detailsLoading && exerciseDetails && !isEditingDetails && (
+                                <button className="edit-details-btn" onClick={handleEditClick}>
+                                    <Edit3 size={16} /> Editar
+                                </button>
+                            )}
+                        </div>
                         {detailsLoading ? (
                             <div className="loading">Cargando técnica...</div>
                         ) : exerciseDetails ? (
@@ -264,30 +309,70 @@ const Progression = () => {
                                 ) : (
                                     <Target size={40} className="muscle-icon" />
                                 )}
-                                <div className="muscle-info">
-                                    <h4>{selectedExercise}</h4>
-
-                                    <div className="technique-section">
-                                        <h5>Técnica Paso a Paso:</h5>
-                                        <ol className="technique-list">
-                                            {exerciseDetails.technique.map((step, idx) => (
-                                                <li key={idx}>{step}</li>
-                                            ))}
-                                        </ol>
-                                    </div>
-
-                                    {exerciseDetails.muscle_image_url && (
-                                        <div className="muscle-map-section">
-                                            <h5>Compromiso Muscular:</h5>
-                                            <img
-                                                src={exerciseDetails.muscle_image_url}
-                                                alt="Mapa Muscular"
-                                                className="muscle-map-img"
-                                                onError={(e) => e.target.style.display = 'none'}
+                                {isEditingDetails ? (
+                                    <div className="edit-details-form">
+                                        <div className="form-group">
+                                            <label>URL Vídeo/GIF Ejecución:</label>
+                                            <input
+                                                type="text"
+                                                value={editForm.execution_video_url}
+                                                onChange={(e) => setEditForm({ ...editForm, execution_video_url: e.target.value })}
+                                                placeholder="https://ejemplo.com/ejercicio.mp4"
                                             />
                                         </div>
-                                    )}
-                                </div>
+                                        <div className="form-group">
+                                            <label>URL Imagen Grupo Muscular:</label>
+                                            <input
+                                                type="text"
+                                                value={editForm.muscle_image_url}
+                                                onChange={(e) => setEditForm({ ...editForm, muscle_image_url: e.target.value })}
+                                                placeholder="https://ejemplo.com/musculo.png"
+                                            />
+                                        </div>
+                                        <div className="form-group">
+                                            <label>Técnica (un paso por línea):</label>
+                                            <textarea
+                                                rows={6}
+                                                value={editForm.technique}
+                                                onChange={(e) => setEditForm({ ...editForm, technique: e.target.value })}
+                                                placeholder="1. Paso uno\n2. Paso dos..."
+                                            />
+                                        </div>
+                                        <div className="edit-actions">
+                                            <button className="save-btn" onClick={handleSaveDetails}>
+                                                <Save size={16} /> Guardar
+                                            </button>
+                                            <button className="cancel-btn" onClick={() => setIsEditingDetails(false)}>
+                                                <X size={16} /> Cancelar
+                                            </button>
+                                        </div>
+                                    </div>
+                                ) : (
+                                    <div className="muscle-info">
+                                        <h4>{selectedExercise}</h4>
+
+                                        <div className="technique-section">
+                                            <h5>Técnica Paso a Paso:</h5>
+                                            <ol className="technique-list">
+                                                {exerciseDetails.technique.map((step, idx) => (
+                                                    <li key={idx}>{step}</li>
+                                                ))}
+                                            </ol>
+                                        </div>
+
+                                        {exerciseDetails.muscle_image_url && (
+                                            <div className="muscle-map-section">
+                                                <h5>Compromiso Muscular:</h5>
+                                                <img
+                                                    src={exerciseDetails.muscle_image_url}
+                                                    alt="Mapa Muscular"
+                                                    className="muscle-map-img"
+                                                    onError={(e) => e.target.style.display = 'none'}
+                                                />
+                                            </div>
+                                        )}
+                                    </div>
+                                )}
                             </div>
                         ) : (
                             <div className="empty-state">No se pudo cargar la información técnica.</div>

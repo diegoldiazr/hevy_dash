@@ -157,18 +157,25 @@ router.get('/:name/history', (req, res) => {
 router.get('/:name/details', async (req, res) => {
     const exerciseName = req.params.name;
 
-    // Check cache first
-    db.get('SELECT * FROM exercise_details WHERE title = ?', [exerciseName], async (err, row) => {
-        if (err) return res.status(500).json({ error: err.message });
+    try {
+        // 1. Check cache first
+        const row = await new Promise((resolve, reject) => {
+            db.get('SELECT * FROM exercise_details WHERE title = ?', [exerciseName], (err, row) => {
+                if (err) reject(err);
+                else resolve(row);
+            });
+        });
 
         if (row) {
+            console.log(`[Exercise] Cache hit for: ${exerciseName}`);
             return res.json({
                 ...row,
-                technique: JSON.parse(row.technique)
+                technique: JSON.parse(row.technique || '[]')
             });
         }
 
-        // Not in cache, try to scrape
+        // 2. Not in cache, try to scrape
+        console.log(`[Exercise] Cache miss for: ${exerciseName}. Starting scrape chain...`);
         try {
             const generateSlug = (name) => {
                 return name.toLowerCase()
@@ -302,22 +309,48 @@ router.get('/:name/details', async (req, res) => {
             console.error("[Exercise] Details Error:", error.message);
             res.status(500).json({ error: "Failed to fetch exercise details" });
         }
-    });
+    } catch (outerError) {
+        console.error("[Exercise] Route Error:", outerError.message);
+        res.status(500).json({ error: "Internal server error" });
+    }
 });
 
 async function scrapeJefit(exerciseName) {
     try {
         const searchUrl = `https://www.jefit.com/exercises?search=${encodeURIComponent(exerciseName)}`;
+        console.log(`[Jefit] Searching: ${searchUrl}`);
         const res = await fetch(searchUrl, { headers: { 'User-Agent': 'Mozilla/5.0' } });
         if (!res.ok) return null;
         const html = await res.text();
         const $ = cheerio.load(html);
 
-        // Find the first result link
-        const firstLink = $('a[href^="/exercises/"]').first().attr('href');
-        if (!firstLink) return null;
+        // Find all result links
+        let bestMatch = null;
+        const searchTerms = exerciseName.toLowerCase().replace(/\(|\)/g, '').split(/\s+/).filter(t => t.length > 2);
 
-        const detailsRes = await fetch(`https://www.jefit.com${firstLink}`, { headers: { 'User-Agent': 'Mozilla/5.0' } });
+        $('a[href^="/exercises/"]').each((i, el) => {
+            const href = $(el).attr('href');
+            // Skip non-exercise links or category links
+            if (href.split('/').length < 4) return;
+
+            const title = $(el).find('p').first().text().trim() || $(el).text().trim();
+            const titleLower = title.toLowerCase();
+
+            // Basic verification: at least one significant term must match
+            const matchCount = searchTerms.filter(term => titleLower.includes(term)).length;
+            if (matchCount > 0) {
+                bestMatch = { href, title, matchCount };
+                return false; // Found a good enough match
+            }
+        });
+
+        if (!bestMatch) {
+            console.log(`[Jefit] No relevant match found for: ${exerciseName}`);
+            return null;
+        }
+
+        console.log(`[Jefit] Selected match: ${bestMatch.title} (${bestMatch.href})`);
+        const detailsRes = await fetch(`https://www.jefit.com${bestMatch.href}`, { headers: { 'User-Agent': 'Mozilla/5.0' } });
         if (!detailsRes.ok) return null;
         const detailsHtml = await detailsRes.text();
         const $d = cheerio.load(detailsHtml);
@@ -326,7 +359,6 @@ async function scrapeJefit(exerciseName) {
         let technique = [];
         const techText = $d('p.whitespace-pre-wrap').text();
         if (techText) {
-            // Jefit usually has "Steps : 1.) ... 2.) ..."
             technique = techText
                 .replace(/^Steps\s*:\s*/i, '')
                 .split(/\d+\.\)\s+/)
@@ -336,14 +368,14 @@ async function scrapeJefit(exerciseName) {
 
         // 2. Extract Muscle Image
         let muscle_image_url = null;
-        // Jefit shows muscle images as icons linked to category pages
         $d('a[href*="/exercises/"]').each((i, el) => {
             const href = $(el).attr('href');
             const img = $(el).find('img');
-            if (img.length > 0 && !href.includes(firstLink)) {
-                // Potential muscle icon
+            if (img.length > 0 && !href.includes(bestMatch.href)) {
                 muscle_image_url = img.attr('src');
-                return false; // break
+                if (muscle_image_url && (muscle_image_url.includes('exercise') || muscle_image_url.includes('muscle'))) {
+                    return false;
+                }
             }
         });
 
@@ -357,7 +389,6 @@ async function scrapeJefit(exerciseName) {
             }
         });
 
-        // Helper to fix URLs
         const fixUrl = (url) => {
             if (!url) return null;
             if (url.startsWith('//')) return `https:${url}`;
@@ -396,5 +427,30 @@ async function scrapeGoogle(exerciseName) {
         return technique.length > 0 ? { technique: technique.slice(0, 8) } : null;
     } catch (e) { return null; }
 }
+
+// Update manual exercise details
+router.post('/:name/details', (req, res) => {
+    const exerciseName = req.params.name;
+    const { technique, muscle_image_url, execution_video_url } = req.body;
+
+    // technique should be an array, but we store it as JSON string
+    const techniqueJson = Array.isArray(technique) ? JSON.stringify(technique) : JSON.stringify([]);
+
+    db.run(`INSERT INTO exercise_details (title, slug, technique, muscle_image_url, execution_video_url)
+            VALUES (?, ?, ?, ?, ?)
+            ON CONFLICT(title) DO UPDATE SET
+                technique = excluded.technique,
+                muscle_image_url = excluded.muscle_image_url,
+                execution_video_url = excluded.execution_video_url`,
+        [exerciseName, exerciseName.toLowerCase().replace(/[^a-z0-9]/g, '-'), techniqueJson, muscle_image_url, execution_video_url],
+        function (err) {
+            if (err) {
+                console.error("[DB] Update Error:", err.message);
+                return res.status(500).json({ error: "No se pudo actualizar la información técnica." });
+            }
+            res.json({ success: true, message: "Detalles actualizados correctamente." });
+        }
+    );
+});
 
 module.exports = router;
