@@ -170,8 +170,6 @@ router.get('/:name/details', async (req, res) => {
 
         // Not in cache, try to scrape
         try {
-            const searchName = exerciseName;
-
             const generateSlug = (name) => {
                 return name.toLowerCase()
                     .replace(/[^a-z0-9]/g, ' ')
@@ -180,20 +178,57 @@ router.get('/:name/details', async (req, res) => {
                     .join('-');
             };
 
-            let slug = generateSlug(searchName);
-            let url = `https://www.hevyapp.com/exercises/${slug}/`;
-            console.log(`[Exercise] Attempting to scrape using English name "${searchName}": ${url}`);
+            // Generate possible slugs to try
+            const nameLower = exerciseName.toLowerCase();
+            const baseSlugs = [generateSlug(exerciseName)];
 
-            let response = await fetch(url);
-
-            // If 404, try with 'how-to-' prefix
-            if (response.status === 404) {
-                let fallbackUrl = `https://www.hevyapp.com/exercises/how-to-${slug}/`;
-                console.log(`[Exercise] 404, trying fallback: ${fallbackUrl}`);
-                response = await fetch(fallbackUrl);
+            // If contains "(Machine)", try "Machine [Name]" and just "[Name]"
+            if (nameLower.includes('(machine)')) {
+                const clean = exerciseName.replace(/\(machine\)/i, '').trim();
+                baseSlugs.push(`machine-${generateSlug(clean)}`);
+                baseSlugs.push(generateSlug(clean));
+            }
+            // If contains "(Dumbbell)", etc.
+            if (nameLower.includes('(dumbbell)')) {
+                const clean = exerciseName.replace(/\(dumbbell\)/i, '').trim();
+                baseSlugs.push(`dumbbell-${generateSlug(clean)}`);
+                baseSlugs.push(generateSlug(clean));
+            }
+            if (nameLower.includes('(barbell)')) {
+                const clean = exerciseName.replace(/\(barbell\)/i, '').trim();
+                baseSlugs.push(`barbell-${generateSlug(clean)}`);
+                baseSlugs.push(generateSlug(clean));
+            }
+            if (nameLower.includes('(cable)')) {
+                const clean = exerciseName.replace(/\(cable\)/i, '').trim();
+                baseSlugs.push(`cable-${generateSlug(clean)}`);
+                baseSlugs.push(generateSlug(clean));
             }
 
-            if (!response.ok) {
+            // De-duplicate slugs
+            const slugsToTry = [...new Set(baseSlugs)];
+            let response = null;
+            let usedSlug = slugsToTry[0];
+
+            for (const s of slugsToTry) {
+                const urls = [
+                    `https://www.hevyapp.com/exercises/${s}/`,
+                    `https://www.hevyapp.com/exercises/how-to-${s}/`
+                ];
+
+                for (const url of urls) {
+                    console.log(`[Exercise] Trying: ${url}`);
+                    const res = await fetch(url);
+                    if (res.ok) {
+                        response = res;
+                        usedSlug = s;
+                        break;
+                    }
+                }
+                if (response) break;
+            }
+
+            if (!response) {
                 // Return defaults if not found
                 return res.json({
                     title: exerciseName,
@@ -205,10 +240,11 @@ router.get('/:name/details', async (req, res) => {
 
             const html = await response.text();
             const $ = cheerio.load(html);
+            const slug = usedSlug;
 
             // 2. Extract Technique
             let technique = [];
-            $('ol li').each((i, el) => {
+            $('.wp-block-columns ol li, ol li').each((i, el) => {
                 technique.push($(el).text().trim());
             });
 
@@ -220,17 +256,25 @@ router.get('/:name/details', async (req, res) => {
             let muscle_image_url = null;
             $('img').each((i, el) => {
                 const src = $(el).attr('src');
-                if (src && (src.includes('muscle') || src.includes('anatomy'))) {
-                    muscle_image_url = src;
+                const alt = $(el).attr('alt') || '';
+                if (src && (src.includes('muscle') || src.includes('anatomy') || alt.toLowerCase().includes('muscle'))) {
+                    muscle_image_url = src.trim();
                 }
             });
-            // Fallback to first major image if no muscle specific one
+            // Fallback to first major image with 'wp-content' if no muscle specific one
             if (!muscle_image_url) {
-                muscle_image_url = $('.entry-content img').first().attr('src');
+                $('img').each((i, el) => {
+                    const src = $(el).attr('src');
+                    if (src && src.includes('wp-content/uploads')) {
+                        muscle_image_url = src.trim();
+                        return false; // break
+                    }
+                });
             }
 
             // 4. Extract Video/Animation
             let execution_video_url = $('video source').attr('src') || $('video').attr('src');
+            if (execution_video_url) execution_video_url = execution_video_url.trim();
 
             const details = {
                 title: exerciseName,
