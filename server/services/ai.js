@@ -53,8 +53,7 @@ const chat = async (message, context = []) => {
             const systemPrompt = "Eres un experto entrenador de fitness especializado en entrenamiento de fuerza y culturismo. Analizas datos de entrenamiento y das consejos accionables. Usa los datos del usuario (edad, altura, peso, medidas) para dar feedback preciso. Sé conciso y motivador. Responde siempre en español.";
 
             const model = genAI.getGenerativeModel({
-                model: "gemini-1.5-flash",
-                systemInstruction: systemPrompt
+                model: "gemini-2.0-flash"
             });
 
             // Gemini history must alternate User/Model and MUST start with User.
@@ -63,6 +62,8 @@ const chat = async (message, context = []) => {
                     role: m.role === 'assistant' ? 'model' : 'user',
                     parts: [{ text: m.content }]
                 }));
+
+            const fullMessage = `System: Eres un experto entrenador de fitness. Responde siempre en español. \n\nUser: ${message}`;
 
             // Safety: Ensure history starts with 'user'. If it starts with 'model', remove it.
             if (history.length > 0 && history[0].role === 'model') {
@@ -76,7 +77,7 @@ const chat = async (message, context = []) => {
                 },
             });
 
-            const result = await chatSession.sendMessage(message);
+            const result = await chatSession.sendMessage(fullMessage);
             const response = await result.response;
             return { role: 'assistant', content: response.text() };
         } catch (error) {

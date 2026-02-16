@@ -7,7 +7,9 @@ const Progression = () => {
     const [exercises, setExercises] = useState([]);
     const [selectedExercise, setSelectedExercise] = useState('');
     const [history, setHistory] = useState([]);
+    const [exerciseDetails, setExerciseDetails] = useState(null);
     const [loading, setLoading] = useState(true);
+    const [detailsLoading, setDetailsLoading] = useState(false);
     const [timePeriod, setTimePeriod] = useState('all'); // 'month', 'year', 'all'
 
     useEffect(() => {
@@ -51,7 +53,21 @@ const Progression = () => {
                 setLoading(false);
             }
         };
+
+        const fetchDetails = async () => {
+            setDetailsLoading(true);
+            try {
+                const res = await axios.get(`/api/exercises/${encodeURIComponent(selectedExercise)}/details`);
+                setExerciseDetails(res.data);
+            } catch (err) {
+                console.error("Failed to fetch exercise details", err);
+            } finally {
+                setDetailsLoading(false);
+            }
+        }
+
         fetchHistory();
+        fetchDetails();
     }, [selectedExercise, timePeriod]);
 
     return (
@@ -225,17 +241,52 @@ const Progression = () => {
 
                     <div className="muscle-guide" style={{ marginTop: '30px' }}>
                         <h3>Técnica y Compromiso Muscular</h3>
-                        <div className="muscle-card">
-                            <Target size={40} className="muscle-icon" />
-                            <div className="muscle-info">
-                                <h4>{selectedExercise}</h4>
-                                <p>Para realizar este ejercicio correctamente, mantén el núcleo estable y un movimiento controlado. Concéntrate en el grupo muscular objetivo.</p>
-                                {/* Placeholder for real muscle map */}
-                                <div className="muscle-map-placeholder">
-                                    [Visualización del Mapa Muscular]
+                        {detailsLoading ? (
+                            <div className="loading">Cargando técnica...</div>
+                        ) : exerciseDetails ? (
+                            <div className="muscle-card">
+                                {exerciseDetails.execution_video_url ? (
+                                    <div className="exercise-media">
+                                        <video
+                                            autoPlay
+                                            loop
+                                            muted
+                                            playsInline
+                                            className="exercise-video"
+                                            src={exerciseDetails.execution_video_url}
+                                        />
+                                    </div>
+                                ) : (
+                                    <Target size={40} className="muscle-icon" />
+                                )}
+                                <div className="muscle-info">
+                                    <h4>{selectedExercise}</h4>
+
+                                    <div className="technique-section">
+                                        <h5>Técnica Paso a Paso:</h5>
+                                        <ol className="technique-list">
+                                            {exerciseDetails.technique.map((step, idx) => (
+                                                <li key={idx}>{step}</li>
+                                            ))}
+                                        </ol>
+                                    </div>
+
+                                    {exerciseDetails.muscle_image_url && (
+                                        <div className="muscle-map-section">
+                                            <h5>Compromiso Muscular:</h5>
+                                            <img
+                                                src={exerciseDetails.muscle_image_url}
+                                                alt="Mapa Muscular"
+                                                className="muscle-map-img"
+                                                onError={(e) => e.target.style.display = 'none'}
+                                            />
+                                        </div>
+                                    )}
                                 </div>
                             </div>
-                        </div>
+                        ) : (
+                            <div className="empty-state">No se pudo cargar la información técnica.</div>
+                        )}
                     </div>
                 </div>
             )}

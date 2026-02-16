@@ -108,6 +108,27 @@ const initDb = () => {
         created_at DATETIME DEFAULT CURRENT_TIMESTAMP
       )
     `);
+
+    // Exercise Details Table (Scraped info)
+    db.run(`
+      CREATE TABLE IF NOT EXISTS exercise_details (
+        title TEXT PRIMARY KEY,
+        slug TEXT,
+        technique TEXT, -- JSON array of steps
+        muscle_image_url TEXT,
+        execution_video_url TEXT,
+        updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
+      )
+    `);
+
+    // Exercise Translations Table
+    db.run(`
+      CREATE TABLE IF NOT EXISTS exercise_translations (
+        title_en TEXT PRIMARY KEY,
+        title_es TEXT,
+        updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
+      )
+    `);
   });
 };
 

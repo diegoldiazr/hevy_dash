@@ -268,3 +268,76 @@
 .set-badge .set-reps {
     color: var(--text-muted);
 }
+
+/* Exercise Details Styling */
+.exercise-media {
+    width: 100%;
+    max-width: 320px;
+    border-radius: var(--radius-md);
+    overflow: hidden;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+    border: 1px solid var(--border-subtle);
+}
+
+.exercise-video {
+    width: 100%;
+    display: block;
+}
+
+.technique-section {
+    margin-top: 24px;
+    padding-top: 24px;
+    border-top: 1px solid var(--border-subtle);
+}
+
+.technique-section h5,
+.muscle-map-section h5 {
+    color: var(--text-dim);
+    text-transform: uppercase;
+    font-size: 0.8rem;
+    letter-spacing: 0.1em;
+    margin-bottom: 16px;
+    font-weight: 700;
+}
+
+.technique-list {
+    padding-left: 20px;
+    color: var(--text-muted);
+    line-height: 1.6;
+}
+
+.technique-list li {
+    margin-bottom: 12px;
+}
+
+.muscle-map-section {
+    margin-top: 32px;
+}
+
+.muscle-map-img {
+    width: 100%;
+    max-width: 400px;
+    border-radius: var(--radius-md);
+    filter: drop-shadow(0 0 10px rgba(0, 0, 0, 0.5));
+    transition: transform 0.3s ease;
+}
+
+.muscle-map-img:hover {
+    transform: scale(1.02);
+}
+
+@media (max-width: 1024px) {
+    .muscle-card {
+        grid-template-columns: 1fr;
+        justify-items: center;
+        text-align: center;
+    }
+
+    .technique-list {
+        text-align: left;
+    }
+
+    .exercise-media {
+        max-width: 400px;
+    }
+}
