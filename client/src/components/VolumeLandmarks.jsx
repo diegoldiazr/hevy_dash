@@ -3,8 +3,15 @@ import {
     BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip,
     ResponsiveContainer, ReferenceLine, Cell, LabelList
 } from 'recharts';
+import SegmentedControl from './SegmentedControl';
 
 const VolumeLandmarks = ({ effectiveVolumeData, period, onPeriodChange }) => {
+    const periodOptions = [
+        { label: 'Mes', value: 'month' },
+        { label: 'Año', value: 'year' },
+        { label: 'Todo', value: 'all' }
+    ];
+
     // Process data based on period
     const chartData = useMemo(() => {
         if (!effectiveVolumeData || effectiveVolumeData.length === 0) return [];
@@ -71,14 +78,6 @@ const VolumeLandmarks = ({ effectiveVolumeData, period, onPeriodChange }) => {
         return null;
     };
 
-    const PeriodSelector = ({ current, onChange }) => (
-        <div className="period-selector mini" style={{ marginBottom: 0 }}>
-            <button className={`period-btn ${current === 'month' ? 'active' : ''}`} onClick={(e) => { e.stopPropagation(); onChange('month'); }}>Mes</button>
-            <button className={`period-btn ${current === 'year' ? 'active' : ''}`} onClick={(e) => { e.stopPropagation(); onChange('year'); }}>Año</button>
-            <button className={`period-btn ${current === 'all' ? 'active' : ''}`} onClick={(e) => { e.stopPropagation(); onChange('all'); }}>Todo</button>
-        </div>
-    );
-
     return (
         <div className="volume-landmarks-card glass-panel" style={{ padding: '24px', height: '480px' }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '20px' }}>
@@ -88,7 +87,12 @@ const VolumeLandmarks = ({ effectiveVolumeData, period, onPeriodChange }) => {
                         Media de series efectivas por semana en el periodo seleccionado.
                     </p>
                 </div>
-                <PeriodSelector current={period} onChange={onPeriodChange} />
+                <SegmentedControl
+                    small
+                    options={periodOptions}
+                    value={period}
+                    onChange={onPeriodChange}
+                />
             </div>
 
             {chartData.length === 0 ? (

@@ -5,12 +5,19 @@ import {
     ResponsiveContainer, Legend, CartesianGrid, PieChart, Pie, Cell
 } from 'recharts';
 import { AlertTriangle, Lightbulb, TrendingUp, Info, CheckCircle2 } from 'lucide-react';
+import SegmentedControl from '../components/SegmentedControl';
 
 const Analytics = () => {
     const [data, setData] = useState(null);
     const [loading, setLoading] = useState(true);
     const [timePeriod, setTimePeriod] = useState('all');
     const [expandedOthers, setExpandedOthers] = useState(false);
+
+    const periodOptions = [
+        { label: 'Mes', value: 'month' },
+        { label: 'Año', value: 'year' },
+        { label: 'Historial', value: 'all' }
+    ];
 
     useEffect(() => {
         fetchAnalytics();
@@ -94,64 +101,62 @@ const Analytics = () => {
         return insights;
     }, [data]);
 
-    if (loading) return <div className="flex items-center justify-center min-h-[400px] text-zinc-500 font-medium">Cargando Análisis de Biomecánica...</div>;
-    if (!data) return <div className="p-8 text-center text-zinc-400">No hay datos suficientes para generar el análisis detallado.</div>;
+    if (loading) return <div className="loading" style={{ height: '400px' }}>Cargando Análisis de Biomecánica...</div>;
+    if (!data) return <div className="empty-state">No hay datos suficientes para generar el análisis detallado.</div>;
 
-    const COLORS = ['#5865f2', '#3dd68c', '#ffc940', '#ff5c5c', '#a78bfa', '#3f3f46'];
+    // Use app-wide chart colors
+    const COLORS = [
+        'var(--chart-1)',
+        'var(--chart-2)',
+        'var(--chart-3)',
+        'var(--chart-4)',
+        'var(--chart-5)',
+        'var(--chart-6)',
+        '#64748b' // Neutral color for "Others"
+    ];
 
     return (
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8 animate-in fade-in duration-500">
+        <div className="analytics-page" style={{ padding: '0 0 40px 0' }}>
             {/* Header */}
-            <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+            <div className="page-header" style={{ marginBottom: '32px' }}>
                 <div>
-                    <h2 className="text-3xl font-extrabold tracking-tight text-white sm:text-4xl bg-gradient-to-r from-indigo-400 to-purple-400 bg-clip-text text-transparent">
-                        Análisis de Hipertrofia
-                    </h2>
-                    <p className="mt-2 text-zinc-400">Optimización de volumen y prevención de desequilibrios.</p>
+                    <h2 className="text-gradient">Análisis de Hipertrofia</h2>
+                    <p style={{ color: 'var(--text-muted)', marginTop: '8px' }}>Optimización de volumen y prevención de desequilibrios.</p>
                 </div>
-                <div className="flex bg-zinc-900 p-1 rounded-xl border border-zinc-800 self-start">
-                    {['month', 'year', 'all'].map((p) => (
-                        <button
-                            key={p}
-                            onClick={() => setTimePeriod(p)}
-                            className={`px-4 py-1.5 rounded-lg text-sm font-semibold transition-all ${timePeriod === p
-                                    ? 'bg-indigo-600 text-white shadow-lg'
-                                    : 'text-zinc-500 hover:text-white'
-                                }`}
-                        >
-                            {p === 'month' ? 'Mes' : p === 'year' ? 'Año' : 'Historial'}
-                        </button>
-                    ))}
-                </div>
+                <SegmentedControl
+                    options={periodOptions}
+                    value={timePeriod}
+                    onChange={setTimePeriod}
+                />
             </div>
 
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+            <div className="analytics-grid">
                 {/* 1. Volume & RPE Trend */}
-                <div className="bg-white dark:bg-zinc-900 rounded-3xl p-8 shadow-xl shadow-indigo-500/5 border border-zinc-100 dark:border-zinc-800">
-                    <div className="flex items-center gap-3 mb-8">
-                        <div className="p-2 bg-indigo-50 dark:bg-indigo-900/30 rounded-xl">
-                            <TrendingUp className="text-indigo-600 dark:text-indigo-400" size={20} />
-                        </div>
-                        <h3 className="text-sm font-bold text-zinc-400 dark:text-zinc-500 uppercase tracking-widest">Tendencia: Volumen vs Esfuerzo</h3>
+                <div className="glass-panel" style={{ padding: '32px' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '32px' }}>
+                        <TrendingUp style={{ color: 'var(--primary)' }} size={24} />
+                        <h3 style={{ margin: 0, border: 'none', padding: 0, textTransform: 'uppercase', letterSpacing: '0.1em', fontSize: '0.9rem', color: 'var(--text-muted)' }}>
+                            Tendencia: Volumen vs Esfuerzo
+                        </h3>
                     </div>
 
-                    <div className="h-[350px] w-full">
+                    <div style={{ height: '350px', width: '100%' }}>
                         <ResponsiveContainer width="100%" height="100%">
                             <ComposedChart data={data.weeklyVolume}>
-                                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="rgba(0,0,0,0.05)" />
+                                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="var(--chart-grid)" />
                                 <XAxis
                                     dataKey="name"
                                     axisLine={false}
                                     tickLine={false}
-                                    tick={{ fill: '#71717a', fontSize: 12 }}
+                                    tick={{ fill: 'var(--text-muted)', fontSize: 12 }}
                                     dy={10}
                                 />
                                 <YAxis
                                     yAxisId="left"
                                     axisLine={false}
                                     tickLine={false}
-                                    tick={{ fill: '#71717a', fontSize: 12 }}
-                                    label={{ value: 'Sets Efectivos', angle: -90, position: 'insideLeft', offset: 10, style: { fill: '#71717a', fontSize: 10, fontWeight: 700 } }}
+                                    tick={{ fill: 'var(--text-muted)', fontSize: 12 }}
+                                    label={{ value: 'Sets Efectivos', angle: -90, position: 'insideLeft', offset: 10, style: { fill: 'var(--text-muted)', fontSize: 10, fontWeight: 700 } }}
                                 />
                                 <YAxis
                                     yAxisId="right"
@@ -159,19 +164,26 @@ const Analytics = () => {
                                     domain={[5, 10]}
                                     axisLine={false}
                                     tickLine={false}
-                                    tick={{ fill: '#ff5c5c', fontSize: 12 }}
-                                    label={{ value: 'RPE Medio', angle: 90, position: 'insideRight', offset: 10, style: { fill: '#ff5c5c', fontSize: 10, fontWeight: 700 } }}
+                                    tick={{ fill: 'var(--error)', fontSize: 12 }}
+                                    label={{ value: 'RPE Medio', angle: 90, position: 'insideRight', offset: 10, style: { fill: 'var(--error)', fontSize: 10, fontWeight: 700 } }}
                                 />
                                 <Tooltip
-                                    contentStyle={{ borderRadius: '16px', border: 'none', boxShadow: '0 10px 25px -5px rgba(0,0,0,0.1)' }}
-                                    cursor={{ fill: 'rgba(0,0,0,0.02)' }}
+                                    contentStyle={{
+                                        backgroundColor: 'var(--bg-card)',
+                                        borderRadius: '16px',
+                                        border: '1px solid var(--border-subtle)',
+                                        boxShadow: 'var(--shadow-lg)',
+                                        color: 'var(--text-main)'
+                                    }}
+                                    itemStyle={{ color: 'var(--text-main)' }}
+                                    cursor={{ fill: 'var(--chart-grid)' }}
                                 />
                                 <Legend verticalAlign="top" height={36} wrapperStyle={{ fontSize: 12, fontWeight: 600, paddingBottom: 20 }} />
                                 <Bar
                                     yAxisId="left"
                                     dataKey="effectiveSets"
                                     name="Sets Efectivos"
-                                    fill="#5865f2"
+                                    fill="var(--primary)"
                                     radius={[6, 6, 0, 0]}
                                     barSize={40}
                                 />
@@ -180,9 +192,9 @@ const Analytics = () => {
                                     type="monotone"
                                     dataKey="avgRPE"
                                     name="Esfuerzo (RPE)"
-                                    stroke="#ff5c5c"
+                                    stroke="var(--error)"
                                     strokeWidth={3}
-                                    dot={{ r: 4, fill: '#ff5c5c', strokeWidth: 2, stroke: '#fff' }}
+                                    dot={{ r: 4, fill: 'var(--error)', strokeWidth: 2, stroke: '#fff' }}
                                     activeDot={{ r: 6, strokeWidth: 0 }}
                                 />
                             </ComposedChart>
@@ -191,18 +203,16 @@ const Analytics = () => {
                 </div>
 
                 {/* 2. Muscle Distribution */}
-                <div className="bg-white dark:bg-zinc-900 rounded-3xl p-8 shadow-xl shadow-indigo-500/5 border border-zinc-100 dark:border-zinc-800">
-                    <div className="flex items-center justify-between mb-8">
-                        <div className="flex items-center gap-3">
-                            <div className="p-2 bg-emerald-50 dark:bg-emerald-900/30 rounded-xl">
-                                <Info className="text-emerald-600 dark:text-emerald-400" size={20} />
-                            </div>
-                            <h3 className="text-sm font-bold text-zinc-400 dark:text-zinc-500 uppercase tracking-widest">Balance Muscular (Sets)</h3>
-                        </div>
+                <div className="glass-panel" style={{ padding: '32px' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '32px' }}>
+                        <Info style={{ color: 'var(--success)' }} size={24} />
+                        <h3 style={{ margin: 0, border: 'none', padding: 0, textTransform: 'uppercase', letterSpacing: '0.1em', fontSize: '0.9rem', color: 'var(--text-muted)' }}>
+                            Balance Muscular (Sets)
+                        </h3>
                     </div>
 
-                    <div className="flex flex-col md:flex-row items-center gap-8">
-                        <div className="h-[300px] w-full md:w-1/2">
+                    <div style={{ display: 'flex', flexDirection: window.innerWidth < 768 ? 'column' : 'row', alignItems: 'center', gap: '32px' }}>
+                        <div style={{ height: '300px', width: window.innerWidth < 768 ? '100%' : '50%' }}>
                             <ResponsiveContainer width="100%" height="100%">
                                 <PieChart>
                                     <Pie
@@ -219,36 +229,56 @@ const Analytics = () => {
                                                 key={`cell-${index}`}
                                                 fill={COLORS[index % COLORS.length]}
                                                 className={entry.isOthers ? 'cursor-pointer' : ''}
+                                                style={{ outline: 'none' }}
                                             />
                                         ))}
                                     </Pie>
                                     <Tooltip
+                                        contentStyle={{
+                                            backgroundColor: 'var(--bg-card)',
+                                            borderRadius: '12px',
+                                            border: '1px solid var(--border-subtle)',
+                                            color: 'var(--text-main)'
+                                        }}
                                         formatter={(val, name, props) => [
                                             `${val} sets`,
-                                            props.payload.isOthers && expandedOthers ? 'Ver desglose abajo' : name
+                                            props.payload.isOthers && expandedOthers ? 'Ver desglose lateral' : name
                                         ]}
                                     />
                                 </PieChart>
                             </ResponsiveContainer>
                         </div>
 
-                        <div className="w-full md:w-1/2 space-y-4">
+                        <div style={{ width: window.innerWidth < 768 ? '100%' : '50%', display: 'flex', flexDirection: 'column', gap: '16px' }}>
                             {muscleData.chart.map((item, i) => (
-                                <div key={item.name} className="flex items-center justify-between">
-                                    <div className="flex items-center gap-2">
-                                        <div className="w-3 h-3 rounded-full" style={{ backgroundColor: COLORS[i % COLORS.length] }}></div>
-                                        <span className="text-sm font-semibold text-zinc-600 dark:text-zinc-300">{item.name}</span>
+                                <div key={item.name} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                                    <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                                        <div style={{ width: '12px', height: '12px', borderRadius: '50%', backgroundColor: COLORS[i % COLORS.length] }}></div>
+                                        <span style={{ fontSize: '0.9rem', fontWeight: 600, color: 'var(--text-muted)' }}>{item.name}</span>
                                     </div>
-                                    <span className="text-sm font-bold text-zinc-800 dark:text-zinc-100">{item.value} <small className="text-zinc-400">sets</small></span>
+                                    <span style={{ fontSize: '0.95rem', fontVariantNumeric: 'tabular-nums', fontWeight: 800, color: 'var(--text-main)' }}>
+                                        {item.value} <small style={{ color: 'var(--text-dim)', fontWeight: 400 }}>sets</small>
+                                    </span>
                                 </div>
                             ))}
                             {expandedOthers && (
-                                <div className="mt-4 p-4 bg-zinc-50 dark:bg-zinc-800/50 rounded-2xl border border-zinc-100 dark:border-zinc-700 space-y-2 animate-in slide-in-from-top-2">
-                                    <p className="text-[10px] font-bold text-zinc-400 uppercase tracking-widest mb-2">Desglose de Grupos Menores</p>
+                                <div style={{
+                                    marginTop: '16px',
+                                    padding: '16px',
+                                    backgroundColor: 'var(--bg-card-hover)',
+                                    borderRadius: '16px',
+                                    border: '1px solid var(--border-subtle)',
+                                    display: 'flex',
+                                    flexDirection: 'column',
+                                    gap: '8px'
+                                }}>
+                                    <p style={{ fontSize: '0.65rem', fontWeight: 800, color: 'var(--text-dim)', textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: '4px' }}>
+                                        Grupos Menores
+                                    </p>
                                     {muscleData.others.map(m => (
-                                        <div key={m.name} className="flex justify-between text-xs">
-                                            <span className="text-zinc-500">{m.name}</span>
-                                            <span className="font-bold">{m.value}</span>
+                                        <div key={m.name} style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.8rem' }}>
+                                            <span style={{ color: 'var(--text-muted)' }}>{m.name}</span>
+                                            <span style={{ fontWeight: 700, color: 'var(--text-main)' }}>{m.value}</span>
                                         </div>
                                     ))}
                                 </div>
@@ -259,42 +289,55 @@ const Analytics = () => {
             </div>
 
             {/* 3. Suggestion Engine */}
-            <div className="space-y-6">
-                <div className="flex items-center gap-3">
-                    <div className="p-2 bg-amber-50 dark:bg-amber-900/30 rounded-xl">
-                        <Lightbulb className="text-amber-600 dark:text-amber-400" size={20} />
-                    </div>
-                    <h3 className="text-xl font-bold text-zinc-800 dark:text-zinc-100">Feedback de Biomecánica</h3>
+            <div style={{ marginTop: '48px' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '24px' }}>
+                    <Lightbulb style={{ color: 'var(--warning)' }} size={24} />
+                    <h3 style={{ margin: 0, border: 'none', padding: 0, textTransform: 'uppercase', letterSpacing: '0.1em', fontSize: '1rem', color: 'var(--text-main)', fontWeight: 800 }}>
+                        Feedback de Biomecánica
+                    </h3>
                 </div>
 
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '24px' }}>
                     {suggestions.length > 0 ? suggestions.map((s, i) => (
                         <div
                             key={i}
-                            className={`p-6 rounded-3xl border transition-all hover:scale-[1.02] ${s.type === 'warning'
-                                    ? 'bg-amber-50/50 dark:bg-amber-900/10 border-amber-200/50 dark:border-amber-700/30 text-amber-900 dark:text-amber-100'
-                                    : 'bg-indigo-50/50 dark:bg-indigo-900/10 border-indigo-200/50 dark:border-indigo-700/30 text-indigo-900 dark:text-indigo-100'
-                                }`}
+                            className="glass-panel"
+                            style={{
+                                padding: '24px',
+                                borderLeft: `4px solid ${s.type === 'warning' ? 'var(--warning)' : 'var(--primary)'}`,
+                                transition: 'transform 0.2s',
+                            }}
                         >
-                            <div className="flex items-start gap-3">
-                                {s.type === 'warning' ? <AlertTriangle className="flex-shrink-0 text-amber-600 mt-1" size={18} /> : <Info className="flex-shrink-0 text-indigo-600 mt-1" size={18} />}
-                                <div className="space-y-2">
-                                    <p className="font-bold text-sm tracking-tight">{s.title}</p>
-                                    <p className="text-sm opacity-80 leading-relaxed">{s.text}</p>
-                                    <div className="mt-4 pt-4 border-t border-current/10">
-                                        <p className="text-xs font-black uppercase tracking-widest opacity-60 mb-1">Recomendación</p>
-                                        <p className="text-sm font-semibold italic">"{s.suggestion}"</p>
+                            <div style={{ display: 'flex', alignItems: 'flex-start', gap: '16px' }}>
+                                {s.type === 'warning' ? <AlertTriangle style={{ color: 'var(--warning)', flexShrink: 0 }} size={20} /> : <Info style={{ color: 'var(--primary)', flexShrink: 0 }} size={20} />}
+                                <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                                    <p style={{ fontWeight: 800, fontSize: '1rem', margin: 0, color: 'var(--text-main)' }}>{s.title}</p>
+                                    <p style={{ fontSize: '0.95rem', lineHeight: 1.5, margin: 0, color: 'var(--text-muted)' }}>{s.text}</p>
+                                    <div style={{ marginTop: '16px', paddingTop: '16px', borderTop: '1px solid var(--border-subtle)' }}>
+                                        <p style={{ fontSize: '0.7rem', fontWeight: 800, textTransform: 'uppercase', color: 'var(--text-dim)', marginBottom: '4px' }}>Recomendación</p>
+                                        <p style={{ fontSize: '0.95rem', fontWeight: 600, color: 'var(--text-main)', fontStyle: 'italic' }}>
+                                            "{s.suggestion}"
+                                        </p>
                                     </div>
                                 </div>
                             </div>
                         </div>
                     )) : (
-                        <div className="col-span-full p-12 text-center bg-zinc-50 dark:bg-zinc-900/50 rounded-[40px] border border-dashed border-zinc-200 dark:border-zinc-800">
-                            <div className="p-4 bg-emerald-100 dark:bg-emerald-900/20 rounded-full inline-flex mb-4">
-                                <CheckCircle2 className="text-emerald-600" size={40} />
+                        <div style={{
+                            gridColumn: '1 / -1',
+                            padding: '48px',
+                            textAlign: 'center',
+                            backgroundColor: 'var(--bg-card)',
+                            borderRadius: '32px',
+                            border: '1px dashed var(--border-subtle)'
+                        }}>
+                            <div style={{ display: 'inline-flex', padding: '16px', backgroundColor: 'rgba(61, 214, 140, 0.1)', borderRadius: '50%', marginBottom: '16px' }}>
+                                <CheckCircle2 style={{ color: 'var(--success)' }} size={40} />
                             </div>
-                            <h4 className="text-lg font-bold text-zinc-800 dark:text-zinc-100">Arquitectura Muscular Equilibrada</h4>
-                            <p className="text-zinc-400 max-w-sm mx-auto mt-2">No hemos detectado desequilibrios significativos entre grupos antagonistas. ¡Sigue así!</p>
+                            <h4 style={{ fontSize: '1.25rem', fontWeight: 800, color: 'var(--text-main)', margin: '0 0 8px 0' }}>Equilibrio Muscular Óptimo</h4>
+                            <p style={{ color: 'var(--text-muted)', maxWidth: '400px', margin: '0 auto', fontSize: '0.95rem' }}>
+                                No hemos detectado desequilibrios significativos entre grupos antagonistas. ¡Buen trabajo con la programación!
+                            </p>
                         </div>
                     )}
                 </div>

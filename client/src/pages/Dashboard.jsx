@@ -4,6 +4,7 @@ import { Dumbbell, Activity, Calendar, Clock } from 'lucide-react';
 import { ComposedChart, Bar, Line, XAxis, YAxis, Tooltip, ResponsiveContainer, LabelList, CartesianGrid, BarChart, Radar, RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis, Cell } from 'recharts';
 import TrainingCalendar from '../components/TrainingCalendar';
 import VolumeLandmarks from '../components/VolumeLandmarks';
+import SegmentedControl from '../components/SegmentedControl';
 import { calculateEffectiveVolume } from '../utils/volumeEngine';
 
 const Dashboard = () => {
@@ -118,12 +119,19 @@ const Dashboard = () => {
     useEffect(() => { fetchMuscleStats(musclePeriod); }, [musclePeriod]);
     useEffect(() => { fetchEffectiveVolume(); }, []);
 
+    const periodOptions = [
+        { label: 'Mes', value: 'month' },
+        { label: 'Año', value: 'year' },
+        { label: 'Todo', value: 'all' }
+    ];
+
     const PeriodSelector = ({ current, onChange }) => (
-        <div className="period-selector mini">
-            <button className={`period-btn ${current === 'month' ? 'active' : ''}`} onClick={(e) => { e.stopPropagation(); onChange('month'); }}>Mes</button>
-            <button className={`period-btn ${current === 'year' ? 'active' : ''}`} onClick={(e) => { e.stopPropagation(); onChange('year'); }}>Año</button>
-            <button className={`period-btn ${current === 'all' ? 'active' : ''}`} onClick={(e) => { e.stopPropagation(); onChange('all'); }}>Todo</button>
-        </div>
+        <SegmentedControl
+            small
+            options={periodOptions}
+            value={current}
+            onChange={onChange}
+        />
     );
 
     if (loading) return <div className="loading">Cargando Panel...</div>;
