@@ -11,41 +11,35 @@ if (!global.fetch) {
     global.Response = fetch.Response;
 }
 
-const getApiKey = () => {
+const getSettings = () => {
     return new Promise((resolve, reject) => {
-        db.get('SELECT openai_api_key FROM user_settings WHERE id = 1', (err, row) => {
+        db.get('SELECT openai_api_key, ai_provider FROM user_settings WHERE id = 1', (err, row) => {
             if (err) reject(err);
-            else resolve(row ? row.openai_api_key : null);
+            else resolve(row || { openai_api_key: null, ai_provider: 'openai' });
         });
     });
 };
 
 const detectProvider = (apiKey) => {
     if (apiKey.startsWith('sk-')) {
-        // Simple detection: OpenAI keys typically start with sk-. 
-        // Note: Grok (xAI) also uses sk- sometimes, but let's assume OpenAI default for sk-
-        // or check if it's explicitly xAI. xAI often starts with xai-
         return 'openai';
     }
     if (apiKey.startsWith('xai-')) {
         return 'grok';
     }
-    // Gemini keys don't always have a strict prefix but often look like AIza...
-    // If it doesn't match above, we'll try Gemini as a fallback or check pattern
     if (apiKey.length > 30 && (apiKey.startsWith('AIza') || !apiKey.includes('-'))) {
         return 'gemini';
     }
-
-    // Default fallback if we can't be sure
     return 'openai';
 };
 
 const chat = async (message, context = []) => {
-    const apiKey = await getApiKey();
+    const settings = await getSettings();
+    const apiKey = settings.openai_api_key;
     if (!apiKey) throw new Error('AI API Key not found in settings');
 
-    const provider = detectProvider(apiKey);
-    console.log(`[AI] Detected provider: ${provider}`);
+    let provider = settings.ai_provider || detectProvider(apiKey);
+    console.log(`[AI] Using provider: ${provider}`);
 
     if (provider === 'gemini') {
         try {
@@ -85,8 +79,17 @@ const chat = async (message, context = []) => {
             throw new Error(`Gemini AI Error: ${error.message}`);
         }
     } else {
-        // OpenAI or Grok (since Grok is OpenAI compatible)
-        const baseUrl = provider === 'grok' ? "https://api.x.ai/v1" : undefined;
+        // OpenAI, Grok, or DeepSeek
+        let baseUrl = undefined;
+        let model = "gpt-4o-mini";
+
+        if (provider === 'grok') {
+            baseUrl = "https://api.x.ai/v1";
+            model = "grok-2";
+        } else if (provider === 'deepseek') {
+            baseUrl = "https://api.deepseek.com";
+            model = "deepseek-chat";
+        }
 
         const configuration = new Configuration({
             apiKey: apiKey,
@@ -100,8 +103,6 @@ const chat = async (message, context = []) => {
                 ...context,
                 { role: "user", content: message }
             ];
-
-            const model = provider === 'grok' ? "grok-2" : "gpt-4o-mini";
 
             const completion = await openai.createChatCompletion({
                 model: model,

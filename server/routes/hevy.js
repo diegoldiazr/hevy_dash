@@ -17,8 +17,15 @@ router.get('/validate', async (req, res) => {
 router.post('/sync', async (req, res) => {
     try {
         const fullSync = req.query.fullSync === 'true';
-        const result = await hevyService.syncWorkouts(fullSync);
-        res.json(result);
+        // Sync both workouts and routines
+        const workoutResult = await hevyService.syncWorkouts(fullSync);
+        const routineResult = await hevyService.syncRoutines();
+
+        res.json({
+            status: 'success',
+            workouts: workoutResult,
+            routines: routineResult
+        });
     } catch (error) {
         res.status(500).json({ error: error.message });
     }

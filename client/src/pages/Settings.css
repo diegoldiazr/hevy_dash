@@ -462,11 +462,22 @@ body[data-theme='light'] .form-group textarea {
 
 /* Light Theme Sync Button */
 body[data-theme='light'] .sync-btn {
-    box-shadow: 0 4px 12px var(--primary-glow);
-    border: 1px solid rgba(0, 0, 0, 0.1);
+    background: #4353d0;
+    /* Solid primary for maximum visibility */
+    color: #ffffff;
+    box-shadow: 0 4px 12px rgba(67, 83, 208, 0.4);
+    border: none;
 }
 
 body[data-theme='light'] .sync-btn:hover:not(:disabled) {
-    filter: brightness(0.9);
-    box-shadow: 0 6px 16px var(--primary-glow);
+    background: #3444c0;
+    filter: none;
+    box-shadow: 0 6px 16px rgba(67, 83, 208, 0.5);
+}
+
+body[data-theme='light'] .sync-btn:disabled {
+    background: #e2e8f0;
+    color: #94a3b8;
+    box-shadow: none;
+    filter: none;
 }

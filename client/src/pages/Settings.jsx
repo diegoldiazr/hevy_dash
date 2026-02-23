@@ -7,6 +7,7 @@ const Settings = () => {
     const [formData, setFormData] = useState({
         hevy_api_key: '',
         openai_api_key: '',
+        ai_provider: 'openai',
         age: '',
         gender: 'male',
         height: '',
@@ -40,6 +41,7 @@ const Settings = () => {
                 setFormData({
                     hevy_api_key: res.data.hevy_api_key || '',
                     openai_api_key: res.data.openai_api_key || '',
+                    ai_provider: res.data.ai_provider || 'openai',
                     age: res.data.age || '',
                     gender: res.data.gender || 'male',
                     height: res.data.height || '',
@@ -69,6 +71,7 @@ const Settings = () => {
             setFormData({
                 hevy_api_key: '',
                 openai_api_key: '',
+                ai_provider: 'openai',
                 age: '',
                 gender: 'male',
                 height: '',
@@ -176,7 +179,17 @@ const Settings = () => {
                         <small>Necesaria para obtener tus entrenamientos.</small>
                     </div>
                     <div className="form-group">
-                        <label>AI API Key (Gemini, OpenAI, Grok)</label>
+                        <label>Proveedor de IA</label>
+                        <select name="ai_provider" value={formData.ai_provider} onChange={handleChange}>
+                            <option value="openai">OpenAI (ChatGPT)</option>
+                            <option value="gemini">Google Gemini</option>
+                            <option value="deepseek">DeepSeek</option>
+                            <option value="grok">xAI Grok</option>
+                        </select>
+                        <small>Selecciona el motor de IA que prefieras usar.</small>
+                    </div>
+                    <div className="form-group">
+                        <label>AI API Key</label>
                         <input
                             type="password"
                             name="openai_api_key"
@@ -184,7 +197,7 @@ const Settings = () => {
                             onChange={handleChange}
                             placeholder="Introduce tu clave..."
                         />
-                        <small>Auto-detecta automáticamente el proveedor (Gemini, ChatGPT o Grok).</small>
+                        <small>Clave para el motor de Inteligencia Artificial seleccionado.</small>
                     </div>
                 </section>
 

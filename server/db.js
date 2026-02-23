@@ -46,12 +46,9 @@ const initDb = () => {
         updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
       )
     `, () => {
-      // Ensure height column exists (for existing DBs)
-      db.run("ALTER TABLE user_settings ADD COLUMN height REAL", (err) => {
-        if (err && !err.message.includes("duplicate column name")) {
-          // Ignore error if column already exists
-        }
-      });
+      // Ensure columns exist (for existing DBs)
+      db.run("ALTER TABLE user_settings ADD COLUMN height REAL", (err) => { });
+      db.run("ALTER TABLE user_settings ADD COLUMN ai_provider TEXT DEFAULT 'openai'", (err) => { });
     });
 
     db.run(`INSERT OR IGNORE INTO user_settings (id) VALUES (1)`);

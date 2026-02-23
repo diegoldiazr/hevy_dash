@@ -1,8 +1,10 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import { Dumbbell, Activity, Calendar, Clock } from 'lucide-react';
-import { ComposedChart, Bar, Line, XAxis, YAxis, Tooltip, ResponsiveContainer, LabelList, CartesianGrid, BarChart, Radar, RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis } from 'recharts';
+import { ComposedChart, Bar, Line, XAxis, YAxis, Tooltip, ResponsiveContainer, LabelList, CartesianGrid, BarChart, Radar, RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis, Cell } from 'recharts';
 import TrainingCalendar from '../components/TrainingCalendar';
+import VolumeLandmarks from '../components/VolumeLandmarks';
+import { calculateEffectiveVolume } from '../utils/volumeEngine';
 
 const Dashboard = () => {
     const [stats, setStats] = useState({
@@ -26,6 +28,9 @@ const Dashboard = () => {
     const [recentMuscleStats, setRecentMuscleStats] = useState([]);
     const [musclePeriod, setMusclePeriod] = useState('month');
     const [radarData, setRadarData] = useState([]);
+
+    const [effectiveVolumeData, setEffectiveVolumeData] = useState([]);
+    const [landmarksPeriod, setLandmarksPeriod] = useState('month');
 
     const currentYear = new Date().getFullYear();
 
@@ -96,10 +101,22 @@ const Dashboard = () => {
         }
     };
 
+    const fetchEffectiveVolume = async () => {
+        try {
+            // Fetch more workouts to have better 1RM history (e.g., last 100)
+            const res = await axios.get('/api/workouts?pageSize=100');
+            const data = calculateEffectiveVolume(res.data);
+            setEffectiveVolumeData(data);
+        } catch (error) {
+            console.error("Failed to fetch effective volume", error);
+        }
+    };
+
     useEffect(() => { fetchCoreStats(); }, []);
     useEffect(() => { fetchChartData('volume', volumePeriod, setVolumeChartData); }, [volumePeriod]);
     useEffect(() => { fetchChartData('duration', durationPeriod, setDurationChartData); }, [durationPeriod]);
     useEffect(() => { fetchMuscleStats(musclePeriod); }, [musclePeriod]);
+    useEffect(() => { fetchEffectiveVolume(); }, []);
 
     const PeriodSelector = ({ current, onChange }) => (
         <div className="period-selector mini">
@@ -147,6 +164,14 @@ const Dashboard = () => {
                         <p>Último Entrenamiento</p>
                     </div>
                 </div>
+            </div>
+
+            <div className="volume-section" style={{ marginBottom: '24px' }}>
+                <VolumeLandmarks
+                    effectiveVolumeData={effectiveVolumeData}
+                    period={landmarksPeriod}
+                    onPeriodChange={setLandmarksPeriod}
+                />
             </div>
 
 
