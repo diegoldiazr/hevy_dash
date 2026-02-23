@@ -71,6 +71,7 @@ const Measurements = () => {
                         <Tooltip
                             contentStyle={{ backgroundColor: 'var(--bg-card)', border: '1px solid var(--border-subtle)', borderRadius: '8px' }}
                             itemStyle={{ color: 'var(--text-main)' }}
+                            labelStyle={{ color: 'var(--text-main)' }}
                         />
                         <Line type="monotone" dataKey={dataKey} stroke={color} strokeWidth={2} dot={{ r: 3 }} activeDot={{ r: 5 }} />
                     </LineChart>

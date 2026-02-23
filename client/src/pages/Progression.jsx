@@ -209,6 +209,7 @@ const Progression = () => {
                                     <Tooltip
                                         contentStyle={{ backgroundColor: 'var(--bg-card)', border: '1px solid var(--border-subtle)', borderRadius: '8px' }}
                                         itemStyle={{ color: 'var(--text-main)' }}
+                                        labelStyle={{ color: 'var(--text-main)' }}
                                     />
                                     <Legend />
                                     <Line

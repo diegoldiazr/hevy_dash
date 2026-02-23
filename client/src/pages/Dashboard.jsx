@@ -195,7 +195,11 @@ const Dashboard = () => {
                             <CartesianGrid strokeDasharray="3 3" stroke="var(--chart-grid)" vertical={false} />
                             <XAxis dataKey="name" stroke="#888" fontSize={10} tickLine={false} axisLine={false} />
                             <YAxis stroke="#888" fontSize={10} tickLine={false} axisLine={false} />
-                            <Tooltip contentStyle={{ backgroundColor: 'var(--bg-card)', border: '1px solid var(--border-subtle)', borderRadius: '8px' }} itemStyle={{ color: 'var(--text-main)' }} />
+                            <Tooltip
+                                contentStyle={{ backgroundColor: 'var(--bg-card)', border: '1px solid var(--border-subtle)', borderRadius: '8px' }}
+                                itemStyle={{ color: 'var(--text-main)' }}
+                                labelStyle={{ color: 'var(--text-main)' }}
+                            />
                             <Bar dataKey="value" fill="#5865f2" radius={[4, 4, 0, 0]} barSize={volumePeriod === 'month' ? 30 : 40}>
                                 <LabelList dataKey="value" position="top" fill="#888" formatter={(v) => `${v}`} style={{ fontSize: '10px' }} />
                             </Bar>
@@ -216,7 +220,11 @@ const Dashboard = () => {
                             <CartesianGrid strokeDasharray="3 3" stroke="var(--chart-grid)" vertical={false} />
                             <XAxis dataKey="name" stroke="#888" fontSize={10} tickLine={false} axisLine={false} />
                             <YAxis stroke="#888" fontSize={10} tickLine={false} axisLine={false} />
-                            <Tooltip contentStyle={{ backgroundColor: 'var(--bg-card)', border: '1px solid var(--border-subtle)', borderRadius: '8px' }} itemStyle={{ color: 'var(--text-main)' }} />
+                            <Tooltip
+                                contentStyle={{ backgroundColor: 'var(--bg-card)', border: '1px solid var(--border-subtle)', borderRadius: '8px' }}
+                                itemStyle={{ color: 'var(--text-main)' }}
+                                labelStyle={{ color: 'var(--text-main)' }}
+                            />
                             <Bar dataKey="value" fill="#10b981" radius={[4, 4, 0, 0]} barSize={durationPeriod === 'month' ? 30 : 40}>
                                 <LabelList dataKey="value" position="top" fill="#888" formatter={(v) => `${v}`} style={{ fontSize: '10px' }} />
                             </Bar>
@@ -259,7 +267,12 @@ const Dashboard = () => {
                             <BarChart data={recentMuscleStats} layout="vertical">
                                 <XAxis type="number" hide />
                                 <YAxis dataKey="name" type="category" stroke="#888" width={100} fontSize={12} tickLine={false} axisLine={false} />
-                                <Tooltip contentStyle={{ backgroundColor: 'var(--bg-card)', border: '1px solid var(--border-subtle)', borderRadius: '8px' }} itemStyle={{ color: 'var(--text-main)' }} cursor={{ fill: 'transparent' }} />
+                                <Tooltip
+                                    contentStyle={{ backgroundColor: 'var(--bg-card)', border: '1px solid var(--border-subtle)', borderRadius: '8px' }}
+                                    itemStyle={{ color: 'var(--text-main)' }}
+                                    labelStyle={{ color: 'var(--text-main)' }}
+                                    cursor={{ fill: 'transparent' }}
+                                />
                                 <Bar dataKey="count" fill="var(--primary)" radius={[0, 4, 4, 0]}>
                                     <LabelList dataKey="count" position="right" style={{ fill: 'var(--text-muted)', fontSize: '12px' }} formatter={(v) => `${v} series`} />
                                 </Bar>
