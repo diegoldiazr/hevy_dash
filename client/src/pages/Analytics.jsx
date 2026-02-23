@@ -172,10 +172,10 @@ const Analytics = () => {
                                         backgroundColor: 'var(--bg-card)',
                                         borderRadius: '16px',
                                         border: '1px solid var(--border-subtle)',
-                                        boxShadow: 'var(--shadow-lg)',
-                                        color: 'var(--text-main)'
+                                        boxShadow: 'var(--shadow-lg)'
                                     }}
                                     itemStyle={{ color: 'var(--text-main)' }}
+                                    labelStyle={{ color: 'var(--text-main)' }}
                                     cursor={{ fill: 'var(--chart-grid)' }}
                                 />
                                 <Legend verticalAlign="top" height={36} wrapperStyle={{ fontSize: 12, fontWeight: 600, paddingBottom: 20 }} />
@@ -238,8 +238,10 @@ const Analytics = () => {
                                             backgroundColor: 'var(--bg-card)',
                                             borderRadius: '12px',
                                             border: '1px solid var(--border-subtle)',
-                                            color: 'var(--text-main)'
+                                            boxShadow: 'var(--shadow-lg)'
                                         }}
+                                        itemStyle={{ color: 'var(--text-main)' }}
+                                        labelStyle={{ color: 'var(--text-main)' }}
                                         formatter={(val, name, props) => [
                                             `${val} sets`,
                                             props.payload.isOthers && expandedOthers ? 'Ver desglose lateral' : name
