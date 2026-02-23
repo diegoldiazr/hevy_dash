@@ -2,7 +2,11 @@
 .app-container {
   display: flex;
   height: 100vh;
+  height: 100dvh;
+  /* Dynamic viewport height for mobile browsers */
   width: 100vw;
+  width: 100dvw;
+  /* Dynamic viewport width */
   background-color: var(--bg-dark);
   color: var(--text-main);
   overflow: hidden;
@@ -33,11 +37,6 @@
   border-right: 1px solid var(--border-subtle);
 }
 
-.app-container.collapsed .logo-container {
-  padding-left: 0;
-  align-items: center;
-}
-
 /* Logo */
 .logo-container {
   display: flex;
@@ -50,10 +49,14 @@
   overflow: hidden;
 }
 
+.app-container.collapsed .logo-container {
+  padding-left: 0;
+  align-items: center;
+}
+
 .logo-text {
   font-family: 'Outfit', sans-serif;
   font-size: 1.5rem;
-  /* ~24px */
   font-weight: 800;
   letter-spacing: -0.03em;
   background: var(--gradient-primary);
@@ -77,6 +80,47 @@
   margin-top: -4px;
   opacity: 0.8;
   letter-spacing: 0.05em;
+  margin-left: 0;
+  transition: all 0.3s;
+}
+
+.app-container.collapsed .version-text {
+  font-size: 0.65rem;
+  margin-top: 0;
+  opacity: 1;
+}
+
+/* Big Logo at Bottom */
+.sidebar-big-logo-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 24px 0;
+  transition: all 0.3s ease;
+  opacity: 1;
+  max-height: 200px;
+  overflow: hidden;
+}
+
+.sidebar-big-logo {
+  width: 160px;
+  /* Made slightly larger as requested */
+  height: 160px;
+  object-fit: contain;
+  border-radius: 20px;
+  filter: drop-shadow(0 8px 16px rgba(0, 0, 0, 0.4));
+  transition: transform 0.3s;
+}
+
+.sidebar-big-logo:hover {
+  transform: scale(1.05) rotate(2deg);
+}
+
+.app-container.collapsed .sidebar-big-logo-container {
+  opacity: 0;
+  max-height: 0;
+  padding: 0;
+  margin: 0;
 }
 
 /* Navigation */
@@ -139,6 +183,14 @@
 .app-container.collapsed .nav-item {
   justify-content: center;
   padding: 12px 0;
+}
+
+.logout-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-family: inherit;
+  width: 100%;
 }
 
 .nav-icon {
@@ -270,5 +322,230 @@ h2 {
 
   to {
     transform: rotate(360deg);
+  }
+}
+
+/* ============================================ */
+/* MOBILE RESPONSIVE STYLES */
+/* ============================================ */
+
+/* Tablet and below (iPad, small laptops) */
+@media (max-width: 1024px) {
+  .content {
+    padding: 24px;
+  }
+
+  .app-container.collapsed .content {
+    padding: 24px 40px;
+  }
+}
+
+/* Mobile devices (iPhone 14, similar phones) */
+@media (max-width: 768px) {
+
+  /* Fix viewport for mobile Safari */
+  .app-container {
+    height: 100vh;
+    height: 100dvh;
+    min-height: -webkit-fill-available;
+  }
+
+  /* Hide sidebar by default on mobile, show as overlay */
+  .sidebar {
+    position: fixed;
+    left: -260px;
+    top: 0;
+    height: 100vh;
+    height: 100dvh;
+    width: 260px;
+    z-index: 100;
+    transition: left 0.3s var(--transition-normal);
+    box-shadow: 4px 0 24px rgba(0, 0, 0, 0.4);
+  }
+
+  /* Show sidebar when not collapsed (mobile menu open) */
+  .app-container:not(.collapsed) .sidebar {
+    left: 0;
+  }
+
+  /* Collapsed state on mobile means sidebar is hidden */
+  .app-container.collapsed .sidebar {
+    left: -260px;
+    width: 260px;
+  }
+
+  /* Content takes full width on mobile */
+  .content {
+    flex: 1;
+    width: 100%;
+    padding: 16px;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .app-container.collapsed .content {
+    padding: 16px;
+  }
+
+  /* Mobile hamburger menu button */
+  .collapse-btn {
+    position: fixed;
+    top: 16px;
+    left: 16px;
+    width: 44px;
+    height: 44px;
+    background-color: var(--bg-card);
+    border: 1px solid var(--border-subtle);
+    border-radius: 8px;
+    z-index: 101;
+    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.3);
+  }
+
+  /* Change icon to hamburger/close on mobile */
+  .collapse-btn svg {
+    transition: transform 0.3s;
+  }
+
+  .app-container:not(.collapsed) .collapse-btn svg {
+    transform: rotate(180deg);
+  }
+
+  .app-container.collapsed .collapse-btn {
+    left: 16px;
+    transform: none;
+  }
+
+  /* Mobile overlay when sidebar is open */
+  .mobile-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.5);
+    z-index: 99;
+    backdrop-filter: blur(2px);
+    -webkit-backdrop-filter: blur(2px);
+  }
+
+  /* Adjust logo for mobile */
+  .logo-container {
+    margin-bottom: 24px;
+  }
+
+  .logo-text {
+    font-size: 1.25rem;
+  }
+
+  /* Ensure nav items are touch-friendly (minimum 44px) */
+  .nav-item {
+    padding: 14px 16px;
+    min-height: 44px;
+  }
+
+  /* Hide big logo on mobile to save space */
+  .sidebar-big-logo-container {
+    display: none;
+  }
+
+  /* Adjust dashboard header for mobile */
+  .dashboard-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 16px;
+    margin-bottom: 24px;
+  }
+
+  .dashboard-header h2 {
+    font-size: 1.5rem;
+  }
+
+  /* Make sync button full width on mobile */
+  .sync-btn {
+    width: 100%;
+    justify-content: center;
+  }
+}
+
+/* Small mobile devices (iPhone SE, small phones) */
+@media (max-width: 390px) {
+  .content {
+    padding: 12px;
+  }
+
+  .logo-text {
+    font-size: 1.1rem;
+  }
+
+  .nav-item {
+    padding: 12px 14px;
+    font-size: 0.9rem;
+  }
+
+  .dashboard-header h2 {
+    font-size: 1.25rem;
+  }
+
+  h2 {
+    font-size: 1.5rem;
+  }
+}
+
+/* Landscape mode on mobile */
+@media (max-width: 896px) and (orientation: landscape) {
+  .app-container {
+    height: 100vh;
+    height: 100dvh;
+  }
+
+  .sidebar {
+    height: 100vh;
+    height: 100dvh;
+  }
+
+  .content {
+    padding: 12px 16px;
+  }
+
+  /* Reduce logo size in landscape */
+  .logo-container {
+    margin-bottom: 16px;
+  }
+
+  .logo-text {
+    font-size: 1.1rem;
+  }
+
+  .version-text {
+    font-size: 0.65rem;
+  }
+
+  /* Compact nav items in landscape */
+  .nav-item {
+    padding: 10px 14px;
+    font-size: 0.85rem;
+  }
+
+  .nav-icon {
+    width: 18px;
+    height: 18px;
+  }
+}
+
+/* iPhone 14 Pro specific (with notch) */
+@media (max-width: 430px) {
+  .app-container {
+    /* Account for notch and home indicator */
+    padding-top: env(safe-area-inset-top);
+    padding-bottom: env(safe-area-inset-bottom);
+  }
+
+  .sidebar {
+    padding-top: calc(24px + env(safe-area-inset-top));
+    padding-bottom: calc(24px + env(safe-area-inset-bottom));
+  }
+
+  .collapse-btn {
+    top: calc(16px + env(safe-area-inset-top));
   }
 }

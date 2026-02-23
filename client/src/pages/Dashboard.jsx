@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
-import { Dumbbell, Activity, Calendar, RefreshCw, Clock } from 'lucide-react';
+import { Dumbbell, Activity, Calendar, Clock } from 'lucide-react';
 import { ComposedChart, Bar, Line, XAxis, YAxis, Tooltip, ResponsiveContainer, LabelList, CartesianGrid, BarChart, Radar, RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis } from 'recharts';
 import TrainingCalendar from '../components/TrainingCalendar';
 
@@ -12,7 +12,6 @@ const Dashboard = () => {
         recentWorkouts: []
     });
     const [loading, setLoading] = useState(true);
-    const [syncing, setSyncing] = useState(false);
 
     // Independent periods
     const [workoutsPeriod, setWorkoutsPeriod] = useState('year');
@@ -102,25 +101,6 @@ const Dashboard = () => {
     useEffect(() => { fetchChartData('duration', durationPeriod, setDurationChartData); }, [durationPeriod]);
     useEffect(() => { fetchMuscleStats(musclePeriod); }, [musclePeriod]);
 
-    const handleSync = async () => {
-        setSyncing(true);
-        try {
-            await axios.post('/api/hevy/sync?fullSync=true');
-            // Refresh dashboard data
-            await Promise.all([
-                fetchCoreStats(),
-                fetchChartData('volume', volumePeriod, setVolumeChartData),
-                fetchChartData('duration', durationPeriod, setDurationChartData),
-                fetchMuscleStats(musclePeriod)
-            ]);
-        } catch (err) {
-            console.error("Sync failed", err);
-            // Optionally show error toast
-        } finally {
-            setSyncing(false);
-        }
-    };
-
     const PeriodSelector = ({ current, onChange }) => (
         <div className="period-selector mini">
             <button className={`period-btn ${current === 'month' ? 'active' : ''}`} onClick={(e) => { e.stopPropagation(); onChange('month'); }}>Mes</button>
@@ -135,10 +115,6 @@ const Dashboard = () => {
         <div className="dashboard-page">
             <div className="dashboard-header">
                 <h2>Panel de Control</h2>
-                <button className={`sync-btn ${syncing ? 'spinning' : ''}`} onClick={handleSync} disabled={syncing}>
-                    <RefreshCw size={18} />
-                    {syncing ? 'Sincronizando...' : 'Sincronizar Hevy'}
-                </button>
             </div>
 
             <div className="stats-grid">

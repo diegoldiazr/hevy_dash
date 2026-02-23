@@ -1,12 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-import { RefreshCw, Calendar, Dumbbell, Clock, ChevronRight, X } from 'lucide-react';
+import { Calendar, Dumbbell, Clock, ChevronRight, X } from 'lucide-react';
 import { Radar, RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis, ResponsiveContainer, Tooltip } from 'recharts';
 
 const Workouts = () => {
     const [workouts, setWorkouts] = useState([]);
     const [loading, setLoading] = useState(true);
-    const [syncing, setSyncing] = useState(false);
     const [page, setPage] = useState(1);
     const [error, setError] = useState(null);
     const [selectedWorkout, setSelectedWorkout] = useState(null);
@@ -29,19 +28,7 @@ const Workouts = () => {
         }
     };
 
-    const handleSync = async () => {
-        setSyncing(true);
-        try {
-            await axios.post('/api/hevy/sync?fullSync=true');
-            setPage(1);
-            fetchWorkouts();
-        } catch (err) {
-            console.error("Sync failed", err);
-            setError('Sincronización fallida. Revisa la API Key en Ajustes.');
-        } finally {
-            setSyncing(false);
-        }
-    };
+
 
     const formatDuration = (start, end) => {
         if (!start || !end) return 'N/A';
@@ -157,14 +144,6 @@ const Workouts = () => {
         <div className="workouts-page">
             <div className="workouts-header">
                 <h2>Entrenamientos</h2>
-                <button
-                    className={`sync-btn ${syncing ? 'spinning' : ''}`}
-                    onClick={handleSync}
-                    disabled={syncing}
-                >
-                    <RefreshCw size={18} />
-                    {syncing ? 'Sincronizando...' : 'Sincronizar Hevy'}
-                </button>
             </div>
 
             {error && <div className="error-banner">{error}</div>}

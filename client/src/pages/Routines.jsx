@@ -1,11 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-import { RefreshCw, Play, BrainCircuit, ChevronDown, ChevronUp } from 'lucide-react';
+import { Play, BrainCircuit, ChevronDown, ChevronUp } from 'lucide-react';
 
 const Routines = () => {
     const [data, setData] = useState({ folders: [], routines: [] });
     const [loading, setLoading] = useState(true);
-    const [syncing, setSyncing] = useState(false);
     const [analyzing, setAnalyzing] = useState(null);
     const [analyses, setAnalyses] = useState({});
     const [expanded, setExpanded] = useState({});
@@ -25,17 +24,7 @@ const Routines = () => {
         }
     };
 
-    const handleSync = async () => {
-        setSyncing(true);
-        try {
-            await axios.post('/api/routines/sync');
-            fetchRoutines();
-        } catch (err) {
-            console.error("Sync failed", err);
-        } finally {
-            setSyncing(false);
-        }
-    };
+
 
     const handleAnalyze = async (id) => {
         setAnalyzing(id);
@@ -137,14 +126,6 @@ const Routines = () => {
         <div className="routines-page">
             <div className="routines-header">
                 <h2>Mis Rutinas</h2>
-                <button
-                    className={`sync-btn ${syncing ? 'spinning' : ''}`}
-                    onClick={handleSync}
-                    disabled={syncing}
-                >
-                    <RefreshCw size={18} />
-                    {syncing ? 'Sincronizando...' : 'Sincronizar'}
-                </button>
             </div>
 
             {loading ? <div className="loading">Cargando rutinas...</div> : (

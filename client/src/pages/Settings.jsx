@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-import { Save, CheckCircle, AlertCircle, Moon, Sun, Trash2 } from 'lucide-react';
+import { Save, CheckCircle, AlertCircle, Moon, Sun, Trash2, RefreshCw } from 'lucide-react';
+import { useSyncContext } from '../context/SyncContext';
 
 const Settings = () => {
     const [formData, setFormData] = useState({
@@ -16,8 +17,10 @@ const Settings = () => {
     });
     const [loading, setLoading] = useState(true);
     const [saving, setSaving] = useState(false);
+    const { isSyncing, startSync, endSync } = useSyncContext();
     const [message, setMessage] = useState(null);
     const [showResetModal, setShowResetModal] = useState(false);
+    const [lastSync, setLastSync] = useState(null);
 
     useEffect(() => {
         fetchSettings();
@@ -95,6 +98,28 @@ const Settings = () => {
         }
     };
 
+    const handleSync = async () => {
+        startSync('Sincronizando entrenamientos desde Hevy...');
+        setMessage(null);
+        try {
+            await axios.post('/api/hevy/sync?fullSync=true');
+            setLastSync(new Date());
+            setMessage({ type: 'success', text: 'Sincronización completada exitosamente! Recargando...' });
+
+            // Reload after 1.5s so the user can read the success message
+            setTimeout(() => {
+                window.location.reload();
+            }, 1500);
+        } catch (err) {
+            console.error("Sync failed", err);
+            setMessage({ type: 'error', text: 'Error al sincronizar con Hevy. Verifica tu API key.' });
+            endSync();
+        } finally {
+            // Only end sync if it failed, if success it will reload anyway
+            // but for safety we can end it here too or let the reload handle it
+        }
+    };
+
     if (loading) return <div>Cargando...</div>;
 
     return (
@@ -160,6 +185,36 @@ const Settings = () => {
                             placeholder="Introduce tu clave..."
                         />
                         <small>Auto-detecta automáticamente el proveedor (Gemini, ChatGPT o Grok).</small>
+                    </div>
+                </section>
+
+                <section className="settings-section">
+                    <h3>Sincronización de Hevy</h3>
+                    <div className="form-group">
+                        <label>Sincronización Manual</label>
+                        <p className="sync-description">
+                            Sincroniza tus entrenamientos desde Hevy. Esta acción importará todos tus entrenamientos, ejercicios y progreso.
+                        </p>
+                        <button
+                            type="button"
+                            className={`sync-btn ${isSyncing ? 'spinning' : ''}`}
+                            onClick={handleSync}
+                            disabled={isSyncing || !formData.hevy_api_key}
+                        >
+                            <RefreshCw size={18} />
+                            {isSyncing ? 'Sincronizando...' : 'Sincronizar Ahora'}
+                        </button>
+                        {lastSync && (
+                            <small className="last-sync">
+                                Última sincronización: {lastSync.toLocaleString('es-ES', {
+                                    dateStyle: 'short',
+                                    timeStyle: 'short'
+                                })}
+                            </small>
+                        )}
+                        {!formData.hevy_api_key && (
+                            <small className="warning-text">⚠️ Necesitas configurar tu Hevy API Key primero</small>
+                        )}
                     </div>
                 </section>
 

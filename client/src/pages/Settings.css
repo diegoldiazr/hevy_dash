@@ -390,3 +390,83 @@ body[data-theme='light'] .form-group textarea {
         opacity: 1;
     }
 }
+
+/* Sync Button */
+.sync-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    background: var(--gradient-primary);
+    color: white;
+    border: none;
+    padding: 16px 48px;
+    border-radius: var(--radius-md);
+    font-weight: 700;
+    font-size: 1.1rem;
+    cursor: pointer;
+    transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+    box-shadow: 0 4px 14px var(--primary-glow);
+    margin-top: 12px;
+    margin-bottom: 12px;
+    align-self: flex-start;
+}
+
+.sync-btn:hover:not(:disabled) {
+    transform: translateY(-2px);
+    box-shadow: 0 12px 32px var(--primary-glow);
+    filter: brightness(1.1);
+}
+
+.sync-btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    filter: grayscale(1);
+}
+
+.sync-btn.spinning svg {
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    from {
+        transform: rotate(0deg);
+    }
+
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+.sync-description {
+    color: var(--text-muted);
+    font-size: 0.95rem;
+    margin-bottom: 16px;
+    line-height: 1.6;
+}
+
+.last-sync {
+    display: block;
+    color: var(--success);
+    font-weight: 600;
+    margin-top: 12px;
+}
+
+.form-group .warning-text {
+    display: block;
+    color: var(--warning);
+    font-weight: 600;
+    margin-top: 12px;
+    text-align: left;
+}
+
+/* Light Theme Sync Button */
+body[data-theme='light'] .sync-btn {
+    box-shadow: 0 4px 12px var(--primary-glow);
+    border: 1px solid rgba(0, 0, 0, 0.1);
+}
+
+body[data-theme='light'] .sync-btn:hover:not(:disabled) {
+    filter: brightness(0.9);
+    box-shadow: 0 6px 16px var(--primary-glow);
+}
