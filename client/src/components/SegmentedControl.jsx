@@ -1,7 +1,7 @@
 import React from 'react';
 import { motion } from 'framer-motion';
 
-const SegmentedControl = ({ options, value, onChange, small = false }) => {
+const SegmentedControl = ({ options, value, onChange, small = false, name = "default" }) => {
     return (
         <div
             className={`relative flex ${small ? 'p-1' : 'p-1.5'} rounded-full shadow-inner border w-fit group/control`}
@@ -40,16 +40,16 @@ const SegmentedControl = ({ options, value, onChange, small = false }) => {
 
                         {isActive && (
                             <motion.div
-                                layoutId="segmented-indicator"
+                                layoutId={`segmented-indicator-${name}`}
                                 className="absolute inset-0 rounded-full z-0"
                                 style={{
-                                    background: 'var(--gradient-primary)',
-                                    boxShadow: '0 4px 15px var(--primary-glow), inset 0 1px 1px rgba(255,255,255,0.2)',
-                                    border: '1px solid rgba(255,255,255,0.1)'
+                                    background: 'linear-gradient(135deg, #6B7FFF 0%, #5865F2 100%)', // Hardcoded vibrant gradient
+                                    boxShadow: '0 4px 15px rgba(107, 127, 255, 0.6), inset 0 1px 1px rgba(255,255,255,0.3)',
+                                    border: '1px solid rgba(255,255,255,0.2)'
                                 }}
                                 transition={{
                                     type: "spring",
-                                    stiffness: 450,
+                                    stiffness: 500,
                                     damping: 35
                                 }}
                             />

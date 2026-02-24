@@ -7,23 +7,7 @@
 }
 
 /* Page Header with Time Period Toggle */
-.page-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    flex-wrap: wrap;
-    gap: 20px;
-}
-
-.page-header h2 {
-    margin: 0;
-    font-size: 2.5rem;
-    letter-spacing: -0.04em;
-    background: var(--gradient-primary);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
-}
+/* Page Header handled by index.css global styles */
 
 .time-period-toggle {
     display: flex;

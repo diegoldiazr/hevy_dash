@@ -124,6 +124,8 @@ const Analytics = () => {
                     <p style={{ color: 'var(--text-muted)', marginTop: '8px' }}>Optimización de volumen y prevención de desequilibrios.</p>
                 </div>
                 <SegmentedControl
+                    small
+                    name="analytics_period"
                     options={periodOptions}
                     value={timePeriod}
                     onChange={setTimePeriod}

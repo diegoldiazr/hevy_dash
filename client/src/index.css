@@ -263,6 +263,44 @@ button {
     gap: 24px;
 }
 
+/* Common Chart & Page Header Components */
+.chart-header,
+.page-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 24px;
+    gap: 16px;
+    flex-wrap: wrap;
+}
+
+.chart-header h3,
+.chart-section h3,
+.page-header h2 {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 0;
+}
+
+/* The "Referencia" Bar */
+.chart-header h3::before,
+.chart-section h3::before,
+.page-header h2::before {
+    content: '';
+    width: 4px;
+    height: 24px;
+    background: var(--primary);
+    border-radius: 2px;
+    display: block;
+    box-shadow: 0 0 8px var(--primary-glow);
+}
+
+.page-header h2::before {
+    height: 32px;
+    /* Slightly taller for main headings */
+}
+
 /* ============================================ */
 /* GLOBAL MOBILE RESPONSIVE STYLES */
 /* ============================================ */

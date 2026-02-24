@@ -89,6 +89,7 @@ const VolumeLandmarks = ({ effectiveVolumeData, period, onPeriodChange }) => {
                 </div>
                 <SegmentedControl
                     small
+                    name="volume_landmarks"
                     options={periodOptions}
                     value={period}
                     onChange={onPeriodChange}

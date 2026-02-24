@@ -125,9 +125,10 @@ const Dashboard = () => {
         { label: 'Todo', value: 'all' }
     ];
 
-    const PeriodSelector = ({ current, onChange }) => (
+    const PeriodSelector = ({ current, onChange, name }) => (
         <SegmentedControl
             small
+            name={name}
             options={periodOptions}
             value={current}
             onChange={onChange}
@@ -144,27 +145,31 @@ const Dashboard = () => {
 
             <div className="stats-grid">
                 <div className="stat-card">
-                    <div className="stat-card-header">
-                        <div className="icon-wrapper"><Dumbbell size={24} /></div>
-                        <h3>{workoutsPeriod === 'month' ? stats.workouts.month : (workoutsPeriod === 'year' ? stats.workouts.year : stats.workouts.all)}</h3>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', width: '100%', marginBottom: '16px' }}>
+                        <div className="stat-card-header" style={{ marginBottom: 0 }}>
+                            <div className="icon-wrapper"><Dumbbell size={24} /></div>
+                            <h3>{workoutsPeriod === 'month' ? stats.workouts.month : (workoutsPeriod === 'year' ? stats.workouts.year : stats.workouts.all)}</h3>
+                        </div>
+                        <PeriodSelector current={workoutsPeriod} onChange={setWorkoutsPeriod} name="workouts" />
                     </div>
                     <div className="stat-info">
                         <p>{workoutsPeriod === 'month' ? 'Entrenamientos (Mes)' : (workoutsPeriod === 'year' ? `Entrenamientos (${currentYear})` : 'Entrenamientos (Total)')}</p>
-                        <PeriodSelector current={workoutsPeriod} onChange={setWorkoutsPeriod} />
                     </div>
                 </div>
                 <div className="stat-card">
-                    <div className="stat-card-header">
-                        <div className="icon-wrapper"><Activity size={24} /></div>
-                        <h3>{((totalVolumePeriod === 'month' ? stats.volume.month : (totalVolumePeriod === 'year' ? stats.volume.year : stats.volume.all)) / 1000).toFixed(1)}k kg</h3>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', width: '100%', marginBottom: '16px' }}>
+                        <div className="stat-card-header" style={{ marginBottom: 0 }}>
+                            <div className="icon-wrapper"><Activity size={24} /></div>
+                            <h3>{((totalVolumePeriod === 'month' ? stats.volume.month : (totalVolumePeriod === 'year' ? stats.volume.year : stats.volume.all)) / 1000).toFixed(1)}k kg</h3>
+                        </div>
+                        <PeriodSelector current={totalVolumePeriod} onChange={setTotalVolumePeriod} name="volume_total" />
                     </div>
                     <div className="stat-info">
                         <p>{totalVolumePeriod === 'month' ? 'Volumen (Mes)' : (totalVolumePeriod === 'year' ? `Volumen (${currentYear})` : 'Volumen (Total)')}</p>
-                        <PeriodSelector current={totalVolumePeriod} onChange={setTotalVolumePeriod} />
                     </div>
                 </div>
                 <div className="stat-card">
-                    <div className="stat-card-header">
+                    <div className="stat-card-header" style={{ marginBottom: 0 }}>
                         <div className="icon-wrapper"><Calendar size={24} /></div>
                         <h3>{stats.recentWorkouts.length > 0 ? new Date(stats.recentWorkouts[0].start_time).toLocaleDateString() : 'N/A'}</h3>
                     </div>
@@ -182,12 +187,10 @@ const Dashboard = () => {
                 />
             </div>
 
-
-
             <div className="chart-section">
                 <div className="chart-header">
                     <h3>Volumen Reciente (kg)</h3>
-                    <PeriodSelector current={volumePeriod} onChange={setVolumePeriod} />
+                    <PeriodSelector current={volumePeriod} onChange={setVolumePeriod} name="volume_chart" />
                 </div>
                 <div className="chart-container">
                     <ResponsiveContainer width="100%" height={300}>
@@ -212,7 +215,7 @@ const Dashboard = () => {
             <div className="chart-section">
                 <div className="chart-header">
                     <h3>Tiempo de Sesión (min)</h3>
-                    <PeriodSelector current={durationPeriod} onChange={setDurationPeriod} />
+                    <PeriodSelector current={durationPeriod} onChange={setDurationPeriod} name="duration_chart" />
                 </div>
                 <div className="chart-container">
                     <ResponsiveContainer width="100%" height={300}>
@@ -238,7 +241,7 @@ const Dashboard = () => {
                 <div className="chart-section">
                     <div className="chart-header">
                         <h3>Enfoque Muscular (Radar)</h3>
-                        <PeriodSelector current={musclePeriod} onChange={setMusclePeriod} />
+                        <PeriodSelector current={musclePeriod} onChange={setMusclePeriod} name="radar_muscle" />
                     </div>
                     <div className="chart-container radar-container">
                         <ResponsiveContainer width="100%" height={350}>
@@ -260,7 +263,7 @@ const Dashboard = () => {
                 <div className="chart-section">
                     <div className="chart-header">
                         <h3>Top 10 Músculos</h3>
-                        <PeriodSelector current={musclePeriod} onChange={setMusclePeriod} />
+                        <PeriodSelector current={musclePeriod} onChange={setMusclePeriod} name="top_muscles" />
                     </div>
                     <div className="chart-container">
                         <ResponsiveContainer width="100%" height={350}>

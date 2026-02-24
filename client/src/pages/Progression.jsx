@@ -3,6 +3,8 @@ import axios from 'axios';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend } from 'recharts';
 import { Target, Activity, Edit3, Save, X } from 'lucide-react';
 
+import SegmentedControl from '../components/SegmentedControl';
+
 const Progression = () => {
     const [exercises, setExercises] = useState([]);
     const [selectedExercise, setSelectedExercise] = useState('');
@@ -17,6 +19,12 @@ const Progression = () => {
         muscle_image_url: '',
         execution_video_url: ''
     });
+
+    const periodOptions = [
+        { label: 'Mes', value: 'month' },
+        { label: 'Año', value: 'year' },
+        { label: 'Historial', value: 'all' }
+    ];
 
     useEffect(() => {
         const fetchExercises = async () => {
@@ -110,28 +118,18 @@ const Progression = () => {
 
     return (
         <div className="progression-page">
-            <div className="page-header">
-                <h2>Análisis de Progresión</h2>
-                <div className="time-period-toggle">
-                    <button
-                        className={`period-btn ${timePeriod === 'month' ? 'active' : ''}`}
-                        onClick={() => setTimePeriod('month')}
-                    >
-                        Mes
-                    </button>
-                    <button
-                        className={`period-btn ${timePeriod === 'year' ? 'active' : ''}`}
-                        onClick={() => setTimePeriod('year')}
-                    >
-                        Año
-                    </button>
-                    <button
-                        className={`period-btn ${timePeriod === 'all' ? 'active' : ''}`}
-                        onClick={() => setTimePeriod('all')}
-                    >
-                        Todos
-                    </button>
+            <div className="page-header" style={{ marginBottom: '32px' }}>
+                <div>
+                    <h2 className="text-gradient">Análisis de Progresión</h2>
+                    <p style={{ color: 'var(--text-muted)', marginTop: '8px' }}>Seguimiento detallado de fuerza y volumen por ejercicio.</p>
                 </div>
+                <SegmentedControl
+                    small
+                    name="progression_period"
+                    options={periodOptions}
+                    value={timePeriod}
+                    onChange={setTimePeriod}
+                />
             </div>
 
             <div className="controls">
@@ -199,7 +197,9 @@ const Progression = () => {
                     )}
 
                     <div className="chart-section">
-                        <h3>Progresión de 1RM Estimado</h3>
+                        <div className="chart-header">
+                            <h3>Progresión de 1RM Estimado</h3>
+                        </div>
                         <div className="chart-container">
                             <ResponsiveContainer width="100%" height={300}>
                                 <LineChart data={history}>
@@ -228,7 +228,9 @@ const Progression = () => {
                     </div>
 
                     <div className="chart-section">
-                        <h3>Progresión de Volumen (Peso × Reps)</h3>
+                        <div className="chart-header">
+                            <h3>Progresión de Volumen (Peso × Reps)</h3>
+                        </div>
                         <div className="chart-container">
                             <ResponsiveContainer width="100%" height={300}>
                                 <LineChart data={history}>
@@ -256,7 +258,9 @@ const Progression = () => {
                     </div>
 
                     <div className="chart-section">
-                        <h3>Progresión de Repeticiones Totales</h3>
+                        <div className="chart-header">
+                            <h3>Progresión de Repeticiones Totales</h3>
+                        </div>
                         <div className="chart-container">
                             <ResponsiveContainer width="100%" height={300}>
                                 <LineChart data={history}>
@@ -284,7 +288,7 @@ const Progression = () => {
                     </div>
 
                     <div className="muscle-guide" style={{ marginTop: '30px' }}>
-                        <div className="muscle-guide-header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                        <div className="chart-header">
                             <h3>Técnica y Compromiso Muscular</h3>
                             {!detailsLoading && exerciseDetails && !isEditingDetails && (
                                 <button className="edit-details-btn" onClick={handleEditClick}>

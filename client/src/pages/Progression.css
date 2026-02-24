@@ -7,23 +7,7 @@
 }
 
 /* Page Header with Time Period Toggle */
-.page-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    flex-wrap: wrap;
-    gap: 20px;
-}
-
-.page-header h2 {
-    margin: 0;
-    font-size: 2.5rem;
-    letter-spacing: -0.04em;
-    background: var(--gradient-primary);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
-}
+/* Page Header handled by index.css global styles */
 
 .time-period-toggle {
     display: flex;
@@ -125,23 +109,9 @@
     border-color: var(--border-active);
 }
 
-.chart-section h3 {
-    font-size: 1.5rem;
-    font-weight: 700;
-    margin-bottom: 24px;
-    color: var(--text-main);
-    display: flex;
-    align-items: center;
-    gap: 12px;
-}
-
-.chart-section h3::before {
-    content: '';
-    width: 12px;
-    height: 12px;
-    background: var(--gradient-primary);
-    border-radius: 50%;
-    box-shadow: 0 0 8px var(--primary);
+/* Chart Header handled by index.css global styles */
+.chart-header h3 {
+    margin-bottom: 0;
 }
 
 /* Muscle Guide */
