@@ -189,20 +189,31 @@ const Analytics = () => {
                     <p style={{ color: 'var(--text-muted)', marginTop: '8px' }}>Métricas estratégicas para recomposición y fuerza estructural.</p>
                 </div>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '24px' }}>
-                    <div style={{
-                        padding: '12px 24px',
-                        backgroundColor: 'var(--bg-card)',
-                        borderRadius: '16px',
-                        border: '1px solid var(--border-subtle)',
-                        display: 'flex',
-                        flexDirection: 'column',
-                        alignItems: 'center'
-                    }}>
-                        <span style={{ fontSize: '0.65rem', fontWeight: 800, textTransform: 'uppercase', color: 'var(--text-dim)' }}>Hipertrofia Score</span>
-                        <div style={{ display: 'flex', alignItems: 'baseline', gap: '4px' }}>
-                            <span style={{ fontSize: '1.5rem', fontWeight: 900, color: 'var(--primary)' }}>{data.hypertrophyScore}</span>
-                            <small style={{ color: 'var(--text-dim)', fontSize: '0.7rem' }}>/ 100</small>
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', alignItems: 'center' }}>
+                        <div style={{
+                            padding: '12px 24px',
+                            backgroundColor: 'var(--bg-card)',
+                            borderRadius: '16px',
+                            border: '1px solid var(--border-subtle)',
+                            display: 'flex',
+                            flexDirection: 'column',
+                            alignItems: 'center',
+                            minWidth: '160px'
+                        }}>
+                            <span style={{ fontSize: '0.65rem', fontWeight: 800, textTransform: 'uppercase', color: 'var(--text-dim)' }}>Hipertrofia Score</span>
+                            <div style={{ display: 'flex', alignItems: 'baseline', gap: '4px' }}>
+                                <span style={{ fontSize: '1.5rem', fontWeight: 900, color: 'var(--primary)' }}>{data.hypertrophyScore}</span>
+                                <small style={{ color: 'var(--text-dim)', fontSize: '0.7rem' }}>/ 100</small>
+                            </div>
                         </div>
+                        {data.hypertrophyBreakdown && (
+                            <p style={{ fontSize: '0.65rem', color: 'var(--text-muted)', textAlign: 'center', margin: 0, maxWidth: '200px', lineHeight: '1.4' }}>
+                                <strong>Cálculo:</strong> Multiplicador de volumen, intensidad y frecuencia frente a meta (20 sets, RPE 9, 5 días).<br />
+                                <span style={{ color: 'var(--text-dim)' }}>
+                                    Basado en tus <strong>{data.hypertrophyBreakdown.avgSets} sets</strong>, <strong>RPE {data.hypertrophyBreakdown.avgRPE}</strong> y <strong>{data.hypertrophyBreakdown.avgFrequency} entrenos</strong>/semana de media.
+                                </span>
+                            </p>
+                        )}
                     </div>
                     <SegmentedControl
                         small
@@ -377,7 +388,7 @@ const Analytics = () => {
                 {/* 4. Relative Strength Radar */}
                 <FlipCard
                     title="Fuerza Estructural Relativa (e1RM/Peso)"
-                    icon={<Target style={{ color: 'var(--secondary)' }} size={24} />}
+                    icon={<Target style={{ color: 'var(--chart-5)' }} size={24} />}
                     infoTitle="Potencia Relativa"
                     infoMethod="Tu e1RM calculado dividido por tu peso corporal más reciente en cada patrón de movimiento."
                     infoMeaning="Permite comparar tu fuerza real eliminando la variable del peso. Un ratio de 1.5 en un patrón significa que eres capaz de movilizar 1.5 veces tu peso corporal."
@@ -391,9 +402,9 @@ const Analytics = () => {
                                     <Radar
                                         name="Ratio Fuerza/Peso"
                                         dataKey="value"
-                                        stroke="var(--secondary)"
-                                        fill="var(--secondary)"
-                                        fillOpacity={0.5}
+                                        stroke="var(--chart-5)"
+                                        fill="var(--chart-5)"
+                                        fillOpacity={0.6}
                                     />
                                     <Tooltip contentStyle={{ backgroundColor: 'var(--bg-card)', borderRadius: '12px', border: '1px solid var(--border-subtle)' }} />
                                 </RadarChart>

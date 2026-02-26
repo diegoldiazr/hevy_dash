@@ -256,6 +256,12 @@ router.get('/', (req, res) => {
             // Normalize: 20 sets/week, 9 RPE, 5 days/week = 100
             const hypertrophyScore = Math.min(100, Math.round(((avgWeeklySets / 20) * (avgWeeklyRPE / 9) * (avgFrequency / 5)) * 100));
 
+            const hypertrophyBreakdown = {
+                avgSets: Math.round(avgWeeklySets * 10) / 10,
+                avgRPE: Math.round(avgWeeklyRPE * 10) / 10,
+                avgFrequency: Math.round(avgFrequency * 10) / 10
+            };
+
             const muscleSplit = Object.entries(muscleCounts)
                 .map(([name, value]) => ({ name, value }))
                 .sort((a, b) => b.value - a.value);
@@ -267,6 +273,7 @@ router.get('/', (req, res) => {
                 relativeStrength,
                 acwr,
                 hypertrophyScore,
+                hypertrophyBreakdown,
                 period
             });
         });
