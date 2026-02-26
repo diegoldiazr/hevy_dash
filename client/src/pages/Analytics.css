@@ -1,129 +1,265 @@
 /* Analytics Dashboard */
 .analytics-page {
-    display: flex;
-    flex-direction: column;
-    gap: 32px;
-    animation: fadeIn 0.4s ease-out;
+  display: flex;
+  flex-direction: column;
+  gap: 32px;
+  animation: fadeIn 0.4s ease-out;
 }
 
 /* Page Header with Time Period Toggle */
 /* Page Header handled by index.css global styles */
 
 .time-period-toggle {
-    display: flex;
-    gap: 8px;
-    background: var(--bg-card);
-    padding: 6px;
-    border-radius: var(--radius-md);
-    border: 1px solid var(--border-subtle);
+  display: flex;
+  gap: 8px;
+  background: var(--bg-card);
+  padding: 6px;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border-subtle);
 }
 
 .period-btn {
-    padding: 10px 20px;
-    background: transparent;
-    border: none;
-    border-radius: var(--radius-sm);
-    color: var(--text-muted);
-    font-size: 0.95rem;
-    font-weight: 600;
-    cursor: pointer;
-    transition: all 0.2s ease;
+  padding: 10px 20px;
+  background: transparent;
+  border: none;
+  border-radius: var(--radius-sm);
+  color: var(--text-muted);
+  font-size: 0.95rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
 }
 
 .period-btn:hover {
-    background: var(--bg-card-hover);
-    color: var(--text-main);
+  background: var(--bg-card-hover);
+  color: var(--text-main);
 }
 
 .period-btn.active {
-    background: var(--gradient-primary);
-    color: white;
-    box-shadow: 0 2px 8px var(--primary-glow);
+  background: var(--gradient-primary);
+  color: white;
+  box-shadow: 0 2px 8px var(--primary-glow);
 }
 
 
 /* Charts Grid */
 .analytics-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
-    gap: 32px;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  gap: 32px;
 }
 
 /* Chart Card */
 .chart-card {
-    background: var(--bg-card);
-    border: 1px solid var(--border-subtle);
-    border-radius: var(--radius-lg);
-    padding: 32px;
-    box-shadow: var(--shadow-sm);
-    transition: transform 0.2s, box-shadow 0.2s;
-    position: relative;
-    overflow: hidden;
+  background: var(--bg-card);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-lg);
+  padding: 32px;
+  box-shadow: var(--shadow-sm);
+  transition: transform 0.2s, box-shadow 0.2s;
+  position: relative;
+  overflow: hidden;
 }
 
 .chart-card:hover {
-    transform: translateY(-2px);
-    box-shadow: var(--shadow-md);
-    border-color: var(--primary);
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-md);
+  border-color: var(--primary);
 }
 
 .chart-card h3 {
-    font-family: 'Outfit', sans-serif;
-    font-size: 1.4rem;
-    font-weight: 700;
-    margin-bottom: 24px;
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    color: var(--text-main);
-    border-bottom: 1px solid var(--border-subtle);
-    padding-bottom: 12px;
+  font-family: 'Outfit', sans-serif;
+  font-size: 1.4rem;
+  font-weight: 700;
+  margin-bottom: 24px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  color: var(--text-main);
+  border-bottom: 1px solid var(--border-subtle);
+  padding-bottom: 12px;
 }
 
 /* Insight Card */
 .insight-section {
-    background: var(--bg-card);
-    border: 1px solid var(--border-subtle);
-    border-left: 4px solid var(--primary);
-    /* Accent line */
-    border-radius: var(--radius-md);
-    padding: 32px;
-    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
-    margin-top: 16px;
+  background: var(--bg-card);
+  border: 1px solid var(--border-subtle);
+  border-left: 4px solid var(--primary);
+  /* Accent line */
+  border-radius: var(--radius-md);
+  padding: 32px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
+  margin-top: 16px;
 }
 
 .insight-section h3 {
-    font-size: 1.6rem;
-    font-weight: 700;
-    color: var(--primary);
-    margin-bottom: 16px;
-    display: flex;
-    align-items: center;
-    gap: 10px;
+  font-size: 1.6rem;
+  font-weight: 700;
+  color: var(--primary);
+  margin-bottom: 16px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
 }
 
 .insight-section p {
-    font-size: 1.1rem;
-    line-height: 1.6;
-    color: var(--text-muted);
-    max-width: 800px;
+  font-size: 1.1rem;
+  line-height: 1.6;
+  color: var(--text-muted);
+  max-width: 800px;
 }
 
 /* Chart Customization Override */
 .recharts-legend-item-text {
-    color: var(--text-dim) !important;
-    font-size: 0.9rem !important;
+  color: var(--text-dim) !important;
+  font-size: 0.9rem !important;
 }
 
 .recharts-tooltip-cursor {
-    fill: rgba(88, 101, 242, 0.1) !important;
+  fill: rgba(88, 101, 242, 0.1) !important;
 }
 
 .recharts-tooltip-wrapper {
-    background: var(--bg-card-hover) !important;
-    border: 1px solid var(--border-subtle) !important;
-    border-radius: 8px !important;
-    box-shadow: var(--shadow-lg) !important;
-    padding: 8px 12px !important;
-    color: var(--text-main) !important;
+  background: var(--bg-card-hover) !important;
+  border: 1px solid var(--border-subtle) !important;
+  border-radius: 8px !important;
+  box-shadow: var(--shadow-lg) !important;
+  padding: 8px 12px !important;
+  color: var(--text-main) !important;
+}
+
+/* Flip Card System */
+.flip-card {
+  background-color: transparent;
+  width: 100%;
+  height: 100%;
+  perspective: 1200px;
+  min-height: 480px;
+}
+
+.flip-card-inner {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+  transform-style: preserve-3d;
+  will-change: transform;
+}
+
+.flip-card.is-flipped .flip-card-inner {
+  transform: rotateY(180deg);
+}
+
+.flip-card-front,
+.flip-card-back {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  -webkit-backface-visibility: hidden;
+  backface-visibility: hidden;
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+}
+
+.flip-card-front {
+  background: var(--bg-card);
+  border: 1px solid var(--border-subtle);
+  padding: 32px;
+}
+
+.flip-card-back {
+  background: var(--bg-card-hover);
+  border: 1px solid var(--primary-glow);
+  transform: rotateY(180deg);
+  padding: 32px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 20px;
+  box-shadow: inset 0 0 40px rgba(88, 101, 242, 0.05);
+}
+
+.info-icon-btn {
+  position: absolute;
+  top: 32px;
+  right: 32px;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid var(--border-subtle);
+  border-radius: 50%;
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  z-index: 10;
+  color: var(--text-dim);
+  transition: all 0.2s;
+}
+
+.info-icon-btn:hover {
+  background: var(--primary);
+  color: white;
+}
+
+.flip-card-back h4 {
+  font-family: 'Outfit', sans-serif;
+  font-size: 1.25rem;
+  font-weight: 800;
+  color: var(--primary);
+  margin: 0;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.flip-card-back .info-section {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.flip-card-back .info-label {
+  font-size: 0.7rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  color: var(--text-dim);
+  letter-spacing: 0.1em;
+}
+
+.flip-card-back .info-text {
+  font-size: 0.95rem;
+  line-height: 1.6;
+  color: var(--text-main);
+  opacity: 0.9;
+}
+
+.close-flip-btn {
+  margin-top: 12px;
+  padding: 10px 20px;
+  background: var(--bg-card);
+  border: 1px solid var(--border-subtle);
+  color: var(--text-main);
+  border-radius: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+  align-self: flex-start;
+}
+
+.close-flip-btn:hover {
+  background: var(--border-subtle);
+}
+
+/* Fix: Disable global glass-panel hover transform when inside a flip card 
+   to prevent 3D coordinate system conflicts that look like weird rotation */
+.flip-card .glass-panel:hover {
+  transform: none !important;
+  box-shadow: var(--shadow-sm);
+  /* Keep static shadow or slightly enhanced without movement */
+}
+
+/* Ensure the back face doesn't inherit any weird transforms */
+.flip-card-back.glass-panel:hover {
+  transform: rotateY(180deg) !important;
 }
