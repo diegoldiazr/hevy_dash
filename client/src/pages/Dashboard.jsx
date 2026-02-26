@@ -16,22 +16,12 @@ const Dashboard = () => {
     });
     const [loading, setLoading] = useState(true);
 
-    // Independent periods
-    const [workoutsPeriod, setWorkoutsPeriod] = useState('year');
-    const [totalVolumePeriod, setTotalVolumePeriod] = useState('year');
-
+    const [globalPeriod, setGlobalPeriod] = useState('month');
     const [volumeChartData, setVolumeChartData] = useState([]);
-    const [volumePeriod, setVolumePeriod] = useState('month');
-
     const [durationChartData, setDurationChartData] = useState([]);
-    const [durationPeriod, setDurationPeriod] = useState('month');
-
     const [recentMuscleStats, setRecentMuscleStats] = useState([]);
-    const [musclePeriod, setMusclePeriod] = useState('month');
     const [radarData, setRadarData] = useState([]);
-
     const [effectiveVolumeData, setEffectiveVolumeData] = useState([]);
-    const [landmarksPeriod, setLandmarksPeriod] = useState('month');
 
     const currentYear = new Date().getFullYear();
 
@@ -114,9 +104,9 @@ const Dashboard = () => {
     };
 
     useEffect(() => { fetchCoreStats(); }, []);
-    useEffect(() => { fetchChartData('volume', volumePeriod, setVolumeChartData); }, [volumePeriod]);
-    useEffect(() => { fetchChartData('duration', durationPeriod, setDurationChartData); }, [durationPeriod]);
-    useEffect(() => { fetchMuscleStats(musclePeriod); }, [musclePeriod]);
+    useEffect(() => { fetchChartData('volume', globalPeriod, setVolumeChartData); }, [globalPeriod]);
+    useEffect(() => { fetchChartData('duration', globalPeriod, setDurationChartData); }, [globalPeriod]);
+    useEffect(() => { fetchMuscleStats(globalPeriod); }, [globalPeriod]);
     useEffect(() => { fetchEffectiveVolume(); }, []);
 
     const periodOptions = [
@@ -141,6 +131,12 @@ const Dashboard = () => {
         <div className="dashboard-page">
             <div className="dashboard-header">
                 <h2>Panel de Control</h2>
+                <SegmentedControl
+                    name="global_dashboard_period"
+                    options={periodOptions}
+                    value={globalPeriod}
+                    onChange={setGlobalPeriod}
+                />
             </div>
 
             <div className="stats-grid">
@@ -148,24 +144,22 @@ const Dashboard = () => {
                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', width: '100%', marginBottom: '16px' }}>
                         <div className="stat-card-header" style={{ marginBottom: 0 }}>
                             <div className="icon-wrapper"><Dumbbell size={24} /></div>
-                            <h3>{workoutsPeriod === 'month' ? stats.workouts.month : (workoutsPeriod === 'year' ? stats.workouts.year : stats.workouts.all)}</h3>
+                            <h3>{globalPeriod === 'month' ? stats.workouts.month : (globalPeriod === 'year' ? stats.workouts.year : stats.workouts.all)}</h3>
                         </div>
-                        <PeriodSelector current={workoutsPeriod} onChange={setWorkoutsPeriod} name="workouts" />
                     </div>
                     <div className="stat-info">
-                        <p>{workoutsPeriod === 'month' ? 'Entrenamientos (Mes)' : (workoutsPeriod === 'year' ? `Entrenamientos (${currentYear})` : 'Entrenamientos (Total)')}</p>
+                        <p>{globalPeriod === 'month' ? 'Entrenamientos (Mes)' : (globalPeriod === 'year' ? `Entrenamientos (${currentYear})` : 'Entrenamientos (Total)')}</p>
                     </div>
                 </div>
                 <div className="stat-card">
                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', width: '100%', marginBottom: '16px' }}>
                         <div className="stat-card-header" style={{ marginBottom: 0 }}>
                             <div className="icon-wrapper"><Activity size={24} /></div>
-                            <h3>{((totalVolumePeriod === 'month' ? stats.volume.month : (totalVolumePeriod === 'year' ? stats.volume.year : stats.volume.all)) / 1000).toFixed(1)}k kg</h3>
+                            <h3>{((globalPeriod === 'month' ? stats.volume.month : (globalPeriod === 'year' ? stats.volume.year : stats.volume.all)) / 1000).toFixed(1)}k kg</h3>
                         </div>
-                        <PeriodSelector current={totalVolumePeriod} onChange={setTotalVolumePeriod} name="volume_total" />
                     </div>
                     <div className="stat-info">
-                        <p>{totalVolumePeriod === 'month' ? 'Volumen (Mes)' : (totalVolumePeriod === 'year' ? `Volumen (${currentYear})` : 'Volumen (Total)')}</p>
+                        <p>{globalPeriod === 'month' ? 'Volumen (Mes)' : (globalPeriod === 'year' ? `Volumen (${currentYear})` : 'Volumen (Total)')}</p>
                     </div>
                 </div>
                 <div className="stat-card">
@@ -182,15 +176,13 @@ const Dashboard = () => {
             <div className="volume-section" style={{ marginBottom: '24px' }}>
                 <VolumeLandmarks
                     effectiveVolumeData={effectiveVolumeData}
-                    period={landmarksPeriod}
-                    onPeriodChange={setLandmarksPeriod}
+                    period={globalPeriod}
                 />
             </div>
 
             <div className="chart-section">
                 <div className="chart-header">
                     <h3>Volumen Reciente (kg)</h3>
-                    <PeriodSelector current={volumePeriod} onChange={setVolumePeriod} name="volume_chart" />
                 </div>
                 <div className="chart-container">
                     <ResponsiveContainer width="100%" height={300}>
@@ -203,7 +195,7 @@ const Dashboard = () => {
                                 itemStyle={{ color: 'var(--text-main)' }}
                                 labelStyle={{ color: 'var(--text-main)' }}
                             />
-                            <Bar dataKey="value" fill="#5865f2" radius={[4, 4, 0, 0]} barSize={volumePeriod === 'month' ? 30 : 40}>
+                            <Bar dataKey="value" fill="#5865f2" radius={[4, 4, 0, 0]} barSize={globalPeriod === 'month' ? 30 : 40}>
                                 <LabelList dataKey="value" position="top" fill="#888" formatter={(v) => `${v}`} style={{ fontSize: '10px' }} />
                             </Bar>
                             <Line type="monotone" dataKey="average" stroke="#ff4757" strokeWidth={2} dot={false} strokeDasharray="5 5" name="Media" />
@@ -215,7 +207,6 @@ const Dashboard = () => {
             <div className="chart-section">
                 <div className="chart-header">
                     <h3>Tiempo de Sesión (min)</h3>
-                    <PeriodSelector current={durationPeriod} onChange={setDurationPeriod} name="duration_chart" />
                 </div>
                 <div className="chart-container">
                     <ResponsiveContainer width="100%" height={300}>
@@ -228,7 +219,7 @@ const Dashboard = () => {
                                 itemStyle={{ color: 'var(--text-main)' }}
                                 labelStyle={{ color: 'var(--text-main)' }}
                             />
-                            <Bar dataKey="value" fill="#10b981" radius={[4, 4, 0, 0]} barSize={durationPeriod === 'month' ? 30 : 40}>
+                            <Bar dataKey="value" fill="#10b981" radius={[4, 4, 0, 0]} barSize={globalPeriod === 'month' ? 30 : 40}>
                                 <LabelList dataKey="value" position="top" fill="#888" formatter={(v) => `${v}`} style={{ fontSize: '10px' }} />
                             </Bar>
                             <Line type="monotone" dataKey="average" stroke="#eccc68" strokeWidth={2} dot={false} strokeDasharray="5 5" name="Media" />
@@ -241,7 +232,6 @@ const Dashboard = () => {
                 <div className="chart-section">
                     <div className="chart-header">
                         <h3>Enfoque Muscular (Radar)</h3>
-                        <PeriodSelector current={musclePeriod} onChange={setMusclePeriod} name="radar_muscle" />
                     </div>
                     <div className="chart-container radar-container">
                         <ResponsiveContainer width="100%" height={350}>
@@ -263,7 +253,6 @@ const Dashboard = () => {
                 <div className="chart-section">
                     <div className="chart-header">
                         <h3>Top 10 Músculos</h3>
-                        <PeriodSelector current={musclePeriod} onChange={setMusclePeriod} name="top_muscles" />
                     </div>
                     <div className="chart-container">
                         <ResponsiveContainer width="100%" height={350}>

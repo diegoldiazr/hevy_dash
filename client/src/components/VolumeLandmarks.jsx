@@ -84,16 +84,9 @@ const VolumeLandmarks = ({ effectiveVolumeData, period, onPeriodChange }) => {
                 <div>
                     <h3 style={{ fontSize: '1.2rem', marginBottom: '4px' }}>Hitos de Volumen Semanal</h3>
                     <p style={{ fontSize: '0.85rem', color: 'var(--text-muted)' }}>
-                        Media de series efectivas por semana en el periodo seleccionado.
+                        Media de series efectivas por semana en el periodo seleccionado ({period === 'month' ? 'Mes' : period === 'year' ? 'Año' : 'Historial'}).
                     </p>
                 </div>
-                <SegmentedControl
-                    small
-                    name="volume_landmarks"
-                    options={periodOptions}
-                    value={period}
-                    onChange={onPeriodChange}
-                />
             </div>
 
             {chartData.length === 0 ? (

@@ -46,7 +46,7 @@ const Login = ({ onLogin }) => {
                         Acceder
                     </button>
                     <div className="login-footer">
-                        <small>v6.0.0 - Acceso Restringido</small>
+                        <small>v8.0.0 - Acceso Restringido</small>
                     </div>
                 </form>
             </div>
