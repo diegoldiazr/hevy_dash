@@ -14,13 +14,11 @@ router.get('/', (req, res) => {
     const now = new Date();
 
     if (period === 'month') {
-        const monthAgo = new Date(now);
-        monthAgo.setMonth(monthAgo.getMonth() - 1);
-        dateFilter = ` WHERE start_time >= '${monthAgo.toISOString()}'`;
+        const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
+        dateFilter = ` WHERE start_time >= '${startOfMonth.toISOString()}'`;
     } else if (period === 'year') {
-        const yearAgo = new Date(now);
-        yearAgo.setFullYear(yearAgo.getFullYear() - 1);
-        dateFilter = ` WHERE start_time >= '${yearAgo.toISOString()}'`;
+        const startOfYear = new Date(now.getFullYear(), 0, 1);
+        dateFilter = ` WHERE start_time >= '${startOfYear.toISOString()}'`;
     }
 
     // Use SQLite JSON functions to extract unique titles directly from the database
@@ -51,13 +49,11 @@ router.get('/:name/history', (req, res) => {
     const now = new Date();
 
     if (period === 'month') {
-        const monthAgo = new Date(now);
-        monthAgo.setMonth(monthAgo.getMonth() - 1);
-        dateFilter = ` WHERE start_time >= '${monthAgo.toISOString()}'`;
+        const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
+        dateFilter = ` WHERE start_time >= '${startOfMonth.toISOString()}'`;
     } else if (period === 'year') {
-        const yearAgo = new Date(now);
-        yearAgo.setFullYear(yearAgo.getFullYear() - 1);
-        dateFilter = ` WHERE start_time >= '${yearAgo.toISOString()}'`;
+        const startOfYear = new Date(now.getFullYear(), 0, 1);
+        dateFilter = ` WHERE start_time >= '${startOfYear.toISOString()}'`;
     }
 
     // Fetch routines and folders to map routine_id -> folder_title

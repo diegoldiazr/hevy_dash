@@ -9,7 +9,7 @@ const VolumeLandmarks = ({ effectiveVolumeData, period, onPeriodChange }) => {
     const periodOptions = [
         { label: 'Mes', value: 'month' },
         { label: 'Año', value: 'year' },
-        { label: 'Todo', value: 'all' }
+        { label: 'Historial', value: 'all' }
     ];
 
     // Process data based on period

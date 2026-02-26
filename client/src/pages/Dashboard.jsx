@@ -122,7 +122,7 @@ const Dashboard = () => {
     const periodOptions = [
         { label: 'Mes', value: 'month' },
         { label: 'Año', value: 'year' },
-        { label: 'Todo', value: 'all' }
+        { label: 'Historial', value: 'all' }
     ];
 
     const PeriodSelector = ({ current, onChange, name }) => (

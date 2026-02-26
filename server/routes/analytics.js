@@ -8,13 +8,11 @@ router.get('/', (req, res) => {
     let dateFilter = '';
     const now = new Date();
     if (period === 'month') {
-        const monthAgo = new Date(now);
-        monthAgo.setMonth(monthAgo.getMonth() - 1);
-        dateFilter = ` WHERE start_time >= '${monthAgo.toISOString()}'`;
+        const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
+        dateFilter = ` WHERE start_time >= '${startOfMonth.toISOString()}'`;
     } else if (period === 'year') {
-        const yearAgo = new Date(now);
-        yearAgo.setFullYear(yearAgo.getFullYear() - 1);
-        dateFilter = ` WHERE start_time >= '${yearAgo.toISOString()}'`;
+        const startOfYear = new Date(now.getFullYear(), 0, 1);
+        dateFilter = ` WHERE start_time >= '${startOfYear.toISOString()}'`;
     }
 
     const muscleTranslations = {
