@@ -18,7 +18,33 @@ const Measurements = () => {
     const fetchHistory = async () => {
         try {
             const res = await axios.get('/api/measurements');
-            setHistory(res.data);
+            const rawData = res.data || [];
+            const processedData = [];
+
+            // Last known values for carrying over
+            let lastValues = {
+                weight: 0, chest: 0, neck: 0, waist: 0, hips: 0
+            };
+
+            // Process data chronologically (assuming backend returns it sorted by date)
+            rawData.forEach(record => {
+                const currentRecord = { ...record };
+
+                // Keys to check and carry over
+                ['weight', 'chest', 'neck', 'waist', 'hips'].forEach(key => {
+                    const val = parseFloat(record[key]);
+                    if (!val || val === 0) {
+                        currentRecord[key] = lastValues[key];
+                    } else {
+                        currentRecord[key] = val;
+                        lastValues[key] = val;
+                    }
+                });
+
+                processedData.push(currentRecord);
+            });
+
+            setHistory(processedData);
         } catch (err) {
             console.error("Failed to fetch measurements", err);
         } finally {

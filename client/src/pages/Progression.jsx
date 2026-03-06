@@ -57,10 +57,33 @@ const Progression = () => {
             setLoading(true);
             try {
                 const res = await axios.get(`/api/exercises/${encodeURIComponent(selectedExercise)}/history?period=${timePeriod}`);
-                setHistory(res.data.map(h => ({
-                    ...h,
-                    date: new Date(h.date).toLocaleDateString()
-                })));
+                const rawHistory = res.data || [];
+                const processedHistory = [];
+                let lastE1RM = 0;
+                let lastVolume = 0;
+                let lastTotalReps = 0;
+
+                rawHistory.forEach(h => {
+                    // Carry over previous values if current is 0 or null
+                    const currentE1RM = (h.e1rm && h.e1rm > 0) ? h.e1rm : lastE1RM;
+                    const currentVolume = (h.volume && h.volume > 0) ? h.volume : lastVolume;
+                    const currentTotalReps = (h.totalReps && h.totalReps > 0) ? h.totalReps : lastTotalReps;
+
+                    processedHistory.push({
+                        ...h,
+                        date: new Date(h.date).toLocaleDateString(),
+                        e1rm: currentE1RM,
+                        volume: currentVolume,
+                        totalReps: currentTotalReps
+                    });
+
+                    // Update last known non-zero values
+                    if (currentE1RM > 0) lastE1RM = currentE1RM;
+                    if (currentVolume > 0) lastVolume = currentVolume;
+                    if (currentTotalReps > 0) lastTotalReps = currentTotalReps;
+                });
+
+                setHistory(processedHistory);
             } catch (err) {
                 console.error("Failed to fetch history", err);
             } finally {

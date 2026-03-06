@@ -311,26 +311,125 @@
 .exercise-info {
     flex: 1;
     display: flex;
-    justify-content: space-between;
-    align-items: center;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 4px;
 }
 
-.exercise-info h4 {
+.exercise-title-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+}
+
+.analysis-badge {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 2px 8px;
+    border-radius: 6px;
+    font-size: 0.7rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.analysis-badge.evolved {
+    background: rgba(16, 185, 129, 0.15);
+    color: #10b981;
+    border: 1px solid rgba(16, 185, 129, 0.2);
+}
+
+.analysis-badge.stagnant {
+    background: rgba(239, 68, 68, 0.15);
+    color: #ef4444;
+    border: 1px solid rgba(239, 68, 68, 0.2);
+}
+
+.analysis-badge.new {
+    background: rgba(59, 130, 246, 0.15);
+    color: #3b82f6;
+    border: 1px solid rgba(59, 130, 246, 0.2);
+}
+
+.proposal-box {
+    margin: 12px 20px;
+    padding: 12px 16px;
+    border-radius: 12px;
+    background: rgba(255, 255, 255, 0.03);
+    border-left: 3px solid var(--primary);
+    position: relative;
+    overflow: hidden;
+}
+
+.proposal-box.success {
+    border-left-color: #10b981;
+    background: linear-gradient(90deg, rgba(16, 185, 129, 0.05), transparent);
+}
+
+.proposal-box.warning {
+    border-left-color: #f59e0b;
+    background: linear-gradient(90deg, rgba(245, 158, 11, 0.05), transparent);
+}
+
+.proposal-box.info {
+    border-left-color: #3b82f6;
+    background: linear-gradient(90deg, rgba(59, 130, 246, 0.05), transparent);
+}
+
+.proposal-header {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 0.75rem;
+    font-weight: 700;
+    color: var(--text-muted);
+    margin-bottom: 6px;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.proposal-box.success .proposal-header svg {
+    color: #10b981;
+}
+
+.proposal-box.warning .proposal-header svg {
+    color: #f59e0b;
+}
+
+.proposal-box.info .proposal-header svg {
+    color: #3b82f6;
+}
+
+.proposal-box p {
     margin: 0;
-    font-size: 1.1rem;
-    font-weight: 600;
+    font-size: 0.85rem;
+    line-height: 1.5;
     color: var(--text-main);
 }
 
-.muscle-label {
-    font-size: 0.75rem;
-    text-transform: uppercase;
-    letter-spacing: 0.05em;
-    background: rgba(88, 101, 242, 0.1);
-    color: var(--primary);
-    padding: 4px 10px;
-    border-radius: 12px;
-    font-weight: 600;
+.proposal-diff {
+    display: flex;
+    gap: 12px;
+    margin-top: 8px;
+    font-size: 0.7rem;
+    font-weight: 700;
+}
+
+.proposal-diff span {
+    padding: 2px 6px;
+    border-radius: 4px;
+}
+
+.proposal-diff .pos {
+    background: rgba(16, 185, 129, 0.15);
+    color: #10b981;
+}
+
+.proposal-diff .neg {
+    background: rgba(239, 68, 68, 0.15);
+    color: #ef4444;
 }
 
 /* Sets Table */

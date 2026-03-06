@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-import { Calendar, Dumbbell, Clock, ChevronRight, X } from 'lucide-react';
+import { Calendar, Dumbbell, Clock, ChevronRight, X, Lightbulb, Zap, TrendingUp, AlertTriangle } from 'lucide-react';
 import { Radar, RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis, ResponsiveContainer, Tooltip } from 'recharts';
 
 const Workouts = () => {
@@ -9,10 +9,20 @@ const Workouts = () => {
     const [page, setPage] = useState(1);
     const [error, setError] = useState(null);
     const [selectedWorkout, setSelectedWorkout] = useState(null);
+    const [analysis, setAnalysis] = useState({});
+    const [analysisLoading, setAnalysisLoading] = useState(false);
 
     useEffect(() => {
         fetchWorkouts();
     }, [page]);
+
+    useEffect(() => {
+        if (selectedWorkout) {
+            fetchAnalysis(selectedWorkout.id);
+        } else {
+            setAnalysis({});
+        }
+    }, [selectedWorkout]);
 
     const fetchWorkouts = async () => {
         setLoading(true);
@@ -25,6 +35,18 @@ const Workouts = () => {
             console.error(err);
         } finally {
             setLoading(false);
+        }
+    };
+
+    const fetchAnalysis = async (id) => {
+        setAnalysisLoading(true);
+        try {
+            const res = await axios.get(`/api/workouts/${id}/analysis`);
+            setAnalysis(res.data);
+        } catch (err) {
+            console.error("Failed to fetch analysis", err);
+        } finally {
+            setAnalysisLoading(false);
         }
     };
 
@@ -256,10 +278,49 @@ const Workouts = () => {
                                                 </div>
                                             </div>
                                             <div className="exercise-info">
-                                                <h4>{exercise.title}</h4>
+                                                <div className="exercise-title-row">
+                                                    <h4>{exercise.title}</h4>
+                                                    {analysis[exercise.title] && (
+                                                        <span className={`analysis-badge ${analysis[exercise.title].status}`}>
+                                                            {analysisLoading ? '...' : (
+                                                                <>
+                                                                    {analysis[exercise.title].status === 'evolved' && <TrendingUp size={12} />}
+                                                                    {analysis[exercise.title].status === 'stagnant' && <AlertTriangle size={12} />}
+                                                                    {analysis[exercise.title].status === 'new' && <Zap size={12} />}
+                                                                    {analysis[exercise.title].status === 'evolved' ? 'En Evolución' : (analysis[exercise.title].status === 'stagnant' ? 'Estancado' : 'Nuevo')}
+                                                                </>
+                                                            )}
+                                                        </span>
+                                                    )}
+                                                </div>
                                                 <span className="muscle-label">{exercise.primary_muscle_group || 'Otros'}</span>
                                             </div>
                                         </div>
+
+                                        {analysis[exercise.title] && (
+                                            <div className={`proposal-box ${analysis[exercise.title].type}`}>
+                                                <div className="proposal-header">
+                                                    <Lightbulb size={16} />
+                                                    <span>Propuesta de Mejora</span>
+                                                </div>
+                                                <p>{analysis[exercise.title].proposal}</p>
+                                                {analysis[exercise.title].diff && (
+                                                    <div className="proposal-diff">
+                                                        {analysis[exercise.title].diff.weight !== '0.0' && (
+                                                            <span className={parseFloat(analysis[exercise.title].diff.weight) >= 0 ? 'pos' : 'neg'}>
+                                                                Peso: {analysis[exercise.title].diff.weight > 0 ? '+' : ''}{analysis[exercise.title].diff.weight}kg
+                                                            </span>
+                                                        )}
+                                                        {analysis[exercise.title].diff.reps !== 0 && (
+                                                            <span className={analysis[exercise.title].diff.reps >= 0 ? 'pos' : 'neg'}>
+                                                                Reps: {analysis[exercise.title].diff.reps > 0 ? '+' : ''}{analysis[exercise.title].diff.reps}
+                                                            </span>
+                                                        )}
+                                                    </div>
+                                                )}
+                                            </div>
+                                        )}
+
                                         <div className="sets-table">
                                             <div className="sets-header">
                                                 <span>SET</span>
