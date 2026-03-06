@@ -23,8 +23,12 @@ export const SyncProvider = ({ children }) => {
         setIsSyncing(false);
     };
 
+    const dismiss = () => {
+        setIsSyncing(false);
+    };
+
     return (
-        <SyncContext.Provider value={{ isSyncing, syncMessage, startSync, endSync }}>
+        <SyncContext.Provider value={{ isSyncing, syncMessage, startSync, endSync, dismiss }}>
             {children}
         </SyncContext.Provider>
     );

@@ -51,15 +51,24 @@ const AutoSyncHandler = ({ isAuthenticated }) => {
             if (hasAutoSynced) return;
 
             try {
-                console.log('Auto-syncing Hevy data...');
-                startSync('Sincronizando datos automáticamente...');
-                await axios.post('/api/hevy/sync?fullSync=true');
+                console.log('Auto-syncing Hevy data (incremental)...');
+                startSync('Buscando nuevos entrenamientos...');
+
+                // Use incremental sync for automatic startup
+                const response = await axios.post('/api/hevy/sync?fullSync=false');
+
                 sessionStorage.setItem('hasAutoSynced', 'true');
                 console.log('Auto-sync completed successfully');
-                // Refresh page to load new data
-                window.location.reload();
+
+                // Only reload if we actually found new workouts to avoid page flickering
+                if (response.data && response.data.workouts && response.data.workouts.synced > 0) {
+                    console.log(`Synced ${response.data.workouts.synced} new workouts, reloading...`);
+                    window.location.reload();
+                }
             } catch (err) {
                 console.error('Auto-sync failed:', err);
+                // Mark as attempted even on failure to avoid infinite loops if it fails persistently
+                sessionStorage.setItem('hasAutoSynced', 'true');
             } finally {
                 endSync();
             }

@@ -1,10 +1,10 @@
 import React from 'react';
-import { RefreshCw } from 'lucide-react';
+import { RefreshCw, X } from 'lucide-react';
 import { useSyncContext } from '../context/SyncContext';
 import './SyncProgressBar.css';
 
 const SyncProgressBar = () => {
-    const { isSyncing, syncMessage } = useSyncContext();
+    const { isSyncing, syncMessage, dismiss } = useSyncContext();
 
     React.useEffect(() => {
         if (isSyncing) {
@@ -22,6 +22,9 @@ const SyncProgressBar = () => {
             <div className="sync-progress-content">
                 <RefreshCw size={16} className="sync-icon spinning" />
                 <span className="sync-text">{syncMessage}</span>
+                <button className="sync-dismiss-btn" onClick={dismiss} title="Cerrar">
+                    <X size={14} />
+                </button>
             </div>
             <div className="sync-progress-line"></div>
         </div>
