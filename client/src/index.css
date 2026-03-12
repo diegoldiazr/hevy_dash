@@ -318,6 +318,7 @@ body {
 }
 
 /* Mobile optimizations */
+/* Global Mobile optimizations */
 @media (max-width: 768px) {
 
     /* Adjust grid for mobile */
@@ -328,7 +329,7 @@ body {
 
     /* Reduce page container padding */
     .page-container {
-        padding: 0 12px;
+        padding: 0 16px;
     }
 
     /* Adjust headings for mobile */
@@ -366,14 +367,52 @@ body {
     }
 }
 
-/* Small mobile devices */
-@media (max-width: 390px) {
+/* Specific optimizations for 6.1" iPhone (iPhone 14, 15, 15 Pro, etc.) and similar */
+@media (max-width: 430px) {
     h1 {
         font-size: 1.5rem;
+        letter-spacing: -0.02em;
     }
 
     h2 {
-        font-size: 1.3rem;
+        font-size: 1.35rem;
+        letter-spacing: -0.02em;
+    }
+
+    h3 {
+        font-size: 1.15rem;
+    }
+
+    h4 {
+        font-size: 1rem;
+    }
+
+    .page-container {
+        padding: 0 12px;
+    }
+
+    .btn-primary {
+        padding: 12px 20px;
+        font-size: 0.9rem;
+        width: 100%;
+        /* Full width buttons on very small screens for better UX */
+    }
+
+    /* Tighter spacing for modern iPhones */
+    :root {
+        --radius-md: 12px;
+        --radius-lg: 16px;
+    }
+}
+
+/* Small mobile devices (iPhone SE/older) */
+@media (max-width: 375px) {
+    h1 {
+        font-size: 1.4rem;
+    }
+
+    h2 {
+        font-size: 1.25rem;
     }
 
     h3 {
@@ -381,26 +420,35 @@ body {
     }
 
     .page-container {
-        padding: 0 8px;
-    }
-
-    .btn-primary {
-        padding: 12px 20px;
-        font-size: 0.9rem;
+        padding: 0 10px;
     }
 }
 
 /* Landscape mode optimizations */
-@media (max-width: 896px) and (orientation: landscape) {
+@media (max-width: 932px) and (orientation: landscape) {
     h1 {
-        font-size: 1.5rem;
+        font-size: 1.4rem;
     }
 
     h2 {
-        font-size: 1.3rem;
+        font-size: 1.2rem;
+    }
+
+    h3 {
+        font-size: 1.1rem;
     }
 
     .page-container {
-        padding: 0 16px;
+        padding: 0 20px;
+        /* More side padding in landscape for grip */
+    }
+
+    /* Reduce vertical padding in landscape to maximize visibility */
+    .page-header {
+        margin-bottom: 16px;
+    }
+
+    .loading {
+        padding: 16px;
     }
 }

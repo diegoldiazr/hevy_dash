@@ -308,121 +308,96 @@
     transform: scale(1.02);
 }
 
-@media (max-width: 1024px) {
+/* Mobile Responsive Styles for Progression */
+@media (max-width: 768px) {
+    .progression-page {
+        gap: 20px;
+    }
+
+    .controls {
+        flex-direction: column;
+        align-items: stretch;
+        padding: 16px;
+        gap: 16px;
+    }
+
+    .controls select {
+        width: 100%;
+        min-width: 0;
+    }
+
+    .chart-section {
+        padding: 20px;
+    }
+
     .muscle-card {
-        grid-template-columns: 1fr;
-        justify-items: center;
+        padding: 24px;
+        gap: 24px;
+    }
+
+    .muscle-info h4 {
+        font-size: 1.5rem;
+    }
+
+    .last-session-card {
+        padding: 20px;
+    }
+}
+
+/* Specific optimizations for 6.1" iPhone */
+@media (max-width: 430px) {
+    .page-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 16px;
+    }
+
+    .time-period-toggle {
+        width: 100%;
+        justify-content: space-between;
+    }
+
+    .period-btn {
+        padding: 8px 12px;
+        font-size: 0.85rem;
+        flex: 1;
         text-align: center;
     }
 
-    .technique-list {
-        text-align: left;
+    .muscle-info h4 {
+        font-size: 1.25rem;
     }
 
-    .exercise-media {
-        max-width: 400px;
+    .muscle-info p {
+        font-size: 0.95rem;
+    }
+
+    .session-info-item .value {
+        font-size: 1rem;
+    }
+
+    .set-badge {
+        padding: 4px 10px;
+        font-size: 0.8rem;
     }
 }
 
-/* Edit Details Styling */
-.edit-details-btn {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    padding: 8px 16px;
-    background: rgba(255, 255, 255, 0.05);
-    border: 1px solid var(--border-subtle);
-    border-radius: var(--radius-sm);
-    color: var(--text-muted);
-    font-size: 0.9rem;
-    font-weight: 600;
-    cursor: pointer;
-    transition: all 0.2s;
-}
+/* Landscape mode on modern iPhones */
+@media (max-width: 932px) and (orientation: landscape) {
+    .progression-page {
+        gap: 16px;
+    }
 
-.edit-details-btn:hover {
-    background: var(--bg-card-hover);
-    color: var(--primary);
-    border-color: var(--primary);
-}
+    .controls {
+        flex-direction: row;
+        padding: 12px 20px;
+    }
 
-.edit-details-form {
-    display: flex;
-    flex-direction: column;
-    gap: 20px;
-    width: 100%;
-}
+    .last-session-card {
+        padding: 16px;
+    }
 
-.form-group {
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
-}
-
-.form-group label {
-    font-size: 0.75rem;
-    text-transform: uppercase;
-    color: var(--text-dim);
-    font-weight: 700;
-    letter-spacing: 0.05em;
-}
-
-.form-group input,
-.form-group textarea {
-    background: var(--bg-dark);
-    border: 1px solid var(--border-subtle);
-    border-radius: var(--radius-sm);
-    padding: 12px;
-    color: var(--text-main);
-    font-size: 1rem;
-    font-family: inherit;
-    transition: all 0.2s;
-}
-
-.form-group input:focus,
-.form-group textarea:focus {
-    outline: none;
-    border-color: var(--primary);
-    box-shadow: 0 0 10px var(--primary-glow);
-}
-
-.edit-actions {
-    display: flex;
-    gap: 12px;
-    margin-top: 20px;
-}
-
-.edit-actions button {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    padding: 10px 20px;
-    border-radius: var(--radius-sm);
-    font-weight: 600;
-    cursor: pointer;
-    transition: all 0.2s;
-}
-
-.edit-details-form .save-btn {
-    background: var(--primary);
-    color: white;
-    border: none;
-    box-shadow: 0 4px 12px var(--primary-glow);
-}
-
-.edit-details-form .save-btn:hover {
-    transform: translateY(-2px);
-    filter: brightness(1.1);
-    box-shadow: 0 6px 16px var(--primary-glow);
-}
-
-.cancel-btn {
-    background: transparent;
-    border: 1px solid var(--border-subtle);
-    color: var(--text-muted);
-}
-
-.cancel-btn:hover {
-    background: rgba(255, 255, 255, 0.05);
-    color: var(--text-main);
+    .last-session-header {
+        grid-template-columns: repeat(4, 1fr);
+    }
 }

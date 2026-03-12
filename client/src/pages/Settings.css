@@ -460,24 +460,92 @@ body[data-theme='light'] .form-group textarea {
     text-align: left;
 }
 
-/* Light Theme Sync Button */
-body[data-theme='light'] .sync-btn {
-    background: #4353d0;
-    /* Solid primary for maximum visibility */
-    color: #ffffff;
-    box-shadow: 0 4px 12px rgba(67, 83, 208, 0.4);
-    border: none;
+/* Mobile Responsive Styles for Settings */
+@media (max-width: 768px) {
+    .settings-header h2 {
+        font-size: 1.75rem;
+    }
+
+    .settings-section {
+        padding: 24px;
+    }
+
+    .settings-section h3 {
+        font-size: 1.25rem;
+        margin-bottom: 24px;
+    }
+
+    .row {
+        flex-direction: column;
+        gap: 0;
+    }
+
+    .theme-btn {
+        padding: 12px;
+        font-size: 0.9rem;
+    }
+
+    .save-btn,
+    .sync-btn {
+        width: 100%;
+        padding: 14px;
+        font-size: 1rem;
+    }
+
+    .delete-btn {
+        width: 100%;
+        justify-content: center;
+    }
 }
 
-body[data-theme='light'] .sync-btn:hover:not(:disabled) {
-    background: #3444c0;
-    filter: none;
-    box-shadow: 0 6px 16px rgba(67, 83, 208, 0.5);
+/* Specific optimizations for 6.1" iPhone */
+@media (max-width: 430px) {
+    .settings-header h2 {
+        font-size: 1.5rem;
+    }
+
+    .settings-section {
+        padding: 20px;
+    }
+
+    .form-group label {
+        font-size: 0.9rem;
+    }
+
+    .form-group input,
+    .form-group select {
+        padding: 12px;
+        font-size: 0.95rem;
+    }
+
+    .modal-content.danger-modal {
+        padding: 24px;
+        width: 95%;
+    }
+
+    .modal-content h2 {
+        font-size: 1.5rem;
+    }
 }
 
-body[data-theme='light'] .sync-btn:disabled {
-    background: #e2e8f0;
-    color: #94a3b8;
-    box-shadow: none;
-    filter: none;
+/* Landscape mode on modern iPhones */
+@media (max-width: 932px) and (orientation: landscape) {
+    .settings-page {
+        gap: 20px;
+    }
+
+    .settings-section {
+        padding: 20px;
+    }
+
+    .row {
+        flex-direction: row;
+        gap: 20px;
+    }
+
+    .save-btn,
+    .sync-btn {
+        width: auto;
+        padding: 12px 32px;
+    }
 }

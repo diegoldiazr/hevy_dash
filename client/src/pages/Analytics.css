@@ -251,15 +251,91 @@
   background: var(--border-subtle);
 }
 
-/* Fix: Disable global glass-panel hover transform when inside a flip card 
-   to prevent 3D coordinate system conflicts that look like weird rotation */
-.flip-card .glass-panel:hover {
-  transform: none !important;
-  box-shadow: var(--shadow-sm);
-  /* Keep static shadow or slightly enhanced without movement */
+/* Mobile Responsive Styles for Analytics */
+@media (max-width: 768px) {
+  .analytics-page {
+    gap: 20px;
+  }
+
+  .analytics-grid {
+    grid-template-columns: 1fr;
+    gap: 20px;
+  }
+
+  .chart-card,
+  .flip-card-front,
+  .flip-card-back {
+    padding: 20px;
+    border-radius: var(--radius-md);
+  }
+
+  .flip-card {
+    min-height: 400px;
+  }
+
+  .chart-card h3 {
+    font-size: 1.2rem;
+    margin-bottom: 20px;
+  }
+
+  .insight-section {
+    padding: 20px;
+  }
+
+  .insight-section h3 {
+    font-size: 1.3rem;
+  }
+
+  .insight-section p {
+    font-size: 1rem;
+  }
 }
 
-/* Ensure the back face doesn't inherit any weird transforms */
-.flip-card-back.glass-panel:hover {
-  transform: rotateY(180deg) !important;
+/* Specific optimizations for 6.1" iPhone */
+@media (max-width: 430px) {
+  .chart-card h3 {
+    font-size: 1.1rem;
+    gap: 8px;
+  }
+
+  .info-icon-btn {
+    top: 20px;
+    right: 20px;
+    width: 28px;
+    height: 28px;
+  }
+
+  .flip-card {
+    min-height: 380px;
+  }
+
+  .flip-card-back h4 {
+    font-size: 1.1rem;
+  }
+
+  .flip-card-back .info-text {
+    font-size: 0.85rem;
+  }
+}
+
+/* Landscape mode on modern iPhones */
+@media (max-width: 932px) and (orientation: landscape) {
+  .analytics-page {
+    gap: 16px;
+  }
+
+  .analytics-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 16px;
+  }
+
+  .flip-card {
+    min-height: 320px;
+  }
+
+  .chart-card h3 {
+    font-size: 1.05rem;
+    padding-bottom: 8px;
+    margin-bottom: 12px;
+  }
 }

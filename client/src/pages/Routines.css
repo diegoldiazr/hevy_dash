@@ -170,79 +170,97 @@
     color: var(--text-main);
 }
 
-/* Routine Details */
-.routine-details {
-    padding: 0 28px 28px 28px;
-    animation: slideDown 0.3s ease-out;
-}
-
-@keyframes slideDown {
-    from {
-        opacity: 0;
-        transform: translateY(-10px);
+/* Mobile Responsive Styles for Routines */
+@media (max-width: 768px) {
+    .routines-header h2 {
+        font-size: 1.75rem;
     }
 
-    to {
-        opacity: 1;
-        transform: translateY(0);
+    .folder-header h3 {
+        font-size: 1.3rem;
+    }
+
+    .routine-header {
+        padding: 16px 20px;
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 16px;
+    }
+
+    .actions {
+        width: 100%;
+        justify-content: space-between;
+    }
+
+    .routine-details {
+        padding: 0 20px 20px 20px;
+    }
+
+    .exercises-list ul {
+        gap: 6px;
+    }
+
+    .exercises-item {
+        padding: 4px 10px;
+        font-size: 0.8rem;
     }
 }
 
-.exercises-list h4 {
-    font-size: 0.9rem;
-    color: var(--text-muted);
-    text-transform: uppercase;
-    letter-spacing: 0.05em;
-    margin-bottom: 12px;
+/* Specific optimizations for 6.1" iPhone */
+@media (max-width: 430px) {
+    .routines-header h2 {
+        font-size: 1.5rem;
+    }
+
+    .folder-header {
+        gap: 12px;
+    }
+
+    .folder-header h3 {
+        font-size: 1.15rem;
+    }
+
+    .title-section h3 {
+        font-size: 1.05rem;
+    }
+
+    .analyze-btn {
+        padding: 6px 12px;
+        font-size: 0.75rem;
+    }
+
+    .ai-analysis {
+        padding: 16px;
+    }
+
+    .ai-analysis p {
+        font-size: 0.85rem;
+    }
 }
 
-.exercises-list ul {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 8px;
-}
+/* Landscape mode on modern iPhones */
+@media (max-width: 932px) and (orientation: landscape) {
+    .routines-page {
+        gap: 20px;
+    }
 
-.exercises-item {
-    background: rgba(255, 255, 255, 0.03);
-    border: 1px solid var(--border-subtle);
-    padding: 6px 14px;
-    border-radius: 12px;
-    font-size: 0.85rem;
-    color: var(--text-muted);
-    display: flex;
-    align-items: center;
-    gap: 6px;
-}
+    .routines-list {
+        gap: 24px;
+    }
 
-.exercises-item .sets-info {
-    color: var(--text-dim);
-    font-size: 0.75rem;
-}
+    .routine-folder {
+        gap: 12px;
+    }
 
-/* AI Analysis Box */
-.ai-analysis {
-    margin-top: 24px;
-    background: rgba(255, 255, 255, 0.02);
-    border: 1px solid var(--border-subtle);
-    padding: 20px;
-    border-radius: var(--radius-md);
-    position: relative;
-    border-left: 4px solid var(--primary);
-}
+    .folder-header {
+        padding-bottom: 8px;
+    }
 
-.ai-analysis h4 {
-    color: var(--primary);
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    margin-bottom: 12px;
-    font-size: 1rem;
-}
+    .folder-header h3 {
+        font-size: 1.1rem;
+    }
 
-.ai-analysis p {
-    white-space: pre-wrap;
-    line-height: 1.6;
-    color: var(--text-main);
-    font-size: 0.9rem;
-    opacity: 0.9;
+    .routine-header {
+        padding: 12px 20px;
+    }
 }

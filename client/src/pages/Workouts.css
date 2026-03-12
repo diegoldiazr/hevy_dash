@@ -4,8 +4,9 @@
     flex-direction: column;
     gap: 32px;
     width: 100%;
-    height: calc(100vh - 100px);
-    /* Adjust to viewport */
+    /* Maximize vertical space but allow scrolling */
+    min-height: 0;
+    flex: 1;
     overflow: hidden;
     animation: fadeIn 0.4s ease-out;
 }
@@ -28,26 +29,158 @@
     margin: 0;
 }
 
-/* Two Column Layout Container */
-.workouts-container {
-    display: flex;
-    gap: 24px;
-    height: 100%;
-    overflow: hidden;
+/* Responsive Layout Changes */
+@media (max-width: 1024px) {
+    .workouts-header h2 {
+        font-size: 2rem;
+    }
 }
 
-/* List Side */
-.workouts-list-section {
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-    overflow-y: auto;
-    padding-right: 8px;
-    /* For scrollbar */
+@media (max-width: 768px) {
+    .workouts-page {
+        gap: 20px;
+        height: auto;
+    }
+
+    .workouts-header {
+        padding-bottom: 8px;
+    }
+
+    .workouts-header h2 {
+        font-size: 1.75rem;
+    }
+
+    .workouts-container {
+        flex-direction: column;
+        gap: 0;
+        position: relative;
+    }
+
+    .workouts-list-section {
+        width: 100%;
+        max-width: none !important;
+        padding-right: 0;
+    }
+
+    /* When a workout is selected on mobile, the detail section covers everything */
+    .workouts-container.has-selection .workouts-detail-overlay {
+        display: block;
+    }
+
+    .workout-card {
+        padding: 16px;
+    }
+    
+    .workout-header h3 {
+        font-size: 1rem;
+    }
 }
 
-.workouts-container.has-selection .workouts-list-section {
-    max-width: 400px;
+/* Specific 6.1" iPhone optimizations for Workouts */
+@media (max-width: 430px) {
+    .workouts-header h2 {
+        font-size: 1.5rem;
+    }
+
+    .workouts-list {
+        gap: 12px;
+    }
+
+    .workout-detail-section {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        z-index: 200;
+        border-radius: 0;
+        border: none;
+        width: 100vw;
+        height: 100dvh;
+        animation: slideInUp 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .detail-content {
+        padding: 20px;
+    }
+
+    .detail-top-info h1 {
+        font-size: 1.75rem;
+        margin-bottom: 12px;
+    }
+
+    .detail-meta-container {
+        flex-direction: column;
+        gap: 20px;
+        margin-bottom: 24px;
+    }
+
+    .workout-radar-container {
+        width: 100%;
+        height: 200px;
+        background: rgba(255, 255, 255, 0.02);
+    }
+    
+    .meta-item {
+        font-size: 0.9rem;
+        padding: 8px 12px;
+    }
+
+    .exercise-header-row {
+        padding: 10px 14px;
+        gap: 12px;
+    }
+
+    .exercise-image-container {
+        width: 48px;
+        height: 48px;
+        border-radius: 8px;
+    }
+
+    .exercise-info h4 {
+        font-size: 0.95rem;
+    }
+
+    .sets-header {
+        font-size: 0.65rem;
+    }
+
+    .set-row {
+        font-size: 0.85rem;
+        padding: 8px 0;
+    }
+}
+
+@keyframes slideInUp {
+    from {
+        transform: translateY(100%);
+    }
+    to {
+        transform: translateY(0);
+    }
+}
+
+@media (max-width: 932px) and (orientation: landscape) {
+    .workouts-container {
+        height: calc(100vh - 120px);
+    }
+    
+    .workout-detail-section {
+        flex: 1.5;
+    }
+
+    .detail-top-info h1 {
+        font-size: 1.5rem;
+    }
+
+    .detail-content {
+        padding: 16px;
+    }
+
+    .workout-radar-container {
+        width: 200px;
+        height: 160px;
+    }
 }
 
 .workouts-list {

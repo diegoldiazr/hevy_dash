@@ -425,18 +425,28 @@
     }
 }
 
-/* Small mobile devices */
-@media (max-width: 390px) {
+/* Specific optimizations for 6.1" iPhone (iPhone 14, 15 Pro, etc.) */
+@media (max-width: 430px) {
     .dashboard-header h2 {
         font-size: 1.5rem;
     }
 
     .stat-card {
         padding: 16px;
+        gap: 8px;
+    }
+
+    .stat-card .stat-card-header {
+        gap: 12px;
     }
 
     .stat-card .stat-card-header h3 {
-        font-size: 1.3rem;
+        font-size: 1.35rem;
+    }
+
+    .icon-wrapper {
+        width: 44px;
+        height: 44px;
     }
 
     .chart-section,
@@ -444,25 +454,37 @@
         padding: 16px;
     }
 
-    .period-btn {
-        padding: 6px 10px;
-        font-size: 0.75rem;
+    .workout-item .title {
+        font-size: 0.9rem;
+    }
+
+    /* Tighter chart containers */
+    .chart-container {
+        height: 220px;
     }
 }
 
 /* Landscape mode on mobile */
-@media (max-width: 896px) and (orientation: landscape) {
+@media (max-width: 932px) and (orientation: landscape) {
     .dashboard-page {
         gap: 16px;
     }
 
     .stats-grid {
-        grid-template-columns: repeat(2, 1fr);
+        grid-template-columns: repeat(3, 1fr);
         gap: 12px;
     }
 
     .stat-card {
-        padding: 16px;
+        padding: 12px;
+        flex-direction: row;
+        align-items: center;
+        gap: 12px;
+    }
+
+    .stat-card .stat-card-header {
+        margin-bottom: 0;
+        gap: 8px;
     }
 
     .icon-wrapper {
@@ -471,7 +493,7 @@
     }
 
     .stat-card .stat-card-header h3 {
-        font-size: 1.3rem;
+        font-size: 1.1rem;
     }
 
     .chart-section,
@@ -480,6 +502,10 @@
     }
 
     .chart-container {
-        height: 200px;
+        height: 180px;
+    }
+
+    .chart-grid {
+        grid-template-columns: repeat(2, 1fr);
     }
 }

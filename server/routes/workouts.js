@@ -90,7 +90,7 @@ router.get('/:id/analysis', (req, res) => {
     // 1. Get User Goal
     db.get('SELECT goal FROM user_settings WHERE id = 1', [], (err, userRow) => {
         if (err) return res.status(500).json({ error: err.message });
-        const userGoal = (userRow?.goal || '').toLowerCase();
+        const userGoal = (userRow && userRow.goal ? userRow.goal : '').toLowerCase();
 
         // 2. Get the specific workout
         db.get('SELECT start_time, raw_data FROM workouts WHERE id = ?', [workoutId], (err, workoutRow) => {

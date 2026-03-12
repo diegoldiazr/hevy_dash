@@ -362,6 +362,8 @@ h2 {
     z-index: 100;
     transition: left 0.3s var(--transition-normal);
     box-shadow: 4px 0 24px rgba(0, 0, 0, 0.4);
+    padding-top: calc(70px + env(safe-area-inset-top));
+    /* Avoid overlap with close button */
   }
 
   /* Show sidebar when not collapsed (mobile menu open) */
@@ -380,31 +382,40 @@ h2 {
     flex: 1;
     width: 100%;
     padding: 16px;
+    padding-top: calc(70px + env(safe-area-inset-top));
+    /* Offset for fixed hamburger */
     overflow-y: auto;
     -webkit-overflow-scrolling: touch;
   }
 
   .app-container.collapsed .content {
     padding: 16px;
+    padding-top: calc(70px + env(safe-area-inset-top));
   }
 
   /* Mobile hamburger menu button */
   .collapse-btn {
     position: fixed;
-    top: 16px;
+    top: calc(16px + env(safe-area-inset-top));
     left: 16px;
     width: 44px;
     height: 44px;
     background-color: var(--bg-card);
     border: 1px solid var(--border-subtle);
-    border-radius: 8px;
+    border-radius: 12px;
+    /* Slightly more modern */
     z-index: 101;
-    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.3);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+    display: flex;
+    align-items: center;
+    justify-content: center;
   }
 
   /* Change icon to hamburger/close on mobile */
   .collapse-btn svg {
     transition: transform 0.3s;
+    width: 20px;
+    height: 20px;
   }
 
   .app-container:not(.collapsed) .collapse-btn svg {
@@ -423,15 +434,16 @@ h2 {
     left: 0;
     right: 0;
     bottom: 0;
-    background-color: rgba(0, 0, 0, 0.5);
+    background-color: rgba(0, 0, 0, 0.6);
     z-index: 99;
-    backdrop-filter: blur(2px);
-    -webkit-backdrop-filter: blur(2px);
+    backdrop-filter: blur(4px);
+    -webkit-backdrop-filter: blur(4px);
   }
 
   /* Adjust logo for mobile */
   .logo-container {
     margin-bottom: 24px;
+    padding-left: 20px;
   }
 
   .logo-text {
@@ -440,113 +452,65 @@ h2 {
 
   /* Ensure nav items are touch-friendly (minimum 44px) */
   .nav-item {
-    padding: 14px 16px;
-    min-height: 44px;
+    padding: 14px 20px;
+    min-height: 48px;
+    font-size: 1rem;
   }
 
   /* Hide big logo on mobile to save space */
   .sidebar-big-logo-container {
     display: none;
   }
-
-  /* Adjust dashboard header for mobile */
-  .dashboard-header {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 16px;
-    margin-bottom: 24px;
-  }
-
-  .dashboard-header h2 {
-    font-size: 1.5rem;
-  }
-
-  /* Make sync button full width on mobile */
-  .sync-btn {
-    width: 100%;
-    justify-content: center;
-  }
 }
 
-/* Small mobile devices (iPhone SE, small phones) */
-@media (max-width: 390px) {
-  .content {
-    padding: 12px;
-  }
-
-  .logo-text {
-    font-size: 1.1rem;
-  }
-
-  .nav-item {
-    padding: 12px 14px;
-    font-size: 0.9rem;
-  }
-
-  .dashboard-header h2 {
-    font-size: 1.25rem;
-  }
-
-  h2 {
-    font-size: 1.5rem;
-  }
-}
-
-/* Landscape mode on mobile */
-@media (max-width: 896px) and (orientation: landscape) {
-  .app-container {
-    height: 100vh;
-    height: 100dvh;
-  }
-
-  .sidebar {
-    height: 100vh;
-    height: 100dvh;
-  }
-
-  .content {
-    padding: 12px 16px;
-  }
-
-  /* Reduce logo size in landscape */
-  .logo-container {
-    margin-bottom: 16px;
-  }
-
-  .logo-text {
-    font-size: 1.1rem;
-  }
-
-  .version-text {
-    font-size: 0.65rem;
-  }
-
-  /* Compact nav items in landscape */
-  .nav-item {
-    padding: 10px 14px;
-    font-size: 0.85rem;
-  }
-
-  .nav-icon {
-    width: 18px;
-    height: 18px;
-  }
-}
-
-/* iPhone 14 Pro specific (with notch) */
+/* Specific optimizations for 6.1" iPhone (390px-430px) */
 @media (max-width: 430px) {
-  .app-container {
-    /* Account for notch and home indicator */
-    padding-top: env(safe-area-inset-top);
+  .sidebar {
+    width: 280px;
+    /* Slightly wider for easier interaction */
+    left: -280px;
+  }
+
+  .app-container.collapsed .sidebar {
+    left: -280px;
+  }
+
+  .nav-item {
+    padding: 16px 24px;
+    /* Larger touch surface */
+  }
+
+  .logo-text {
+    font-size: 1.15rem;
+  }
+
+  /* Bottom navigation padding for home indicator */
+  .sidebar-footer {
     padding-bottom: env(safe-area-inset-bottom);
   }
+}
 
-  .sidebar {
-    padding-top: calc(24px + env(safe-area-inset-top));
-    padding-bottom: calc(24px + env(safe-area-inset-bottom));
+/* Landscape mode on modern iPhones (with notch on side) */
+@media (max-width: 932px) and (orientation: landscape) {
+  .app-container {
+    padding-left: env(safe-area-inset-left);
+    padding-right: env(safe-area-inset-right);
   }
 
-  .collapse-btn {
-    top: calc(16px + env(safe-area-inset-top));
+  .sidebar {
+    width: 100%;
+    max-width: 320px;
+    height: 100vh;
+    padding-top: 16px;
+  }
+
+  .nav-item {
+    padding: 10px 16px;
+    font-size: 0.9rem;
+    min-height: 40px;
+  }
+
+  .logo-container {
+    margin-bottom: 12px;
   }
 }

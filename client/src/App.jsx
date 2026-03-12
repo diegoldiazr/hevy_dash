@@ -125,7 +125,7 @@ function App() {
                     <nav className="sidebar">
                         <div className="logo-container">
                             <div className="logo-text">{isCollapsed ? 'HD' : 'HEVY DASH'}</div>
-                            <div className="version-text">v8.0.0</div>
+                            <div className="version-text">v9.0.0</div>
                         </div>
 
                         <div className="sidebar-nav">
